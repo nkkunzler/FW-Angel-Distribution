@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane prefHeight="800.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <top>
+      <Label text="Add Angel" BorderPane.alignment="CENTER">
+         <font>
+            <Font name="System Bold" size="36.0" />
+         </font>
+      </Label>
+   </top>
+   <bottom>
+      <Button mnemonicParsing="false" onAction="#toMainMenu" text="To Main Menu" BorderPane.alignment="CENTER">
+         <font>
+            <Font size="14.0" />
+         </font>
+         <BorderPane.margin>
+            <Insets bottom="10.0" />
+         </BorderPane.margin>
+      </Button>
+   </bottom>
+   <center>
+      <VBox alignment="CENTER" focusTraversable="true" spacing="10.0" BorderPane.alignment="CENTER">
+         <children>
+            <GridPane alignment="CENTER" focusTraversable="true" hgap="10.0" vgap="15.0" VBox.vgrow="NEVER">
+               <children>
+                  <Label fx:id="idLabel" alignment="CENTER" contentDisplay="CENTER" text="Angel ID">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                  </Label>
+                  <Label fx:id="sexLabel" alignment="CENTER" contentDisplay="CENTER" text="Sex" GridPane.rowIndex="1">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                  </Label>
+                  <Label fx:id="ageLabel" alignment="CENTER" contentDisplay="CENTER" text="Age" GridPane.rowIndex="2">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                  </Label>
+                  <Label fx:id="shoeLabel" alignment="CENTER" contentDisplay="CENTER" text="Shoe Size" GridPane.rowIndex="3">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                  </Label>
+                  <Label fx:id="clothesLabel" alignment="CENTER" contentDisplay="CENTER" text="Clothes Size" GridPane.rowIndex="4">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                  </Label>
+                  <Label fx:id="shirtLabel" alignment="CENTER" contentDisplay="CENTER" text="Shirt Size" GridPane.rowIndex="5">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                  </Label>
+                  <Label fx:id="pantLabel" alignment="CENTER" contentDisplay="CENTER" text="Pants Size" GridPane.rowIndex="6">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                  </Label>
+                  <Label fx:id="wishLabel" alignment="CENTER" contentDisplay="CENTER" text="Wish" GridPane.rowIndex="7">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                  </Label>
+                  <Label fx:id="bookLabel" alignment="CENTER" contentDisplay="CENTER" text="Book" GridPane.rowIndex="9">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                  </Label>
+                  <Label fx:id="specialLabel" alignment="CENTER" contentDisplay="CENTER" text="Special" GridPane.rowIndex="10">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                  </Label>
+                  <TextField fx:id="idInput" onKeyPressed="#validateAngelID" promptText="Angel ID" GridPane.columnIndex="1">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                  </TextField>
+                  <TextField fx:id="sexInput" disable="true" onKeyPressed="#validateSex" promptText="Sex" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                  </TextField>
+                  <TextField fx:id="ageInput" disable="true" onKeyPressed="#validateAge" promptText="Age" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                  </TextField>
+                  <TextField fx:id="shoeInput" disable="true" onKeyPressed="#validateShoe" promptText="Shoe Size" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                  </TextField>
+                  <TextField fx:id="clothesInput" disable="true" onKeyPressed="#validateClothesSize" promptText="Clothes Size" GridPane.columnIndex="1" GridPane.rowIndex="4">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                  </TextField>
+                  <TextField fx:id="shirtInput" disable="true" onKeyPressed="#validateShirtSize" promptText="Shirt Size" GridPane.columnIndex="1" GridPane.rowIndex="5">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                  </TextField>
+                  <TextField fx:id="pantsInput" disable="true" onKeyPressed="#validatePantSize" promptText="Pants Size" GridPane.columnIndex="1" GridPane.rowIndex="6">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                  </TextField>
+                  <TextArea fx:id="wishInput" disable="true" onKeyPressed="#validateWish" prefWidth="350.0" promptText="Wish" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="7" GridPane.rowSpan="2">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                  </TextArea>
+                  <TextArea fx:id="specialInput" disable="true" onKeyPressed="#validateSpecial" prefHeight="200.0" prefWidth="200.0" promptText="Special" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="10" GridPane.rowSpan="2">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                  </TextArea>
+                  <Label cacheShape="false" centerShape="false" disable="true" focusTraversable="false" scaleShape="false" visible="false" GridPane.rowIndex="8">
+                     <font>
+                        <Font size="18.0" />
+                     </font>
+                  </Label>
+                  <TextField fx:id="bookInput" disable="true" onKeyPressed="#validateBook" promptText="Book" GridPane.columnIndex="1" GridPane.rowIndex="9">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                  </TextField>
+               </children>
+               <columnConstraints>
+                  <ColumnConstraints halignment="RIGHT" />
+                  <ColumnConstraints />
+               </columnConstraints>
+               <rowConstraints>
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" />
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" />
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" />
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" />
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" />
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" />
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" />
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" />
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" />
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" />
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" />
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" />
+               </rowConstraints>
+            </GridPane>
+            <Button fx:id="addAngelButton" disable="true" mnemonicParsing="false" onAction="#addButtonHandler" text="Add Angel">
+               <font>
+                  <Font size="18.0" />
+               </font>
+            </Button>
+         </children>
+      </VBox>
+   </center>
+</BorderPane>
