@@ -100,7 +100,7 @@ public class Database {
 	 * @return ArangoCursor list containing the contents of the query. If the
 	 *         query could not be executed, null is returned.
 	 */
-	protected ArangoCursor<BaseDocument> query(String query, String collection) {
+	protected ArangoCursor<BaseDocument> query(String query) {
 		try {
 			ArangoCursor<BaseDocument> cursor = arangoDB.db(dbName).query(query,
 					BaseDocument.class);

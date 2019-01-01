@@ -9,7 +9,7 @@
 
 package controllers;
 
-import javafx.fxml.FXML;
+import display.Displays;
 
 public class MainMenuController extends Controller {
 
@@ -20,14 +20,23 @@ public class MainMenuController extends Controller {
 		super(Displays.MAIN_MENU);
 	}
 
-	@FXML
 	/**
 	 * Switches the scene from the MainMenu to the AddAngel.fxml display.
 	 * 
-	 * This method is called by the AddAngel.fxml file when the 'Add Angel'
+	 * This method is called by the MainMenu.fxml file when the 'Add Angel'
 	 * button has an action.
 	 */
 	public void switchToAddAngel() {
 		super.switchScene(Displays.ADD_DISPLAY);
+	}
+	
+	/**
+	 * Switches the scene from the MainMenu to the EditAngel.fxml display.
+	 * 
+	 * This method is called by the MainMenu.fxml file when the 'Edit Angel'
+	 * button has an action.
+	 */
+	public void switchToEditStatus() {
+		super.switchScene(Displays.EDIT_DISPLAY);
 	}
 }

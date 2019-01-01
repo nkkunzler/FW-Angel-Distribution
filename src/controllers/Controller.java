@@ -7,29 +7,10 @@
  */
 package controllers;
 
+import display.DisplayManager;
+import display.Displays;
+
 public class Controller {
-
-	/**
-	 * The Displays enum is used to store all the displays within the
-	 * application and their corresponding fxml file paths.
-	 */
-	public enum Displays {
-		MAIN_MENU("resources/fxml/MainMenu.fxml"),
-		ADD_DISPLAY("resources/fxml/AddAngel.fxml");
-
-		private String fxmlFile;
-
-		private Displays(String fxmlFile) {
-			this.fxmlFile = fxmlFile;
-		}
-
-		/**
-		 * @return The file location of the displays fxml
-		 */
-		public String getFile() {
-			return fxmlFile;
-		}
-	}
 
 	private Displays displayName;
 
@@ -42,7 +23,7 @@ public class Controller {
 	 */
 	protected Controller(Displays display) {
 		this.displayName = display;
-		DisplayManager.addController(display, this);
+		DisplayManager.addDisplay(display, this);
 	}
 
 	/**

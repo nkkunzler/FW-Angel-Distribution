@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<BorderPane fx:id="pane" onKeyPressed="#updateIDLabelKeyPress" prefHeight="800.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <left>
+      <VBox alignment="CENTER" focusTraversable="true" spacing="20.0" BorderPane.alignment="CENTER">
+         <children>
+            <TextField fx:id="idLabel" alignment="CENTER" disable="true" editable="false" focusTraversable="false" prefHeight="77.0" prefWidth="122.0" promptText="Angel ID">
+               <font>
+                  <Font name="System Bold" size="36.0" />
+               </font>
+            </TextField>
+            <GridPane alignment="CENTER" hgap="10.0" vgap="10.0">
+              <columnConstraints>
+                <ColumnConstraints hgrow="NEVER" minWidth="10.0" />
+                <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" />
+                  <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" />
+              </columnConstraints>
+              <rowConstraints>
+                <RowConstraints />
+                <RowConstraints />
+                <RowConstraints />
+                  <RowConstraints />
+                  <RowConstraints />
+                  <RowConstraints />
+                  <RowConstraints />
+              </rowConstraints>
+               <children>
+                  <Button fx:id="oneButton" contentDisplay="CENTER" mnemonicParsing="false" onAction="#updateIDLabelActionEvent" style="-fx-background-radius: 30;" text="1">
+                     <font>
+                        <Font size="32.0" />
+                     </font>
+                  </Button>
+                  <Button fx:id="twoButton" contentDisplay="CENTER" layoutX="26.0" layoutY="10.0" mnemonicParsing="false" onAction="#updateIDLabelActionEvent" style="-fx-background-radius: 30;" text="2" GridPane.columnIndex="1">
+                     <font>
+                        <Font size="32.0" />
+                     </font>
+                  </Button>
+                  <Button fx:id="threeButton" contentDisplay="CENTER" layoutX="110.0" layoutY="10.0" mnemonicParsing="false" onAction="#updateIDLabelActionEvent" style="-fx-background-radius: 30;" text="3" GridPane.columnIndex="2">
+                     <font>
+                        <Font size="32.0" />
+                     </font>
+                  </Button>
+                  <Button fx:id="fourButton" contentDisplay="CENTER" layoutX="26.0" layoutY="10.0" mnemonicParsing="false" onAction="#updateIDLabelActionEvent" style="-fx-background-radius: 30;" text="4" GridPane.rowIndex="1">
+                     <font>
+                        <Font size="32.0" />
+                     </font>
+                  </Button>
+                  <Button fx:id="fiveButton" contentDisplay="CENTER" layoutX="126.0" layoutY="10.0" mnemonicParsing="false" onAction="#updateIDLabelActionEvent" style="-fx-background-radius: 30;" text="5" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                     <font>
+                        <Font size="32.0" />
+                     </font>
+                  </Button>
+                  <Button fx:id="sixButton" contentDisplay="CENTER" mnemonicParsing="false" onAction="#updateIDLabelActionEvent" style="-fx-background-radius: 30;" text="6" GridPane.columnIndex="2" GridPane.rowIndex="1">
+                     <font>
+                        <Font size="32.0" />
+                     </font>
+                  </Button>
+                  <Button fx:id="sevenButton" contentDisplay="CENTER" layoutX="26.0" layoutY="87.0" mnemonicParsing="false" onAction="#updateIDLabelActionEvent" style="-fx-background-radius: 30;" text="7" GridPane.rowIndex="2">
+                     <font>
+                        <Font size="32.0" />
+                     </font>
+                  </Button>
+                  <Button fx:id="eightButton" contentDisplay="CENTER" mnemonicParsing="false" onAction="#updateIDLabelActionEvent" style="-fx-background-radius: 30;" text="8" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                     <font>
+                        <Font size="32.0" />
+                     </font>
+                  </Button>
+                  <Button fx:id="nineButton" contentDisplay="CENTER" mnemonicParsing="false" onAction="#updateIDLabelActionEvent" style="-fx-background-radius: 30;" text="9" GridPane.columnIndex="2" GridPane.rowIndex="2">
+                     <font>
+                        <Font size="32.0" />
+                     </font>
+                  </Button>
+                  <Button fx:id="backButton" contentDisplay="CENTER" mnemonicParsing="false" onAction="#updateIDLabelActionEvent" style="-fx-background-radius: 30;" text="&lt;" GridPane.rowIndex="3">
+                     <font>
+                        <Font size="32.0" />
+                     </font>
+                  </Button>
+                  <Button fx:id="zeroButton" contentDisplay="CENTER" layoutX="26.0" layoutY="164.0" mnemonicParsing="false" onAction="#updateIDLabelActionEvent" style="-fx-background-radius: 30;" text="0" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                     <font>
+                        <Font size="32.0" />
+                     </font>
+                  </Button>
+                  <Button fx:id="clearButton" contentDisplay="CENTER" mnemonicParsing="false" onAction="#updateIDLabelActionEvent" style="-fx-background-radius: 30;" text="C" GridPane.columnIndex="2" GridPane.rowIndex="3">
+                     <font>
+                        <Font size="32.0" />
+                     </font>
+                  </Button>
+               </children>
+            </GridPane>
+         </children>
+         <BorderPane.margin>
+            <Insets left="50.0" right="10.0" />
+         </BorderPane.margin>
+      </VBox>
+   </left>
+   <top>
+      <Label text="Edit Status" BorderPane.alignment="CENTER">
+         <font>
+            <Font name="System Bold" size="36.0" />
+         </font>
+         <BorderPane.margin>
+            <Insets top="10.0" />
+         </BorderPane.margin>
+      </Label>
+   </top>
+   <bottom>
+      <Button fx:id="menuButton" alignment="CENTER" mnemonicParsing="false" onAction="#toMainMenu" text="To Main Menu" BorderPane.alignment="CENTER">
+         <BorderPane.margin>
+            <Insets bottom="10.0" />
+         </BorderPane.margin>
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Button>
+   </bottom>
+</BorderPane>

@@ -8,6 +8,9 @@
 
 package database;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.arangodb.ArangoCursor;
 import com.arangodb.entity.BaseDocument;
 
@@ -55,11 +58,14 @@ public class DatabaseController {
 	 * 
 	 * @param query      The aql query command for the collection
 	 * @param collection The collection used when quering the collection
-	 * @return An ArangoCursor list containing the results of the query. Null is
+	 * @return A list containing the results of the query. Null is
 	 *         returned if the query is inconclusive.
 	 */
-	public ArangoCursor<BaseDocument> query(String query, String collection) {
-		return db.query(query, collection);
+	public List<BaseDocument> query(String query) {
+		List<BaseDocument> results = new ArrayList<>();
+		for (BaseDocument doc : db.query(query))
+			results.add(doc);
+		return results;
 	}
 
 	/**

@@ -5,7 +5,7 @@
  * @author Nicholas Kunzler
  */
 
-package controllers;
+package display;
 
 import java.io.IOException;
 import java.util.ArrayDeque;
@@ -13,6 +13,7 @@ import java.util.Deque;
 import java.util.HashMap;
 import java.util.Map;
 
+import controllers.Controller;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.stage.Stage;
@@ -20,9 +21,9 @@ import javafx.stage.Stage;
 public class DisplayManager {
 
 	private static Stage stage;
-	private static Controller.Displays mainDisplay = null;
-	private static Map<Controller.Displays, Parent> displays;
-	private static Deque<Controller.Displays> sceneStack;
+	private static Displays mainDisplay = null;
+	private static Map<Displays, Parent> displays;
+	private static Deque<Displays> sceneStack;
 
 	/**
 	 * Stores the stage for which the scenes will be placed.
@@ -39,14 +40,14 @@ public class DisplayManager {
 		displays = new HashMap<>();
 	}
 
-	protected static void addController(Controller.Displays display,
+	public static void addDisplay(Displays display,
 			Controller controller) {
-		FXMLLoader newDisplay = new FXMLLoader(DisplayManager.class
+		FXMLLoader loader = new FXMLLoader(DisplayManager.class
 				.getClassLoader().getResource(display.getFile()));
-		newDisplay.setController(controller);
+		loader.setController(controller);
 
 		try {
-			displays.put(display, newDisplay.load());
+			displays.put(display, loader.load());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -60,8 +61,8 @@ public class DisplayManager {
 	 * @param currentScene    The scene you are currently one
 	 * @param sceneToSwitchTo The scene you would like to go to.
 	 */
-	protected static void switchScene(Controller.Displays currentScene,
-			Controller.Displays sceneToSwitchTo) {
+	public static void switchScene(Displays currentScene,
+			Displays sceneToSwitchTo) {
 		sceneStack.push(currentScene);
 
 		// Removing previous style classes that were loaded to display
@@ -75,7 +76,7 @@ public class DisplayManager {
 	 * When called, the stage will replace the current scene being viewed with
 	 * the scene that moved you to the current scene.
 	 */
-	protected static void previousDisplay() {
+	public static void previousDisplay() {
 		if (sceneStack.isEmpty()) {
 			System.err.println("There is no previous scene");
 			return;
@@ -94,7 +95,7 @@ public class DisplayManager {
 	 * 
 	 * @param display The display to make the main display.
 	 */
-	public static void setMainDisplay(Controller.Displays display) {
+	public static void setMainDisplay(Displays display) {
 		if (mainDisplay != null)
 			return;
 		mainDisplay = display;

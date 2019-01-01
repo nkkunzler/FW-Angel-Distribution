@@ -9,6 +9,7 @@
 package controllers;
 
 import database.DatabaseController;
+import display.Displays;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -313,8 +314,8 @@ public class AddController extends Controller {
 		}
 
 		if (e.getCode() == KeyCode.TAB) {
-			if (wishInput.getText().equals(""))
-				wishInput.setText("Age Appropriate");
+			if (bookInput.getText().equals(""))
+				bookInput.setText("Age Appropriate");
 			e.consume();
 			specialInput.setDisable(false);
 			specialInput.requestFocus();
@@ -340,6 +341,7 @@ public class AddController extends Controller {
 				specialInput.setText("Age Appropriate");
 			e.consume();
 			addAngelButton.setDisable(false);
+			addAngelButton.requestFocus();
 		}
 	}
 
@@ -353,7 +355,7 @@ public class AddController extends Controller {
 		Angel angel = new Angel();
 		// The basic angel attributes
 		angel.addAttribute(Attribute.ID, idInput.getText().toUpperCase());
-		angel.addAttribute(Attribute.SEX, sexInput.getText());
+		angel.addAttribute(Attribute.SEX, sexInput.getText().toLowerCase());
 		angel.addAttribute(Attribute.AGE, Integer.valueOf(ageInput.getText()));
 		angel.addAttribute(Attribute.SHOE_SIZE, shoeInput.getText());
 		angel.addAttribute(Attribute.CLOTHES_SIZE, clothesInput.getText());
@@ -361,12 +363,15 @@ public class AddController extends Controller {
 		angel.addAttribute(Attribute.PANT_SIZE, pantsInput.getText());
 
 		// Converting into lists as there are multiple values
-		String[] wish = wishInput.getText().replaceAll(" ", "").split(",");
-		String[] book = bookInput.getText().replaceAll(" ", "").split(",");
-		String[] spec = specialInput.getText().replaceAll(" ", "").split(",");
-		angel.addAttribute(Attribute.WISH, wish);
-		angel.addAttribute(Attribute.BOOK, book);
-		angel.addAttribute(Attribute.SPECIAL, spec);
+		String[] wishes = wishInput.getText().replaceAll(", ", ",").split(",");
+		String[] books = bookInput.getText().replaceAll(", ", ",").split(",");
+		String[] specs = specialInput.getText().replaceAll(", ", ",").split(",");
+		for (String wish : wishes)
+			angel.addAttribute(Attribute.WISH, wish.toLowerCase());
+		for (String book : books)
+			angel.addAttribute(Attribute.BOOK, book.toLowerCase());
+		for (String spec : specs)
+			angel.addAttribute(Attribute.SPECIAL, spec.toLowerCase());
 
 		// Default values when the angels are first created
 		angel.addAttribute(Attribute.STATUS, "incomplete");
