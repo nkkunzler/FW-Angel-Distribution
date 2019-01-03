@@ -4,41 +4,12 @@
  * 
  * @author Nicholas Kunzler
  */
-package main;
+package angels;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class Angel {
-
-	/**
-	 * All the attributes associated with an angel.
-	 */
-	public enum Attribute {
-		ID("id"),
-		SEX("sex"),
-		AGE("age"),
-		SHOE_SIZE("shoe_size"),
-		CLOTHES_SIZE("clothes_size"),
-		SHIRT_SIZE("shirt_size"),
-		PANT_SIZE("pant_size"),
-		WISH("wish"),
-		BOOK("book"),
-		SPECIAL("special"),
-		STATUS("status"),
-		MISSING("mising"),
-		LOCATION("location");
-
-		private final String type;
-
-		private Attribute(String type) {
-			this.type = type;
-		}
-
-		public final String getType() {
-			return this.type;
-		}
-	}
 
 	private Map<String, Object> attrValues = new HashMap<>();
 
@@ -96,7 +67,7 @@ public class Angel {
 	 * @param attribute The attribute to find the value for.
 	 * @return A string representing the value associated with the attribute.
 	 */
-	public String get(Attribute attribute) {
+	public Object get(Attribute attribute) {
 		return attrValues.get(attribute.getType()) + "";
 	}
 

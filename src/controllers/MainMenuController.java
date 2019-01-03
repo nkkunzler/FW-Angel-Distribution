@@ -36,7 +36,7 @@ public class MainMenuController extends Controller {
 	 * This method is called by the MainMenu.fxml file when the 'Edit Angel'
 	 * button has an action.
 	 */
-	public void switchToEditStatus() {
-		super.switchScene(Displays.EDIT_DISPLAY);
+	public void switchToAngelSelection() {
+		super.switchScene(Displays.ANGEL_SELECTION);
 	}
 }

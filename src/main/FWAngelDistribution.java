@@ -1,20 +1,18 @@
 package main;
 
-import com.arangodb.ArangoCursor;
-import com.arangodb.entity.BaseDocument;
-
+import angels.Angel;
+import angels.Attribute;
 import controllers.AddController;
-import controllers.EditController;
+import controllers.AngelSelectionController;
 import controllers.MainMenuController;
+import controllers.StatusSelectController;
 import database.Database;
 import database.DatabaseController;
-import database.DatabaseTester;
 import display.DisplayManager;
 import display.Displays;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import main.Angel.Attribute;
 
 public class FWAngelDistribution extends Application {
 
@@ -33,7 +31,7 @@ public class FWAngelDistribution extends Application {
 		dbController.createCollection(ANGEL_COLLECTION);
 
 		// Uncomment if you want to generate angels within the angels database.
-		// populateDatabase();
+		//populateDatabase();
 
 		launch();
 	}
@@ -58,10 +56,14 @@ public class FWAngelDistribution extends Application {
 		stage.setOnCloseRequest(e -> dbController.close()); // Close connection
 	}
 
+	/**
+	 * Creating all the controllers need for the displays.
+	 */
 	private void initControllers() {
 		new MainMenuController();
 		new AddController(dbController, ANGEL_COLLECTION);
-		new EditController(dbController, ANGEL_COLLECTION);
+		new AngelSelectionController(dbController, ANGEL_COLLECTION);
+		new StatusSelectController(dbController, ANGEL_COLLECTION);
 	}
 
 	/**
@@ -99,7 +101,7 @@ public class FWAngelDistribution extends Application {
 				"headphones", "lol dolls", "puzzles", "baseball bat",
 				"dodgeball", "soccer ball" };
 
-		for (int angelNum = 1; angelNum <= 250; angelNum++) {
+		for (int angelNum = 1; angelNum <= 50; angelNum++) {
 			for (int charIndex = 0; charIndex < Math.random() * 6
 					+ 1; ++charIndex) {
 				int row = angelNum;

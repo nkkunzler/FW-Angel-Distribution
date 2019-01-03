@@ -1,20 +1,40 @@
+/**
+ * This class is used to store all of the displays within the application.
+ * 
+ * New displays that are added needed to be added as a constant with a
+ * provided .fxml file.
+ * 
+ * @author Nicholas Kunzler
+ */
 package display;
 
-public class Displays {
+public enum Displays {
 
-	private static final String BASE_LOC = "resources/fxml/";;
+	// Display first shown on app start up
+	MAIN_MENU("resources/fxml/MainMenu.fxml"),
 
-	public static final Displays MAIN_MENU = new Displays("MainMenu.fxml");
-	public static final Displays ADD_DISPLAY = new Displays("AddAngel.fxml");
-	public static final Displays EDIT_DISPLAY = new Displays("EditStatus.fxml");
+	// Display to create and add a new angel to the database
+	ADD_DISPLAY("resources/fxml/AddAngel.fxml"),
 
-	private String fxmlFile;
+	// Display where the user can enter an angel id and select desired angel
+	ANGEL_SELECTION("resources/fxml/AngelSelection.fxml"),
 
+	// Display where the user can change the status of the angel
+	ANGEL_STATUS("resources/fxml/AngelStatus.fxml");
+
+	private final String fxmlFile;
+	
 	private Displays(String fxmlFile) {
-		this.fxmlFile = BASE_LOC + fxmlFile;
+		this.fxmlFile = fxmlFile;
+	}
+	/**
+	 * @return String with the displays file location
+	 */
+	public String getFile() {
+		return fxmlFile;
 	}
 
-	public String getFile() {
+	public String toString() {
 		return fxmlFile;
 	}
 }

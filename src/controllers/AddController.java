@@ -8,6 +8,9 @@
  */
 package controllers;
 
+import angels.Angel;
+import angels.Attribute;
+import angels.Status;
 import database.DatabaseController;
 import display.Displays;
 import javafx.fxml.FXML;
@@ -18,8 +21,6 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import main.Angel;
-import main.Angel.Attribute;
 
 public class AddController extends Controller {
 
@@ -374,7 +375,7 @@ public class AddController extends Controller {
 			angel.addAttribute(Attribute.SPECIAL, spec.toLowerCase());
 
 		// Default values when the angels are first created
-		angel.addAttribute(Attribute.STATUS, "incomplete");
+		angel.addAttribute(Attribute.STATUS, Status.AWAITING.getStatus());
 		angel.addAttribute(Attribute.MISSING, new String[0]);
 		angel.addAttribute(Attribute.LOCATION, "Family Resource");
 

@@ -22,6 +22,7 @@ public class Controller {
 	 * @param display
 	 */
 	protected Controller(Displays display) {
+		super();
 		this.displayName = display;
 		DisplayManager.addDisplay(display, this);
 	}
@@ -42,5 +43,15 @@ public class Controller {
 	 */
 	protected void previousDisplay() {
 		DisplayManager.previousDisplay();
+	}
+
+	/**
+	 * Returns the controller associated with the desired display.
+	 * 
+	 * @param display The display to which to get the controller
+	 * @return The controller associated with the desired display
+	 */
+	protected Controller getController(Displays display) {
+		return DisplayManager.getController(display);
 	}
 }

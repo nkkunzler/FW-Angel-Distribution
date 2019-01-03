@@ -22,7 +22,7 @@ public class DisplayManager {
 
 	private static Stage stage;
 	private static Displays mainDisplay = null;
-	private static Map<Displays, Parent> displays;
+	private static Map<Displays, Controller> displays;
 	private static Deque<Displays> sceneStack;
 
 	/**
@@ -45,31 +45,31 @@ public class DisplayManager {
 		FXMLLoader loader = new FXMLLoader(DisplayManager.class
 				.getClassLoader().getResource(display.getFile()));
 		loader.setController(controller);
-
-		try {
-			displays.put(display, loader.load());
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		displays.put(display, controller);
 	}
 
 	/**
-	 * Switches between two different GameScenes.
-	 * 
-	 * TODO: May add scene transitions if feeling exited enough.
+	 * Switches between two different Displays.
 	 * 
 	 * @param currentScene    The scene you are currently one
 	 * @param sceneToSwitchTo The scene you would like to go to.
 	 */
 	public static void switchScene(Displays currentScene,
 			Displays sceneToSwitchTo) {
-		sceneStack.push(currentScene);
 
 		// Removing previous style classes that were loaded to display
 		if (stage.getScene().getRoot().getStyleClass().size() > 1)
 			stage.getScene().getRoot().getStyleClass().remove(0);
 
-		stage.getScene().setRoot(displays.get(sceneToSwitchTo));
+		try {
+			sceneStack.push(currentScene);
+			FXMLLoader loader = new FXMLLoader(DisplayManager.class
+					.getClassLoader().getResource(sceneToSwitchTo.getFile()));
+			loader.setController(displays.get(sceneToSwitchTo));
+			stage.getScene().setRoot(loader.load());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**
@@ -86,7 +86,25 @@ public class DisplayManager {
 		if (stage.getScene().getRoot().getStyleClass().size() > 1)
 			stage.getScene().getRoot().getStyleClass().remove(0);
 
-		stage.getScene().setRoot(displays.get(sceneStack.pop()));
+		try {
+			Displays prevDisplay = sceneStack.pop();
+			FXMLLoader loader = new FXMLLoader(DisplayManager.class
+					.getClassLoader().getResource(prevDisplay.getFile()));
+			loader.setController(displays.get(prevDisplay));
+			stage.getScene().setRoot(loader.load());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * Returns the controller associated with the display requested.
+	 * 
+	 * @param display The display to get the controller for
+	 * @return The controller associated with the display.
+	 */
+	public static Controller getController(Displays display) {
+		return displays.get(display);
 	}
 
 	/**
@@ -110,6 +128,15 @@ public class DisplayManager {
 		if (displays.get(mainDisplay) == null) {
 			System.err.println("Controller for main display does not exist");
 		}
-		return displays.get(mainDisplay);
+
+		try {
+			FXMLLoader loader = new FXMLLoader(DisplayManager.class
+					.getClassLoader().getResource(mainDisplay.getFile()));
+			loader.setController(displays.get(mainDisplay));
+			return loader.load();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 }

@@ -22,7 +22,7 @@
                   <Font size="24.0" />
                </font>
             </Button>
-            <Button fx:id="editStatusButton" mnemonicParsing="false" onAction="#switchToEditStatus" text="Edit Status">
+            <Button fx:id="editStatusButton" mnemonicParsing="false" onAction="#switchToAngelSelection" text="Edit Status">
                <font>
                   <Font size="24.0" />
                </font>

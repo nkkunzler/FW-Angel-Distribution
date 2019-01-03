@@ -11,10 +11,10 @@ package database;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.arangodb.ArangoCursor;
 import com.arangodb.entity.BaseDocument;
 
-import main.Angel;
+import angels.Angel;
+import angels.Attribute;
 
 public class DatabaseController {
 
@@ -49,8 +49,8 @@ public class DatabaseController {
 	 *         otherwise false is returned.
 	 */
 	public boolean insertAngel(Angel angel, String collection) {
-		return db.insert(angel.get(Angel.Attribute.ID), angel.getAttributes(),
-				collection);
+		return db.insert((String) angel.get(Attribute.ID),
+				angel.getAttributes(), collection);
 	}
 
 	/**
@@ -58,13 +58,18 @@ public class DatabaseController {
 	 * 
 	 * @param query      The aql query command for the collection
 	 * @param collection The collection used when quering the collection
-	 * @return A list containing the results of the query. Null is
-	 *         returned if the query is inconclusive.
+	 * @return A list containing the results of the query. Null is returned if
+	 *         the query is inconclusive.
 	 */
-	public List<BaseDocument> query(String query) {
-		List<BaseDocument> results = new ArrayList<>();
-		for (BaseDocument doc : db.query(query))
-			results.add(doc);
+	public List<Angel> query(String query) {
+		List<Angel> results = new ArrayList<>();
+		for (BaseDocument doc : db.query(query)) {
+			Angel angel = new Angel();
+			for (Attribute attr : Attribute.values()) {
+				angel.addAttribute(attr, doc.getAttribute(attr.getType()));
+			}
+			results.add(angel);
+		}
 		return results;
 	}
 
@@ -72,13 +77,21 @@ public class DatabaseController {
 	 * Returns a boolean indicating whether a given angel exists within the
 	 * databases collection.
 	 * 
-	 * @param key      The key to check for within the collection
+	 * @param key        The key to check for within the collection
 	 * @param collection The collection to check for the angel
 	 * @return True if the angel exists within the collection; otherwise false
 	 *         is returned.
 	 */
 	public boolean contains(String key, String collection) {
 		return db.contains(key, collection);
+	}
+
+	public void update(String key, String attribute, String value,
+			String collection) {
+		String updateQuery = "UPDATE {_key: '" + key + "'} "
+				+ "WITH {" + attribute + ": '" + value + "'} "
+				+ "IN " + collection;
+		db.query(updateQuery);
 	}
 
 	/**

@@ -16,8 +16,8 @@ package controllers;
 
 import java.util.List;
 
-import com.arangodb.entity.BaseDocument;
-
+import angels.Angel;
+import angels.Attribute;
 import database.DatabaseController;
 import display.Displays;
 import javafx.event.ActionEvent;
@@ -30,9 +30,8 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.text.Font;
-import main.Angel.Attribute;
 
-public class EditController extends Controller {
+public class AngelSelectionController extends Controller {
 
 	@FXML
 	private Button clearButton, backButton;
@@ -53,9 +52,9 @@ public class EditController extends Controller {
 	 * @param collection The collection in which an angel will eventually be
 	 *                   added to.
 	 */
-	public EditController(DatabaseController dbController,
+	public AngelSelectionController(DatabaseController dbController,
 			String dbCollection) {
-		super(Displays.EDIT_DISPLAY);
+		super(Displays.ANGEL_SELECTION);
 
 		this.dbController = dbController;
 		this.dbCollection = dbCollection;
@@ -129,8 +128,9 @@ public class EditController extends Controller {
 		// Searching for the angel id in database
 		String query = "FOR doc IN angels "
 				+ "FILTER LIKE(doc.id, " + "'" + angelID + "_')"
+				+ "SORT doc.id "
 				+ "RETURN doc";
-		List<BaseDocument> result = dbController.query(query);
+		List<Angel> result = dbController.query(query);
 
 		// Do nothing if there are no results
 		if (result == null)
@@ -144,19 +144,24 @@ public class EditController extends Controller {
 
 		// Creating the buttons for each of the results
 		for (int i = 0; i < result.size(); ++i) {
-			BaseDocument doc = result.get(i);
-			String id = (String) doc.getAttribute(Attribute.ID.getType());
-			String sex = (String) doc.getAttribute(Attribute.SEX.getType());
+			Angel angel = result.get(i);
+			String id = (String) angel.get(Attribute.ID);
+			String sex = (String) angel.get(Attribute.SEX);
 			Button btn = new Button(id);
 			btn.setFont(new Font(42));
+
 			if (sex.equalsIgnoreCase("boy")) // Boys are colored light blue
 				btn.setStyle("-fx-background-color: lightblue;");
 			else // Girls are colored light pink
 				btn.setStyle("-fx-background-color: lightpink;");
 			grid.add(btn, i % 3, i / 3); // GridPane is 3x3.
 
-			// TODO: Make button change display to change the status of angel
-			btn.setOnAction(e -> System.out.println(btn.getText()));
+			btn.setOnAction(e -> {
+				super.switchScene(Displays.ANGEL_STATUS);
+				StatusSelectController ssc = (StatusSelectController) super.getController(
+						Displays.ANGEL_STATUS);
+				ssc.setAngel(angel);
+			});
 		}
 		return grid;
 	}

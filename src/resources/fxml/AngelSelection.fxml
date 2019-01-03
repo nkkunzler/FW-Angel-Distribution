@@ -101,7 +101,7 @@
       </VBox>
    </left>
    <top>
-      <Label text="Edit Status" BorderPane.alignment="CENTER">
+      <Label text="Select An Angel" BorderPane.alignment="CENTER">
          <font>
             <Font name="System Bold" size="36.0" />
          </font>
