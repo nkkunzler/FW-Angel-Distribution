@@ -20,7 +20,10 @@ public enum Displays {
 	ANGEL_SELECTION("resources/fxml/AngelSelection.fxml"),
 
 	// Display where the user can change the status of the angel
-	ANGEL_STATUS("resources/fxml/AngelStatus.fxml");
+	ANGEL_STATUS("resources/fxml/AngelStatus.fxml"),
+	
+	// Displays where the user adds the items holding the angel
+	HOLD_DISPLAY("resources/fxml/HoldDisplay.fxml");
 
 	private final String fxmlFile;
 	

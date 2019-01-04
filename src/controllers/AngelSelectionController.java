@@ -106,7 +106,7 @@ public class AngelSelectionController extends Controller {
 			clearButton.fire(); // Calls updateIDLabelActionEvent()
 		else if (ke.getCode() == KeyCode.BACK_SPACE)
 			backButton.fire(); // Calls updateIDLabelActionEvent()
-		else if (ke.getText().matches("\\d*")) {
+		else if (ke.getText().matches("\\d*")) { // Checks input is a number
 			idLabel.setText(idLabel.getText() + ke.getText());
 			pane.setCenter(generateAngelIDButtons(idLabel.getText()));
 		}

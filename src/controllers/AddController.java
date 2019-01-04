@@ -67,14 +67,22 @@ public class AddController extends Controller {
 	 * @param e KeyEvent that is triggered every time a button is pressed.
 	 */
 	public void validateAngelID(KeyEvent e) {
-		//TODO: Have the idInput be focused on when the scene first starts
 		if (e.getCode() == KeyCode.TAB) {
 			String angelID = idInput.getText().toUpperCase();
-			if (angelID.equals("")) {
+			
+			if (angelID.equals("")) { // Cant have an empty angel id
 				showMessage("Invalid ID", "An Angel ID must be provided");
 				idInput.requestFocus();
 				return;
+			} 
+			
+			// Checking to see that a character was included, else an A is added
+			if (!angelID.matches(".*[a-zA-Z]+.*")) {
+				angelID = angelID + "A";
+				idInput.setText(angelID);
 			}
+			
+			// Checking to see if the angel id already exist in the database
 			if (dbController.contains(angelID, dbCollection)) {
 				showMessage("Invalid ID",
 						"Angel ID '" + angelID + "' already exists");

@@ -8,14 +8,14 @@
 
 <BorderPane prefHeight="800.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <top>
-      <Label text="Add Angel" BorderPane.alignment="CENTER">
+      <Label focusTraversable="false" text="Add Angel" BorderPane.alignment="CENTER">
          <font>
             <Font name="System Bold" size="36.0" />
          </font>
       </Label>
    </top>
    <bottom>
-      <Button mnemonicParsing="false" onAction="#toMainMenu" text="To Main Menu" BorderPane.alignment="CENTER">
+      <Button focusTraversable="false" mnemonicParsing="false" onAction="#toMainMenu" text="To Main Menu" BorderPane.alignment="CENTER">
          <font>
             <Font size="14.0" />
          </font>
@@ -25,56 +25,56 @@
       </Button>
    </bottom>
    <center>
-      <VBox alignment="CENTER" focusTraversable="true" spacing="10.0" BorderPane.alignment="CENTER">
+      <VBox alignment="CENTER" spacing="10.0" BorderPane.alignment="CENTER">
          <children>
-            <GridPane alignment="CENTER" focusTraversable="true" hgap="10.0" vgap="15.0" VBox.vgrow="NEVER">
+            <GridPane alignment="CENTER" hgap="10.0" vgap="15.0" VBox.vgrow="NEVER">
                <children>
-                  <Label fx:id="idLabel" alignment="CENTER" contentDisplay="CENTER" text="Angel ID">
+                  <Label fx:id="idLabel" alignment="CENTER" contentDisplay="CENTER" focusTraversable="false" text="Angel ID">
                      <font>
                         <Font size="16.0" />
                      </font>
                   </Label>
-                  <Label fx:id="sexLabel" alignment="CENTER" contentDisplay="CENTER" text="Sex" GridPane.rowIndex="1">
+                  <Label fx:id="sexLabel" alignment="CENTER" contentDisplay="CENTER" focusTraversable="false" text="Sex" GridPane.rowIndex="1">
                      <font>
                         <Font size="16.0" />
                      </font>
                   </Label>
-                  <Label fx:id="ageLabel" alignment="CENTER" contentDisplay="CENTER" text="Age" GridPane.rowIndex="2">
+                  <Label fx:id="ageLabel" alignment="CENTER" contentDisplay="CENTER" focusTraversable="false" text="Age" GridPane.rowIndex="2">
                      <font>
                         <Font size="16.0" />
                      </font>
                   </Label>
-                  <Label fx:id="shoeLabel" alignment="CENTER" contentDisplay="CENTER" text="Shoe Size" GridPane.rowIndex="3">
+                  <Label fx:id="shoeLabel" alignment="CENTER" contentDisplay="CENTER" focusTraversable="false" text="Shoe Size" GridPane.rowIndex="3">
                      <font>
                         <Font size="16.0" />
                      </font>
                   </Label>
-                  <Label fx:id="clothesLabel" alignment="CENTER" contentDisplay="CENTER" text="Clothes Size" GridPane.rowIndex="4">
+                  <Label fx:id="clothesLabel" alignment="CENTER" contentDisplay="CENTER" focusTraversable="false" text="Clothes Size" GridPane.rowIndex="4">
                      <font>
                         <Font size="16.0" />
                      </font>
                   </Label>
-                  <Label fx:id="shirtLabel" alignment="CENTER" contentDisplay="CENTER" text="Shirt Size" GridPane.rowIndex="5">
+                  <Label fx:id="shirtLabel" alignment="CENTER" contentDisplay="CENTER" focusTraversable="false" text="Shirt Size" GridPane.rowIndex="5">
                      <font>
                         <Font size="16.0" />
                      </font>
                   </Label>
-                  <Label fx:id="pantLabel" alignment="CENTER" contentDisplay="CENTER" text="Pants Size" GridPane.rowIndex="6">
+                  <Label fx:id="pantLabel" alignment="CENTER" contentDisplay="CENTER" focusTraversable="false" text="Pants Size" GridPane.rowIndex="6">
                      <font>
                         <Font size="16.0" />
                      </font>
                   </Label>
-                  <Label fx:id="wishLabel" alignment="CENTER" contentDisplay="CENTER" text="Wish" GridPane.rowIndex="7">
+                  <Label fx:id="wishLabel" alignment="CENTER" contentDisplay="CENTER" focusTraversable="false" text="Wish" GridPane.rowIndex="7">
                      <font>
                         <Font size="16.0" />
                      </font>
                   </Label>
-                  <Label fx:id="bookLabel" alignment="CENTER" contentDisplay="CENTER" text="Book" GridPane.rowIndex="9">
+                  <Label fx:id="bookLabel" alignment="CENTER" contentDisplay="CENTER" focusTraversable="false" text="Book" GridPane.rowIndex="9">
                      <font>
                         <Font size="16.0" />
                      </font>
                   </Label>
-                  <Label fx:id="specialLabel" alignment="CENTER" contentDisplay="CENTER" text="Special" GridPane.rowIndex="10">
+                  <Label fx:id="specialLabel" alignment="CENTER" contentDisplay="CENTER" focusTraversable="false" text="Special" GridPane.rowIndex="10">
                      <font>
                         <Font size="16.0" />
                      </font>
@@ -154,7 +154,7 @@
                   <RowConstraints minHeight="10.0" prefHeight="30.0" />
                </rowConstraints>
             </GridPane>
-            <Button fx:id="addAngelButton" disable="true" mnemonicParsing="false" onAction="#addButtonHandler" text="Add Angel">
+            <Button fx:id="addAngelButton" disable="true" focusTraversable="false" mnemonicParsing="false" onAction="#addButtonHandler" text="Add Angel">
                <font>
                   <Font size="18.0" />
                </font>

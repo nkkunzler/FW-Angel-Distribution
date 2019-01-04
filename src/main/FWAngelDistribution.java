@@ -2,8 +2,10 @@ package main;
 
 import angels.Angel;
 import angels.Attribute;
+import angels.Status;
 import controllers.AddController;
 import controllers.AngelSelectionController;
+import controllers.HoldController;
 import controllers.MainMenuController;
 import controllers.StatusSelectController;
 import database.Database;
@@ -64,6 +66,7 @@ public class FWAngelDistribution extends Application {
 		new AddController(dbController, ANGEL_COLLECTION);
 		new AngelSelectionController(dbController, ANGEL_COLLECTION);
 		new StatusSelectController(dbController, ANGEL_COLLECTION);
+		new HoldController(dbController, ANGEL_COLLECTION);
 	}
 
 	/**
@@ -101,7 +104,7 @@ public class FWAngelDistribution extends Application {
 				"headphones", "lol dolls", "puzzles", "baseball bat",
 				"dodgeball", "soccer ball" };
 
-		for (int angelNum = 1; angelNum <= 50; angelNum++) {
+		for (int angelNum = 1; angelNum <= 25; angelNum++) {
 			for (int charIndex = 0; charIndex < Math.random() * 6
 					+ 1; ++charIndex) {
 				int row = angelNum;
@@ -152,7 +155,7 @@ public class FWAngelDistribution extends Application {
 				angel.addAttribute(Attribute.SPECIAL, special);
 
 				// Default values when the angels are first created
-				angel.addAttribute(Attribute.STATUS, "incomplete");
+				angel.addAttribute(Attribute.STATUS, Status.AWAITING);
 				angel.addAttribute(Attribute.MISSING, new String[0]);
 				angel.addAttribute(Attribute.LOCATION, "Family Resource");
 
