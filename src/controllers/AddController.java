@@ -69,19 +69,19 @@ public class AddController extends Controller {
 	public void validateAngelID(KeyEvent e) {
 		if (e.getCode() == KeyCode.TAB) {
 			String angelID = idInput.getText().toUpperCase();
-			
+
 			if (angelID.equals("")) { // Cant have an empty angel id
 				showMessage("Invalid ID", "An Angel ID must be provided");
 				idInput.requestFocus();
 				return;
-			} 
-			
+			}
+
 			// Checking to see that a character was included, else an A is added
 			if (!angelID.matches(".*[a-zA-Z]+.*")) {
 				angelID = angelID + "A";
 				idInput.setText(angelID);
 			}
-			
+
 			// Checking to see if the angel id already exist in the database
 			if (dbController.contains(angelID, dbCollection)) {
 				showMessage("Invalid ID",
@@ -157,6 +157,12 @@ public class AddController extends Controller {
 		if (e.getCode() == KeyCode.TAB) {
 			String text = shoeInput.getText().toLowerCase(); // Text from input
 
+			if (text.equals("")) {
+				shoeInput.setText("none");
+				clothesInput.setDisable(false);
+				return;
+			}
+
 			char firstChar = text.charAt(0); // Checking to see if prefix exist
 			if (firstChar != 'w' && firstChar != 'm' && firstChar != 'k') {
 				// Check to see if last character is a W, meaning a wide shoe
@@ -164,11 +170,17 @@ public class AddController extends Controller {
 
 				// Need to check for 'w' for proper parsing of shoe size
 				int shoeSize;
-				if (wide == 'W')
-					shoeSize = Integer
-							.valueOf(text.substring(0, text.length() - 1));
-				else
-					shoeSize = Integer.valueOf(text);
+				try {
+					if (wide == 'W')
+						shoeSize = Integer
+								.valueOf(text.substring(0, text.length() - 1));
+					else
+						shoeSize = Integer.valueOf(text);
+				} catch (NumberFormatException nfe) {
+					showMessage("Invalid Shoe Size",
+							"Please enter a number indicating shoe size");
+					return;
+				}
 
 				// Determines if the shoe is for a kid, man, or women
 				int age = Integer.valueOf(ageInput.getText());
@@ -200,9 +212,13 @@ public class AddController extends Controller {
 	 */
 	public void validateClothesSize(KeyEvent e) {
 		if (e.getCode() == KeyCode.TAB) {
-			String size = convertClothesSizeToDimensions(sexInput.getText(),
-					clothesInput.getText());
-			clothesInput.setText(size);
+			if (clothesInput.getText().equals("")) {
+				clothesInput.setText("none");
+			} else {
+				String size = convertClothesSizeToDimensions(sexInput.getText(),
+						clothesInput.getText());
+				clothesInput.setText(size);
+			}
 			shirtInput.setDisable(false);
 		}
 	}
@@ -374,13 +390,12 @@ public class AddController extends Controller {
 		// Converting into lists as there are multiple values
 		String[] wishes = wishInput.getText().replaceAll(", ", ",").split(",");
 		String[] books = bookInput.getText().replaceAll(", ", ",").split(",");
-		String[] specs = specialInput.getText().replaceAll(", ", ",").split(",");
-		for (String wish : wishes)
-			angel.addAttribute(Attribute.WISH, wish.toLowerCase());
-		for (String book : books)
-			angel.addAttribute(Attribute.BOOK, book.toLowerCase());
-		for (String spec : specs)
-			angel.addAttribute(Attribute.SPECIAL, spec.toLowerCase());
+		String[] specs = specialInput.getText().replaceAll(", ", ",")
+				.split(",");
+
+		angel.addAttribute(Attribute.WISH, wishes);
+		angel.addAttribute(Attribute.BOOK, books);
+		angel.addAttribute(Attribute.SPECIAL, specs);
 
 		// Default values when the angels are first created
 		angel.addAttribute(Attribute.STATUS, Status.AWAITING.getStatus());

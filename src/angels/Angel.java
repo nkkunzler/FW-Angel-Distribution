@@ -6,6 +6,7 @@
  */
 package angels;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -19,6 +20,7 @@ public class Angel {
 	 * @param attribute The attribute being assigned a value
 	 * @param value     The value assigned to the attribute.
 	 */
+	@SuppressWarnings("unchecked")
 	public void addAttribute(Attribute attribute, Object value) {
 		attrValues.put(attribute.getType(), value);
 	}
@@ -39,6 +41,14 @@ public class Angel {
 			System.err.println(
 					"Enum for attribute '" + attribute + "' not found.");
 		}
+	}
+	
+	public void setAttribute(Attribute attribute, Object value) {
+		if (attrValues.get(attribute.getType()) == null) {
+			System.err.println("Attribute Does Not Exist");
+			return;
+		}
+		attrValues.put(attribute.getType(), value);
 	}
 
 	/**
@@ -68,7 +78,7 @@ public class Angel {
 	 * @return A string representing the value associated with the attribute.
 	 */
 	public Object get(Attribute attribute) {
-		return attrValues.get(attribute.getType()) + "";
+		return attrValues.get(attribute.getType());
 	}
 
 }

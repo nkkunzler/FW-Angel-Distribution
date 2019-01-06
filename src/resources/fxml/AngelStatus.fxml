@@ -26,7 +26,7 @@
                         <Font size="28.0" />
                      </font>
                   </Label>
-                  <Label fx:id="angelIDLabel" text="test">
+                  <Label fx:id="angelIDLabel" text="null">
                      <font>
                         <Font name="System Bold" size="28.0" />
                      </font>

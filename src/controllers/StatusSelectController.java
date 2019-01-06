@@ -1,3 +1,10 @@
+/**
+ * This class is the controller to connect between the AngelStatus.fxml file 
+ * and the JavaFX Node objects within the file. The purpose for this class is 
+ * to allow for selecting a new status for a desired angel.
+ * 
+ * @author Nicholas Kunzler
+ */
 package controllers;
 
 import angels.Angel;
@@ -25,6 +32,15 @@ public class StatusSelectController extends Controller {
 	private DatabaseController dbController;
 	private String collection;
 
+	/**
+	 * Constructor for the controller used to change the status of an angel. The
+	 * types of status's can be found within the angels.Status package.
+	 * 
+	 * @param controller The database controller used to connect to the
+	 *                   database.
+	 * @param collection The collection in which an angel will eventually be
+	 *                   added to.
+	 */
 	public StatusSelectController(DatabaseController dbController,
 			String collection) {
 		super(Displays.ANGEL_STATUS);
@@ -48,15 +64,13 @@ public class StatusSelectController extends Controller {
 
 		String status = ((String) angel.get(Attribute.STATUS)).toUpperCase();
 
-		angelIDLabel.setText(
-				angel.get(Attribute.ID) + " - "
-						+ status);
+		angelIDLabel.setText(angel.get(Attribute.ID) + " - " + status);
 
 		// Show warning if the angel is suppose to be pulled
 		if (status.equalsIgnoreCase(Status.PULL.getStatus())) {
 			Alert alert = new Alert(AlertType.ERROR);
-			alert.setHeaderText("PULL BAG");
-			alert.setContentText("BAG NEEDS TO BE PULLED");
+			alert.setHeaderText("PULL ANGEL");
+			alert.setContentText("Angel needs to be pulled.");
 			alert.showAndWait();
 		}
 	}
@@ -71,12 +85,20 @@ public class StatusSelectController extends Controller {
 				Attribute.STATUS.getType(),
 				Status.COMPLETE.getStatus(),
 				collection);
+		Alert alert = new Alert(AlertType.CONFIRMATION);
+		alert.setHeaderText("ANGEL STATUS CHANGED - COMPLETE");
+		alert.setContentText("The angel status has been changed to 'Complete'");
+		alert.showAndWait();
+		super.previousDisplay();
 	}
 
 	@FXML
 	/**
 	 * This method handles the onActionEvent() method for the yellow hold button
 	 * on the AngelStatus.fxml display.
+	 * 
+	 * When the Hold Button is selected, the scene will change to allow for the
+	 * user to select which items are causing the angel to go onto display.
 	 */
 	public void holdHandler() {
 		super.switchScene(Displays.HOLD_DISPLAY);
@@ -92,11 +114,11 @@ public class StatusSelectController extends Controller {
 	 */
 	public void pullHandler() {
 		Alert alert = new Alert(AlertType.WARNING);
-		alert.setContentText("Do you want to pull this bag?");
+		alert.setContentText("Do you want to pull this angel?");
 		alert.getButtonTypes().setAll(ButtonType.YES, ButtonType.NO);
 		alert.showAndWait();
 
-		// If YES on warning message, set the status of angel to pull
+		// If YES on warning message, sets the status of angel to pull
 		if (alert.resultProperty().get() == ButtonType.YES) {
 			dbController.update((String) angel.get(Attribute.ID),
 					Attribute.STATUS.getType(),
@@ -115,6 +137,11 @@ public class StatusSelectController extends Controller {
 				Attribute.STATUS.getType(),
 				Status.AWAITING.getStatus(),
 				collection);
+		Alert alert = new Alert(AlertType.CONFIRMATION);
+		alert.setHeaderText("ANGEL STATUS CHANGED - AWAITING");
+		alert.setContentText("The angel status has been changed to 'Awaiting'");
+		alert.showAndWait();
+		super.previousDisplay();
 	}
 
 	@FXML
@@ -127,6 +154,13 @@ public class StatusSelectController extends Controller {
 				Attribute.STATUS.getType(),
 				Status.OUT.getStatus(),
 				collection);
+		
+		// TODO: Change to display dealing with handing out angels
+		Alert alert = new Alert(AlertType.CONFIRMATION);
+		alert.setHeaderText("ANGEL STATUS CHANGED - OUT");
+		alert.setContentText("The angel status has been changed to 'Out'");
+		alert.showAndWait();
+		super.previousDisplay();
 	}
 
 	@FXML

@@ -7,6 +7,7 @@
  */
 package controllers;
 
+import angels.Angel;
 import display.DisplayManager;
 import display.Displays;
 

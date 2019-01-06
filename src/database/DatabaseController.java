@@ -11,6 +11,7 @@ package database;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.arangodb.ArangoCursor;
 import com.arangodb.entity.BaseDocument;
 
 import angels.Angel;
@@ -63,7 +64,12 @@ public class DatabaseController {
 	 */
 	public List<Angel> query(String query) {
 		List<Angel> results = new ArrayList<>();
-		for (BaseDocument doc : db.query(query)) {
+		ArangoCursor<BaseDocument> documents = db.query(query);
+		
+		if (documents == null)
+			return null;
+		
+		for (BaseDocument doc : documents) {
 			Angel angel = new Angel();
 			for (Attribute attr : Attribute.values()) {
 				angel.addAttribute(attr, doc.getAttribute(attr.getType()));
@@ -90,6 +96,14 @@ public class DatabaseController {
 			String collection) {
 		String updateQuery = "UPDATE {_key: '" + key + "'} "
 				+ "WITH {" + attribute + ": '" + value + "'} "
+				+ "IN " + collection;
+		db.query(updateQuery);
+	}
+	
+	public void update(String key, String attribute, Object values,
+			String collection) {
+		String updateQuery = "UPDATE {_key: '" + key + "'} "
+				+ "WITH {" + attribute + ": '" + values + "'} "
 				+ "IN " + collection;
 		db.query(updateQuery);
 	}

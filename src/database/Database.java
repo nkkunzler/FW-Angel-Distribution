@@ -110,7 +110,7 @@ public class Database {
 			return null;
 		}
 	}
-
+	
 	/**
 	 * Creates a new collection within the database. If the collection already
 	 * exists within the database then nothing happens.

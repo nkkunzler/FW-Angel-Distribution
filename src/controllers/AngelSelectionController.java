@@ -171,7 +171,7 @@ public class AngelSelectionController extends Controller {
 	 * Goes back to the scene that resulted in this scene to be displayed
 	 */
 	public void toMainMenu() {
-		super.previousDisplay();
+		super.switchScene(Displays.MAIN_MENU);
 	}
 
 }

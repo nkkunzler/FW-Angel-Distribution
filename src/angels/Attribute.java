@@ -15,7 +15,7 @@ public enum Attribute {
 	BOOK("book"),
 	SPECIAL("special"),
 	STATUS("status"),
-	MISSING("mising"),
+	MISSING("missing"),
 	LOCATION("location");
 
 	private final String type;
