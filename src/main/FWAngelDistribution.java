@@ -5,6 +5,7 @@ import angels.Attribute;
 import angels.Status;
 import controllers.AddController;
 import controllers.AngelSelectionController;
+import controllers.ExportController;
 import controllers.HoldController;
 import controllers.MainMenuController;
 import controllers.StatusSelectController;
@@ -67,10 +68,11 @@ public class FWAngelDistribution extends Application {
 		new AngelSelectionController(dbController, ANGEL_COLLECTION);
 		new StatusSelectController(dbController, ANGEL_COLLECTION);
 		new HoldController(dbController, ANGEL_COLLECTION);
+		new ExportController(dbController);
 	}
 
 	/**
-	 * Used to populate the database with 250 angels
+	 * Used to populate the database with 10 angels
 	 * 
 	 * Not the nicest looking
 	 */
@@ -104,7 +106,7 @@ public class FWAngelDistribution extends Application {
 				"headphones", "lol dolls", "puzzles", "baseball bat",
 				"dodgeball", "soccer ball" };
 
-		for (int angelNum = 1; angelNum <= 25; angelNum++) {
+		for (int angelNum = 1; angelNum <= 10; angelNum++) {
 			for (int charIndex = 0; charIndex < Math.random() * 6
 					+ 1; ++charIndex) {
 				int row = angelNum;

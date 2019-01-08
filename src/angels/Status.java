@@ -1,20 +1,18 @@
+/**
+ * This class represents the different status associated with an angels
+ * status. The fields are used without the program in order maintain naming
+ * conventions.
+ * 
+ * @author Nicholas Kunzler
+ */
+
 package angels;
 
 public enum Status {
 
-	COMPLETE("complete"),
-	HOLD("hold"),
-	PULL("pull"),
-	AWAITING("awaiting"),
-	OUT("out");
-
-	private final String status;
-
-	private Status(String status) {
-		this.status = status;
-	}
-
-	public final String getStatus() {
-		return this.status;
-	}
+	COMPLETE,
+	HOLD,
+	PULL,
+	AWAITING,
+	OUT;
 }

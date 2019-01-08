@@ -6,7 +6,6 @@
  */
 package angels;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,35 +19,8 @@ public class Angel {
 	 * @param attribute The attribute being assigned a value
 	 * @param value     The value assigned to the attribute.
 	 */
-	@SuppressWarnings("unchecked")
 	public void addAttribute(Attribute attribute, Object value) {
-		attrValues.put(attribute.getType(), value);
-	}
-
-	/**
-	 * Adds a new attribute and its value to the map of attributes. If the
-	 * string representing an attribute does not exists, then an
-	 * IllegalArgumentException is thrown indicating the enum does not exist.
-	 * 
-	 * @param attribute The attribute being assigned a value
-	 * @param value     The value assigned to the attribute.
-	 */
-	public void addAttribute(String attribute, Object value) {
-		try {
-			this.addAttribute(Attribute.valueOf(attribute.toUpperCase()),
-					value);
-		} catch (IllegalArgumentException ae) {
-			System.err.println(
-					"Enum for attribute '" + attribute + "' not found.");
-		}
-	}
-	
-	public void setAttribute(Attribute attribute, Object value) {
-		if (attrValues.get(attribute.getType()) == null) {
-			System.err.println("Attribute Does Not Exist");
-			return;
-		}
-		attrValues.put(attribute.getType(), value);
+		attrValues.put(attribute.toString(), value);
 	}
 
 	/**
@@ -61,15 +33,6 @@ public class Angel {
 	public Map<String, Object> getAttributes() {
 		return attrValues;
 	}
-	
-	/**
-	 * Returns the Enum Attribute associated with the desired string attribute name
-	 * @param strAttribute The string version of the Enum to get
-	 * @return The attribute associated with the string version
-	 */
-	public Attribute getAttribute(String strAttribute) {
-		return Attribute.valueOf(strAttribute.toUpperCase());
-	}
 
 	/**
 	 * Returns the value associated with the attribute.
@@ -78,7 +41,7 @@ public class Angel {
 	 * @return A string representing the value associated with the attribute.
 	 */
 	public Object get(Attribute attribute) {
-		return attrValues.get(attribute.getType());
+		return attrValues.get(attribute.toString());
 	}
 
 }

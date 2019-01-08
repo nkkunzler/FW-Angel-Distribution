@@ -11,16 +11,19 @@ package controllers;
 import angels.Angel;
 import angels.Attribute;
 import angels.Status;
+import customFX.Popup;
 import database.DatabaseController;
 import display.Displays;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
+import javafx.scene.Node;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextInputControl;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.VBox;
 
 public class AddController extends Controller {
 
@@ -34,6 +37,8 @@ public class AddController extends Controller {
 	// All the TextFields input within the AddAngel.fxml display
 	private TextField idInput, sexInput, ageInput, shoeInput, clothesInput,
 			shirtInput, pantsInput, bookInput;
+	@FXML
+	private VBox inputsContainer;
 
 	@FXML
 	private TextArea wishInput, specialInput;
@@ -66,27 +71,26 @@ public class AddController extends Controller {
 	 * 
 	 * @param e KeyEvent that is triggered every time a button is pressed.
 	 */
+	@FXML
 	public void validateAngelID(KeyEvent e) {
 		if (e.getCode() == KeyCode.TAB) {
 			String angelID = idInput.getText().toUpperCase();
 
-			if (angelID.equals("")) { // Cant have an empty angel id
-				showMessage("Invalid ID", "An Angel ID must be provided");
+			if (angelID.equals("")) { // Can't have an empty angel id
+				showPopup("Invalid ID", "An Angel ID must be provided");
 				idInput.requestFocus();
 				return;
 			}
 
 			// Checking to see that a character was included, else an A is added
-			if (!angelID.matches(".*[a-zA-Z]+.*")) {
-				angelID = angelID + "A";
-				idInput.setText(angelID);
-			}
+			if (!angelID.matches(".*[a-zA-Z]+.*"))
+				idInput.setText(angelID + "A");
 
 			// Checking to see if the angel id already exist in the database
-			if (dbController.contains(angelID, dbCollection)) {
-				showMessage("Invalid ID",
-						"Angel ID '" + angelID + "' already exists");
-				e.consume();
+			if (dbController.contains(idInput.getText(), dbCollection)) {
+				showPopup("Invalid ID",
+						"Angel ID '" + idInput.getText() + "' already exists");
+				e.consume(); // Prevents next enabled Node to be auto selected
 			} else {
 				sexInput.setDisable(false);
 			}
@@ -100,13 +104,14 @@ public class AddController extends Controller {
 	 * 
 	 * @param e KeyEvent that is triggered every time a button is pressed.
 	 */
+	@FXML
 	public void validateSex(KeyEvent e) {
 		if (e.getCode() == KeyCode.TAB) {
 			String input = sexInput.getText().toLowerCase();
 
 			if (!input.equals("boy") && !input.equals("girl")) {
-				showMessage("Invalid Gender", "Enter 'boy' or 'girl'");
-				e.consume();
+				showPopup("Invalid Gender", "Enter 'boy' or 'girl'");
+				e.consume(); // Prevents next enabled Node from being selected
 			} else {
 				ageInput.setDisable(false);
 			}
@@ -120,6 +125,7 @@ public class AddController extends Controller {
 	 * 
 	 * @param e KeyEvent that is triggered every time a button is pressed.
 	 */
+	@FXML
 	public void validateAge(KeyEvent e) {
 		if (e.getCode() == KeyCode.TAB) {
 			int age = -1;
@@ -127,13 +133,14 @@ public class AddController extends Controller {
 			try {
 				age = Integer.valueOf(ageInput.getText());
 			} catch (NumberFormatException nfe) {
-				showMessage("Invalid Age", "Enter a number between 1 and 12");
+				showPopup("Invalid Age", "Enter a number between 1 and 12");
+				e.consume(); // Prevents next enabled Node from being selected
 				return;
 			}
 
 			// Valid ages are between 1 and 12, inclusive
 			if (age < 0 || age > 12) {
-				showMessage("Invalid Age", "Enter a number between 1 and 12");
+				showPopup("Invalid Age", "Enter a number between 1 and 12");
 				e.consume();
 			} else {
 				shoeInput.setDisable(false);
@@ -153,22 +160,23 @@ public class AddController extends Controller {
 	 * 
 	 * @param e KeyEvent that is triggered every time a button is pressed.
 	 */
+	@FXML
 	public void validateShoe(KeyEvent e) {
 		if (e.getCode() == KeyCode.TAB) {
 			String text = shoeInput.getText().toLowerCase(); // Text from input
 
-			if (text.equals("")) {
+			if (text.equals("") || text.equals("none")) { // No shoes are valid
 				shoeInput.setText("none");
 				clothesInput.setDisable(false);
 				return;
 			}
 
-			char firstChar = text.charAt(0); // Checking to see if prefix exist
+			char firstChar = text.charAt(0); // Checking for prefix
 			if (firstChar != 'w' && firstChar != 'm' && firstChar != 'k') {
 				// Check to see if last character is a W, meaning a wide shoe
 				char wide = text.charAt(text.length() - 1) == 'w' ? 'W' : '\0';
 
-				// Need to check for 'w' for proper parsing of shoe size
+				// Need to check for 'W' for proper parsing of shoe size
 				int shoeSize;
 				try {
 					if (wide == 'W')
@@ -177,8 +185,9 @@ public class AddController extends Controller {
 					else
 						shoeSize = Integer.valueOf(text);
 				} catch (NumberFormatException nfe) {
-					showMessage("Invalid Shoe Size",
+					showPopup("Invalid Shoe Size",
 							"Please enter a number indicating shoe size");
+					e.consume(); // Prevents next Node from being selected
 					return;
 				}
 
@@ -186,8 +195,7 @@ public class AddController extends Controller {
 				int age = Integer.valueOf(ageInput.getText());
 				char ageLevel = 'K';
 				if (age >= 8 && shoeSize >= 1) {
-					String sex = sexInput.getText().toLowerCase();
-					if (sex.equals("boy"))
+					if (sexInput.getText().equalsIgnoreCase("boy"))
 						ageLevel = 'M';
 					else
 						ageLevel = 'W';
@@ -210,8 +218,10 @@ public class AddController extends Controller {
 	 * 
 	 * @param e KeyEvent that is triggered every time a button is pressed.
 	 */
+	@FXML
 	public void validateClothesSize(KeyEvent e) {
 		if (e.getCode() == KeyCode.TAB) {
+			// It is possible not to have any clothes
 			if (clothesInput.getText().equals("")) {
 				clothesInput.setText("none");
 			} else {
@@ -232,6 +242,7 @@ public class AddController extends Controller {
 	 * 
 	 * @param e KeyEvent that is triggered every time a button is pressed.
 	 */
+	@FXML
 	public void validateShirtSize(KeyEvent e) {
 		if (e.getCode() == KeyCode.TAB) {
 			// Takes clothes size if empty
@@ -255,6 +266,7 @@ public class AddController extends Controller {
 	 * 
 	 * @param e KeyEvent that is triggered every time a button is pressed.
 	 */
+	@FXML
 	public void validatePantSize(KeyEvent e) {
 		if (e.getCode() == KeyCode.TAB) {
 			// Takes clothes size if empty
@@ -310,8 +322,9 @@ public class AddController extends Controller {
 	 * 
 	 * @param e KeyEvent that is triggered every time a button is pressed.
 	 */
+	@FXML
 	public void validateWish(KeyEvent e) {
-		if (wishInput.getText().length() > MAX_WISH_CHARS) {
+		if (wishInput.getText().length() >= MAX_WISH_CHARS) {
 			wishInput.deletePreviousChar();
 		}
 
@@ -333,6 +346,7 @@ public class AddController extends Controller {
 	 * 
 	 * @param e KeyEvent that is triggered every time a button is pressed.
 	 */
+	@FXML
 	public void validateBook(KeyEvent e) {
 		if (bookInput.getText().length() > MAX_BOOK_CHARS) {
 			bookInput.deletePreviousChar();
@@ -356,6 +370,7 @@ public class AddController extends Controller {
 	 * 
 	 * @param e KeyEvent that is triggered every time a button is pressed.
 	 */
+	@FXML
 	public void validateSpecial(KeyEvent e) {
 		if (specialInput.getText().length() > MAX_SPECIAL_CHARS) {
 			specialInput.deletePreviousChar();
@@ -370,12 +385,32 @@ public class AddController extends Controller {
 		}
 	}
 
+	/**
+	 * Goes back to the scene that resulted in this scene to be displayed
+	 */
 	@FXML
+	public void toMainMenu() {
+		super.previousDisplay();
+	}
+
+	/**
+	 * If the user presses enter while the Add Angel button is selected, then
+	 * the button will be pressed.
+	 * 
+	 * @param e KeyEvent that is triggered every time a button is pressed.
+	 */
+	@FXML
+	public void addButtonKeyHandler(KeyEvent e) {
+		if (e.getCode() == KeyCode.ENTER)
+			addAngelButton.fire();
+	}
+
 	/**
 	 * Button handler to add a new angel to the database. Takes inputs from the
 	 * scene, converts them to angel attributes, used to create an angel, and
 	 * then add the angel to the database.
 	 */
+	@FXML
 	public void addButtonHandler() {
 		Angel angel = new Angel();
 		// The basic angel attributes
@@ -398,16 +433,16 @@ public class AddController extends Controller {
 		angel.addAttribute(Attribute.SPECIAL, specs);
 
 		// Default values when the angels are first created
-		angel.addAttribute(Attribute.STATUS, Status.AWAITING.getStatus());
+		angel.addAttribute(Attribute.STATUS, Status.AWAITING);
 		angel.addAttribute(Attribute.MISSING, new String[0]);
 		angel.addAttribute(Attribute.LOCATION, "Family Resource");
 
 		// If the angel was added reset the inputs and indicate success
 		if (dbController.insertAngel(angel, dbCollection)) {
-			showMessage("Successful", "Angel was added successfully");
+			showPopup("Successful", "Angel was added successfully");
 			resetInputs();
 		} else {
-			showMessage("Unsuccessful", "Angel addition was unsuccessfully");
+			showPopup("Unsuccessful", "Angel addition was unsuccessfully");
 		}
 	}
 
@@ -416,28 +451,15 @@ public class AddController extends Controller {
 	 * addition and disables the TextFields to their original setup.
 	 */
 	private void resetInputs() {
-		// Clearing all the inputs to prepare for new angel entry
-		idInput.clear();
-		sexInput.clear();
-		ageInput.clear();
-		shoeInput.clear();
-		clothesInput.clear();
-		shirtInput.clear();
-		pantsInput.clear();
-		wishInput.clear();
-		bookInput.clear();
-		specialInput.clear();
+		// Clearing all the inputs after AngelID to prepare for new angel entry
+		for (int i = 1; i < inputsContainer.getChildren().size(); ++i) {
+			((TextInputControl) inputsContainer.getChildren().get(i)).clear();
+			((TextInputControl) inputsContainer.getChildren().get(i))
+					.setDisable(true);
+		}
 
-		// Disabling TextFields to make sure all values are added
-		sexInput.setDisable(true);
-		ageInput.setDisable(true);
-		shoeInput.setDisable(true);
-		clothesInput.setDisable(true);
-		shirtInput.setDisable(true);
-		pantsInput.setDisable(true);
-		wishInput.setDisable(true);
-		bookInput.setDisable(true);
-		specialInput.setDisable(true);
+		// Clearing the AngelID TextField
+		((TextInputControl) inputsContainer.getChildren().get(0)).clear();
 		addAngelButton.setDisable(true);
 	}
 
@@ -446,18 +468,8 @@ public class AddController extends Controller {
 	 * 
 	 * @param message The message to display
 	 */
-	private void showMessage(String header, String message) {
-		Alert alert = new Alert(AlertType.INFORMATION);
-		alert.setHeaderText(header);
-		alert.setContentText(message);
-		alert.showAndWait();
-	}
-
-	@FXML
-	/**
-	 * Goes back to the scene that resulted in this scene to be displayed
-	 */
-	public void toMainMenu() {
-		super.previousDisplay();
+	private void showPopup(String header, String message) {
+		Popup popup = new Popup(AlertType.WARNING, header, message);
+		popup.initOwner(super.getStage());
 	}
 }

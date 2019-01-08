@@ -62,12 +62,12 @@ public class StatusSelectController extends Controller {
 	public void setAngel(Angel angelToChange) {
 		angel = angelToChange;
 
-		String status = ((String) angel.get(Attribute.STATUS)).toUpperCase();
+		Status status = Status.valueOf(angel.get(Attribute.STATUS).toString());
 
 		angelIDLabel.setText(angel.get(Attribute.ID) + " - " + status);
 
 		// Show warning if the angel is suppose to be pulled
-		if (status.equalsIgnoreCase(Status.PULL.getStatus())) {
+		if (status == Status.PULL) {
 			Alert alert = new Alert(AlertType.ERROR);
 			alert.setHeaderText("PULL ANGEL");
 			alert.setContentText("Angel needs to be pulled.");
@@ -82,8 +82,8 @@ public class StatusSelectController extends Controller {
 	 */
 	public void completeHandler() {
 		dbController.update((String) angel.get(Attribute.ID),
-				Attribute.STATUS.getType(),
-				Status.COMPLETE.getStatus(),
+				Attribute.STATUS.toString(),
+				Status.COMPLETE.toString(),
 				collection);
 		Alert alert = new Alert(AlertType.CONFIRMATION);
 		alert.setHeaderText("ANGEL STATUS CHANGED - COMPLETE");
@@ -121,9 +121,10 @@ public class StatusSelectController extends Controller {
 		// If YES on warning message, sets the status of angel to pull
 		if (alert.resultProperty().get() == ButtonType.YES) {
 			dbController.update((String) angel.get(Attribute.ID),
-					Attribute.STATUS.getType(),
-					Status.PULL.getStatus(),
+					Attribute.STATUS.toString(),
+					Status.PULL.toString(),
 					collection);
+			super.previousDisplay();
 		}
 	}
 
@@ -134,8 +135,8 @@ public class StatusSelectController extends Controller {
 	 */
 	public void awaitingHandler() {
 		dbController.update((String) angel.get(Attribute.ID),
-				Attribute.STATUS.getType(),
-				Status.AWAITING.getStatus(),
+				Attribute.STATUS.toString(),
+				Status.AWAITING.toString(),
 				collection);
 		Alert alert = new Alert(AlertType.CONFIRMATION);
 		alert.setHeaderText("ANGEL STATUS CHANGED - AWAITING");
@@ -151,10 +152,10 @@ public class StatusSelectController extends Controller {
 	 */
 	public void outHandler() {
 		dbController.update((String) angel.get(Attribute.ID),
-				Attribute.STATUS.getType(),
-				Status.OUT.getStatus(),
+				Attribute.STATUS.toString(),
+				Status.OUT.toString(),
 				collection);
-		
+
 		// TODO: Change to display dealing with handing out angels
 		Alert alert = new Alert(AlertType.CONFIRMATION);
 		alert.setHeaderText("ANGEL STATUS CHANGED - OUT");

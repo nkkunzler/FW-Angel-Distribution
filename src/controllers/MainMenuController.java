@@ -10,6 +10,7 @@
 package controllers;
 
 import display.Displays;
+import javafx.fxml.FXML;
 
 public class MainMenuController extends Controller {
 
@@ -26,6 +27,7 @@ public class MainMenuController extends Controller {
 	 * This method is called by the MainMenu.fxml file when the 'Add Angel'
 	 * button has an action.
 	 */
+	@FXML
 	public void switchToAddAngel() {
 		super.switchScene(Displays.ADD_DISPLAY);
 	}
@@ -36,7 +38,19 @@ public class MainMenuController extends Controller {
 	 * This method is called by the MainMenu.fxml file when the 'Edit Angel'
 	 * button has an action.
 	 */
+	@FXML
 	public void switchToAngelSelection() {
 		super.switchScene(Displays.ANGEL_SELECTION);
+	}
+	
+	/**
+	 * Switches the scene from the MainMenu to the ExportDisplay.fxml display.
+	 * 
+	 * This method is called by the MainMenu.fxml file when the 'Export'
+	 * button has an action.
+	 */
+	@FXML
+	public void switchToExportDisplay() {
+		//super.switchScene(Displays.EXPORT_DISPLAY);
 	}
 }

@@ -65,14 +65,14 @@ public class DatabaseController {
 	public List<Angel> query(String query) {
 		List<Angel> results = new ArrayList<>();
 		ArangoCursor<BaseDocument> documents = db.query(query);
-		
+
 		if (documents == null)
 			return null;
-		
+
 		for (BaseDocument doc : documents) {
 			Angel angel = new Angel();
 			for (Attribute attr : Attribute.values()) {
-				angel.addAttribute(attr, doc.getAttribute(attr.getType()));
+				angel.addAttribute(attr, doc.getAttribute(attr.toString()));
 			}
 			results.add(angel);
 		}
@@ -92,18 +92,20 @@ public class DatabaseController {
 		return db.contains(key, collection);
 	}
 
-	public void update(String key, String attribute, String value,
+	/**
+	 * Updates the desired keys attribute with the new value within the provided
+	 * collection.
+	 * 
+	 * @param key        String representing the key of the document being
+	 *                   updated
+	 * @param attribute  The attribute to update within the document.
+	 * @param value      The value of the new attribute
+	 * @param collection The collection in which to search for the key
+	 */
+	public void update(String key, Object attribute, Object values,
 			String collection) {
 		String updateQuery = "UPDATE {_key: '" + key + "'} "
-				+ "WITH {" + attribute + ": '" + value + "'} "
-				+ "IN " + collection;
-		db.query(updateQuery);
-	}
-	
-	public void update(String key, String attribute, Object values,
-			String collection) {
-		String updateQuery = "UPDATE {_key: '" + key + "'} "
-				+ "WITH {" + attribute + ": '" + values + "'} "
+				+ "WITH {" + attribute.toString() + ": '" + values + "'} "
 				+ "IN " + collection;
 		db.query(updateQuery);
 	}

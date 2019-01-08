@@ -139,4 +139,11 @@ public class DisplayManager {
 		}
 		return null;
 	}
+	
+	/**
+	 * @return The instance of the stage
+	 */
+	public static Stage getStage() {
+		return stage;
+	}
 }

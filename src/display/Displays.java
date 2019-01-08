@@ -23,7 +23,10 @@ public enum Displays {
 	ANGEL_STATUS("resources/fxml/AngelStatus.fxml"),
 	
 	// Displays where the user adds the items holding the angel
-	HOLD_DISPLAY("resources/fxml/HoldDisplay.fxml");
+	HOLD_DISPLAY("resources/fxml/HoldDisplay.fxml"),
+	
+	// Displays where the user can export the database
+	EXPORT_DISPLAY("resources/fxml/ExportDisplay.fxml");
 
 	private final String fxmlFile;
 	
@@ -34,10 +37,6 @@ public enum Displays {
 	 * @return String with the displays file location
 	 */
 	public String getFile() {
-		return fxmlFile;
-	}
-
-	public String toString() {
 		return fxmlFile;
 	}
 }

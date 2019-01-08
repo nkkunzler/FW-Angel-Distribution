@@ -7,13 +7,13 @@
  */
 package controllers;
 
-import angels.Angel;
 import display.DisplayManager;
 import display.Displays;
+import javafx.stage.Stage;
 
 public class Controller {
 
-	private Displays displayName;
+	private Displays display;
 
 	/**
 	 * Constructor for a display.
@@ -24,7 +24,7 @@ public class Controller {
 	 */
 	protected Controller(Displays display) {
 		super();
-		this.displayName = display;
+		this.display = display;
 		DisplayManager.addDisplay(display, this);
 	}
 
@@ -35,7 +35,7 @@ public class Controller {
 	 * @param sceneToSwitchTo The scene to switch two
 	 */
 	protected void switchScene(Displays sceneToSwitchTo) {
-		DisplayManager.switchScene(displayName, sceneToSwitchTo);
+		DisplayManager.switchScene(display, sceneToSwitchTo);
 	}
 
 	/**
@@ -54,5 +54,12 @@ public class Controller {
 	 */
 	protected Controller getController(Displays display) {
 		return DisplayManager.getController(display);
+	}
+	
+	/**
+	 * @return Returns the stage associated with the display
+	 */
+	protected Stage getStage() {
+		return DisplayManager.getStage();
 	}
 }

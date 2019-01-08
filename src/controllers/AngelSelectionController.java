@@ -24,6 +24,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -32,6 +33,8 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.text.Font;
 
 public class AngelSelectionController extends Controller {
+
+	private final int FONT_SIZE = 42;
 
 	@FXML
 	private Button clearButton, backButton;
@@ -63,7 +66,9 @@ public class AngelSelectionController extends Controller {
 	@FXML
 	/**
 	 * Updates the TextField that is displayed above the number pad based off of
-	 * the buttons selected.
+	 * the buttons selected. The numbers that are entered are then used to query
+	 * the database to find all documents that contain the id of the input
+	 * value.
 	 * 
 	 * The buttons on the keypad include the numbers 0-9, in a phone keypad
 	 * layout. There is also a backspace, <, and a Clear, C, button.
@@ -78,7 +83,7 @@ public class AngelSelectionController extends Controller {
 		if (button == clearButton) { // The clear button
 			idLabel.clear();
 			pane.setCenter(generateAngelIDButtons(null));
-			return; // Do not need to query the database
+			return; // Do not need to query the database when clearing
 		} else if (button == backButton) {
 			if (!idLabel.getText().equals("")) // Don't delete if id is empty
 				idLabel.setText(idLabel.getText().substring(0,
@@ -86,8 +91,7 @@ public class AngelSelectionController extends Controller {
 		} else
 			idLabel.setText(idLabel.getText() + btnText);
 
-		// Queries database for id provided and displays results on
-		// the BorderPane.
+		// Puts buttons, representing angels, with the same id as input value
 		pane.setCenter(generateAngelIDButtons(idLabel.getText()));
 	}
 
@@ -127,14 +131,12 @@ public class AngelSelectionController extends Controller {
 	private GridPane generateAngelIDButtons(String angelID) {
 		// Searching for the angel id in database
 		String query = "FOR doc IN angels "
-				+ "FILTER LIKE(doc.id, " + "'" + angelID + "_')"
-				+ "SORT doc.id "
-				+ "RETURN doc";
-		List<Angel> result = dbController.query(query);
+				+ "FILTER LIKE(doc." + Attribute.ID
+				+ ", " + "'" + angelID + "_')" // Find id similar to input
+				+ " SORT doc." + Attribute.ID // Sort the ID, a -> z
+				+ " RETURN doc";
 
-		// Do nothing if there are no results
-		if (result == null)
-			return null;
+		List<Angel> result = dbController.query(query);
 
 		// Creating GridPane used to display the found angels
 		GridPane grid = new GridPane();
@@ -142,21 +144,31 @@ public class AngelSelectionController extends Controller {
 		grid.setHgap(10);
 		grid.setVgap(10);
 
+		// Do nothing if there are no results
+		if (result.size() == 0) {
+			Label label = new Label("No Results Found");
+			label.setFont(new Font(FONT_SIZE));
+			grid.add(label, 1, 1);
+			return grid;
+		}
 		// Creating the buttons for each of the results
 		for (int i = 0; i < result.size(); ++i) {
 			Angel angel = result.get(i);
-			String id = (String) angel.get(Attribute.ID);
-			String sex = (String) angel.get(Attribute.SEX);
-			Button btn = new Button(id);
-			btn.setFont(new Font(42));
+			Button btn = new Button((String) angel.get(Attribute.ID));
+			btn.setFont(new Font(FONT_SIZE));
 
-			if (sex.equalsIgnoreCase("boy")) // Boys are colored light blue
+			String sex = (String) angel.get(Attribute.SEX);
+			if (sex.equalsIgnoreCase("boy")) // Boys are colored light
+												// blue
 				btn.setStyle("-fx-background-color: lightblue;");
 			else // Girls are colored light pink
 				btn.setStyle("-fx-background-color: lightpink;");
+
 			grid.add(btn, i % 3, i / 3); // GridPane is 3x3.
 
 			btn.setOnAction(e -> {
+				// Switching scenes to AngelStatus.fxml and passing the angel to
+				// the controller to be used by the scene.
 				super.switchScene(Displays.ANGEL_STATUS);
 				StatusSelectController ssc = (StatusSelectController) super.getController(
 						Displays.ANGEL_STATUS);

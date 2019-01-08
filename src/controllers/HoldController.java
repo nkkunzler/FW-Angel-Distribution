@@ -13,16 +13,19 @@
 package controllers;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import angels.Angel;
 import angels.Attribute;
 import angels.Status;
+import customFX.Popup;
 import database.DatabaseController;
 import display.Displays;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
@@ -106,10 +109,10 @@ public class HoldController extends Controller {
 	@SuppressWarnings("unchecked")
 	private VBox newSection(Attribute attribute) {
 		try {
-			return this.newSection(attribute.getType(),
+			return newSection(attribute.toString(),
 					(List<String>) angel.get(attribute));
 		} catch (ClassCastException cce) {
-			System.err.println("Angel Attribute '" + attribute.getType()
+			System.err.println("Angel Attribute '" + attribute.toString()
 					+ " does not correspond to a List<String>");
 		}
 		return new VBox();
@@ -140,6 +143,14 @@ public class HoldController extends Controller {
 		return section;
 	}
 
+	/**
+	 * Creates a new GridPane of CheckBoxes with the labels assigned from the
+	 * items list.
+	 * 
+	 * @param items List of strings which will be assigned to CheckBoxes.
+	 * @return GridPane containing CheckBoxes with the text from the items list.
+	 */
+	@SuppressWarnings("unchecked")
 	private GridPane createGridPane(List<String> items) {
 		GridPane pane = new GridPane();
 		pane.setVgap(10);
@@ -148,87 +159,113 @@ public class HoldController extends Controller {
 		int row = 0;
 		int col = 0;
 		int numChars = 0;
+		Set<String> itemSet = new HashSet<>(
+				(List<String>) angel.get(Attribute.MISSING));
 		for (int i = 0; i < items.size(); ++i) {
 			CheckBox cb = new CheckBox(items.get(i).toUpperCase());
 			cb.setFont(new Font(18));
-
-			numChars += cb.getText().length();
-
-			if (numChars >= 20 && col < 2) {
-				row++;
-				col++;
-				numChars = 0;
-			}
-
-			pane.add(cb, row++ % 2, col++ / 2);
-
-			// TODO: Bug if there are two identical items on hold it will select
-			// both items. Should probably only select one of them.
-			if (((List<String>) angel.get(Attribute.MISSING))
-					.contains(cb.getText())) {
-				cb.setSelected(true);
-				Label label = new Label(cb.getText());
-				label.setFont(new Font(18));
-				selectedItemsVBox.getChildren().add(label);
-			}
-
-			cb.setOnAction(e -> { // A checkbox was selected or unselected
-				if (cb.isSelected()) {
+			cb.setOnAction(e -> {
+				if (cb.isSelected()) { // Adds label showing new missing item
 					Label label = new Label(cb.getText());
 					label.setFont(new Font(18));
-					// Adding the selected missing item to VBox to be displayed
 					selectedItemsVBox.getChildren().add(label);
-				} else {
-					// Removing unselected value from the missing items display
+				} else { // Removes unselected CheckBox from missing items list
 					selectedItemsVBox.getChildren().removeIf(
 							p -> cb.getText().equals(((Labeled) p).getText()));
 				}
 			});
+
+			numChars += cb.getText().length();
+
+			// If text in CheckBox is longer than 20 characters, new CheckBoxes
+			// within the section are moved down one column.
+			if (numChars >= 20 && col <= 1) {
+				if (items.size() != 1)
+					row++;
+				col++;
+				numChars = 0;
+			}
+			pane.add(cb, row++ % 2, col++ / 2);
+
+			// If items are in hold then pre-check the CheckBox
+			if (itemSet.contains(cb.getText()))
+				cb.fire();
 		}
 		return pane;
 	}
 
+	/**
+	 * This method is called when the 'PUT ON HOLD' button in the
+	 * HoldDisplay.fxml file is pressed. This method puts all selected items,
+	 * which represents the items that are missing, into the database under the
+	 * attribute of MISSING.
+	 */
 	@FXML
 	public void onHoldButtonHandler() {
 		// TODO: Figure out a way to insert an array into the database without
 		// have to convert the array into a string.
-		String items = "[";
-		int numOfItems = selectedItemsVBox.getChildren().size() - 1;
+		String missingItems = convertArrToStr(selectedItemsVBox.getChildren());
 
-		if (numOfItems == -1) {
-			items += "]";
-			Alert alert = new Alert(AlertType.INFORMATION);
-			alert.getButtonTypes().setAll(ButtonType.YES, ButtonType.NO);
-			alert.setContentText(
-					"This angel has nothing on hold.\n"
-							+ "Would you like to mark it as complete?");
-			alert.setHeaderText("Mark As Complete?");
-			alert.showAndWait();
-			if (alert.resultProperty().get() == ButtonType.YES) {
+		// If no missingItems, [], ask if the item should be marked as complete
+		if (missingItems.equals("[]")) {
+			String contentText = "This angel has nothing on hold.\n"
+					+ "Would you like to mark it as complete?";
+			Popup popup = new Popup(
+					AlertType.INFORMATION,
+					"", contentText,
+					ButtonType.YES,
+					ButtonType.NO);
+			if (popup.getSelection() == ButtonType.YES) {
 				dbController.update((String) angel.get(Attribute.ID),
-						Attribute.STATUS.getType(), Status.COMPLETE,
+						Attribute.STATUS, Status.COMPLETE,
 						collection);
 			}
-		} else {
-
-			for (int i = 0; i < numOfItems; ++i) {
-				Label label = (Label) selectedItemsVBox.getChildren().get(i);
-				items += "\"" + label.getText() + "\", ";
-			}
-			Label label = (Label) selectedItemsVBox.getChildren()
-					.get(numOfItems);
-			items += "\"" + label.getText() + "\"]";
+		} else { // Missing items indicate that item needs to go on hold
 			dbController.update((String) angel.get(Attribute.ID),
-					Attribute.STATUS.getType(), Status.HOLD, collection);
+					Attribute.STATUS, Status.HOLD, collection);
 		}
 
+		// Changing the missing items in the database to newly selected items
 		dbController.query(
 				"UPDATE {_key: '" + angel.get(Attribute.ID) + "'} WITH {'"
-						+ Attribute.MISSING.getType()
-						+ "':" + items + "} IN " + collection);
+						+ Attribute.MISSING + "':" + missingItems + "} "
+						+ "IN " + collection);
+
 		super.switchScene(Displays.ANGEL_SELECTION);
 	}
 
+	/**
+	 * Converts an ObservableList<Node> into a string form usable by an arangodb
+	 * database query.
+	 * 
+	 * The string will have a form similar to the one as below, " marks not
+	 * included.
+	 * 
+	 * " ['item one', 'item two'] "
+	 * 
+	 * @param array ObservableList<?> that will be converted to a string
+	 * @return A string representation of the array
+	 */
+	private String convertArrToStr(ObservableList<?> array) {
+		String strArray = "[";
+
+		if (array.size() == 0) {
+			strArray += "]";
+		} else {
+			for (int i = 0; i < array.size() - 1; ++i) {
+				Label label = (Label) array.get(i);
+				strArray += "'" + label.getText() + "', ";
+			}
+			Label label = (Label) array.get(array.size() - 1);
+			strArray += "'" + label.getText() + "']";
+		}
+		return strArray;
+	}
+
+	/**
+	 * Cancels the hold operation and returns back to the StatusSelection
+	 * display.
+	 */
 	@FXML
 	public void cancelButtonHandler() {
 		super.previousDisplay();
@@ -236,5 +273,4 @@ public class HoldController extends Controller {
 				Displays.ANGEL_STATUS);
 		controller.setAngel(angel);
 	}
-
 }

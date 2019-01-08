@@ -27,6 +27,11 @@
                   <Font size="24.0" />
                </font>
             </Button>
+            <Button fx:id="exportButton" mnemonicParsing="false" onAction="#switchToExportDisplay" text="Export">
+               <font>
+                  <Font size="24.0" />
+               </font>
+            </Button>
          </children>
       </VBox>
    </center>
