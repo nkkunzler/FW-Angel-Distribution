@@ -87,7 +87,7 @@ public class AddController extends Controller {
 				idInput.setText(angelID + "A");
 
 			// Checking to see if the angel id already exist in the database
-			if (dbController.contains(idInput.getText(), dbCollection)) {
+			if (dbController.contains(angelID, dbCollection)) {
 				showPopup("Invalid ID",
 						"Angel ID '" + idInput.getText() + "' already exists");
 				e.consume(); // Prevents next enabled Node to be auto selected
@@ -470,6 +470,5 @@ public class AddController extends Controller {
 	 */
 	private void showPopup(String header, String message) {
 		Popup popup = new Popup(AlertType.WARNING, header, message);
-		popup.initOwner(super.getStage());
 	}
 }

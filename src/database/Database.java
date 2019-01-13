@@ -22,10 +22,13 @@ import com.arangodb.entity.BaseDocument;
 public class Database {
 
 	private String dbName;
+	private String user, password;
 	private ArangoDB arangoDB;
 
 	public Database(String dbName, String user, String password) {
 		this.dbName = dbName;
+		this.user = user;
+		this.password = password;
 		arangoDB = new ArangoDB.Builder().user(user).password(password).build();
 		createDatabase();
 	}
@@ -110,7 +113,7 @@ public class Database {
 			return null;
 		}
 	}
-	
+
 	/**
 	 * Creates a new collection within the database. If the collection already
 	 * exists within the database then nothing happens.

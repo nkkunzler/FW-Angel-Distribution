@@ -15,14 +15,21 @@
 package controllers;
 
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import angels.Angel;
 import angels.Attribute;
+import customFX.Popup;
 import database.DatabaseController;
 import display.Displays;
+import javafx.application.Platform;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -117,33 +124,83 @@ public class AngelSelectionController extends Controller {
 	}
 
 	/**
+	 * When the user puts in an angle id number, this method is responsible for
+	 * querying the database and finding all angels with the given id.
+	 * 
+	 * @param angelID String representing the id of the angel to find within the
+	 *                database
+	 * @return
+	 * @return A GridPane containing all the angels that match the angel id
+	 *         input.
+	 */
+	private GridPane generateAngelIDButtons(String angelID) {
+		// Searching for the angel id in database
+		final String query = "FOR doc IN angels "
+				+ "FILTER LIKE(doc." + Attribute.ID
+				+ ", " + "'" + angelID + "_')" // Find id similar to input
+				+ " SORT doc." + Attribute.ID // Sort the ID, a -> z
+				+ " RETURN doc";
+
+		// Creating GridPane used to display the found angels
+		final GridPane grid = new GridPane();
+		grid.setAlignment(Pos.CENTER);
+		grid.setHgap(10);
+		grid.setVgap(10);
+
+		// TODO: Seems like new thread pools are being created each time. I am
+		// not sure if this a good or bad thing. Research more into this.
+
+		// Creating the buttons corresponding to input id value. Done on
+		// Separate thread to prevent UI locking
+		Task<Void> task = new Task<Void>() {
+			@Override
+			protected Void call() throws Exception {
+				if (isCancelled())
+					return null;
+
+				// Run query if input has not changed in 1/2 a second.
+				Thread.sleep(650);
+				if (!idLabel.getText().equals(angelID)) {
+					super.cancel();
+					return null;
+				}
+				List<Angel> results = dbController.query(query);
+
+				// Updating GridPane to desired value
+				Platform.runLater(new Runnable() {
+					public void run() {
+						populateGrid(grid, results);
+					}
+				});
+				return null;
+			}
+		};
+
+		task.setOnFailed(e -> {
+			new Popup(AlertType.ERROR, "Database Error",
+					"Database Retrail Error has occured");
+		});
+
+		ExecutorService exec = Executors.newSingleThreadExecutor();
+		exec.submit(task);
+		exec.shutdown();
+
+		return grid;
+	}
+
+	/**
 	 * Creates the buttons for the angels that match the input for the angel id.
 	 * The buttons are colored corresponding to the gender of the angel, blue
 	 * for boy and pink for girl. The buttons when selected change the display
 	 * to allow for a selection of changing the status of the angel to complete,
 	 * on hold, or pull.
 	 * 
-	 * @param angelID String representing the id of the angel to find within the
-	 *                database
-	 * @return A GridPane containing all the angels that match the angel id
-	 *         input.
+	 * @param grid   GridPane to which to add the buttons corresponding to the
+	 *               angels within the result list.
+	 * @param result A list, containing zero or more Angels, that are used to
+	 *               generate buttons with text corresponding to the Angel ID.
 	 */
-	private GridPane generateAngelIDButtons(String angelID) {
-		// Searching for the angel id in database
-		String query = "FOR doc IN angels "
-				+ "FILTER LIKE(doc." + Attribute.ID
-				+ ", " + "'" + angelID + "_')" // Find id similar to input
-				+ " SORT doc." + Attribute.ID // Sort the ID, a -> z
-				+ " RETURN doc";
-
-		List<Angel> result = dbController.query(query);
-
-		// Creating GridPane used to display the found angels
-		GridPane grid = new GridPane();
-		grid.setAlignment(Pos.CENTER);
-		grid.setHgap(10);
-		grid.setVgap(10);
-
+	private GridPane populateGrid(GridPane grid, List<Angel> result) {
 		// Do nothing if there are no results
 		if (result.size() == 0) {
 			Label label = new Label("No Results Found");
@@ -157,11 +214,11 @@ public class AngelSelectionController extends Controller {
 			Button btn = new Button((String) angel.get(Attribute.ID));
 			btn.setFont(new Font(FONT_SIZE));
 
+			// Coloring button depending on gender
 			String sex = (String) angel.get(Attribute.SEX);
-			if (sex.equalsIgnoreCase("boy")) // Boys are colored light
-												// blue
+			if (sex.equalsIgnoreCase("boy"))
 				btn.setStyle("-fx-background-color: lightblue;");
-			else // Girls are colored light pink
+			else
 				btn.setStyle("-fx-background-color: lightpink;");
 
 			grid.add(btn, i % 3, i / 3); // GridPane is 3x3.
@@ -185,5 +242,4 @@ public class AngelSelectionController extends Controller {
 	public void toMainMenu() {
 		super.switchScene(Displays.MAIN_MENU);
 	}
-
 }

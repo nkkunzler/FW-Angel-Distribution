@@ -10,6 +10,10 @@ package database;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
 
 import com.arangodb.ArangoCursor;
 import com.arangodb.entity.BaseDocument;
@@ -20,6 +24,8 @@ import angels.Attribute;
 public class DatabaseController {
 
 	private Database db;
+	private static boolean inactive = false;
+	private ScheduledExecutorService exec;
 
 	/**
 	 * Creates a new database controller based off of a database. This allows
@@ -29,6 +35,29 @@ public class DatabaseController {
 	 */
 	public DatabaseController(Database db) {
 		this.db = db;
+
+		exec = Executors.newScheduledThreadPool(1, new ThreadFactory() {
+			
+			@Override
+			public Thread newThread(Runnable r) {
+				Thread thread = new Thread(r);
+				thread.setDaemon(true);
+				return thread;
+			}
+		});
+		
+		final Runnable dbDisconnect = new Runnable() {
+			public void run() {
+				if (!inactive) {
+					inactive = true;
+					System.out.println("Database is inactive");
+				} else {
+					db.shutdown();
+					System.out.println("Closing connection to database");
+				}
+			}
+		};
+		exec.scheduleAtFixedRate(dbDisconnect, 30, 60, TimeUnit.SECONDS);
 	}
 
 	/**
@@ -38,6 +67,8 @@ public class DatabaseController {
 	 * @return True if the collection was added; otherwise false is returned.
 	 */
 	public boolean createCollection(String collectionName) {
+		inactive = false;
+		
 		return db.createCollection(collectionName);
 	}
 
@@ -50,6 +81,8 @@ public class DatabaseController {
 	 *         otherwise false is returned.
 	 */
 	public boolean insertAngel(Angel angel, String collection) {
+		inactive = false;
+		
 		return db.insert((String) angel.get(Attribute.ID),
 				angel.getAttributes(), collection);
 	}
@@ -63,6 +96,8 @@ public class DatabaseController {
 	 *         the query is inconclusive.
 	 */
 	public List<Angel> query(String query) {
+		inactive = false;
+		
 		List<Angel> results = new ArrayList<>();
 		ArangoCursor<BaseDocument> documents = db.query(query);
 
@@ -89,6 +124,7 @@ public class DatabaseController {
 	 *         is returned.
 	 */
 	public boolean contains(String key, String collection) {
+		inactive = false;
 		return db.contains(key, collection);
 	}
 
@@ -104,6 +140,7 @@ public class DatabaseController {
 	 */
 	public void update(String key, Object attribute, Object values,
 			String collection) {
+		inactive = false;
 		String updateQuery = "UPDATE {_key: '" + key + "'} "
 				+ "WITH {" + attribute.toString() + ": '" + values + "'} "
 				+ "IN " + collection;
@@ -119,6 +156,7 @@ public class DatabaseController {
 	 *         false is deleted.
 	 */
 	public boolean delete(String key, String collection) {
+		inactive = false;
 		return db.delete(key, collection);
 	}
 
@@ -126,6 +164,12 @@ public class DatabaseController {
 	 * Closes the connection to the database.
 	 */
 	public void close() {
+		exec.shutdownNow();
+		try {
+			exec.awaitTermination(500, TimeUnit.MILLISECONDS);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 		db.shutdown();
 	}
 

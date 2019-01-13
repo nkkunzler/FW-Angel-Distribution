@@ -5,7 +5,6 @@ import angels.Attribute;
 import angels.Status;
 import controllers.AddController;
 import controllers.AngelSelectionController;
-import controllers.ExportController;
 import controllers.HoldController;
 import controllers.MainMenuController;
 import controllers.StatusSelectController;
@@ -35,7 +34,7 @@ public class FWAngelDistribution extends Application {
 
 		// Uncomment if you want to generate angels within the angels database.
 		//populateDatabase();
-
+		
 		launch();
 	}
 
@@ -56,7 +55,9 @@ public class FWAngelDistribution extends Application {
 
 		stage.setScene(new Scene(DisplayManager.getMainDisplay()));
 		stage.show();
-		stage.setOnCloseRequest(e -> dbController.close()); // Close connection
+		stage.setOnCloseRequest(e -> {
+			dbController.close();
+		}); // Close connection
 	}
 
 	/**
@@ -68,7 +69,7 @@ public class FWAngelDistribution extends Application {
 		new AngelSelectionController(dbController, ANGEL_COLLECTION);
 		new StatusSelectController(dbController, ANGEL_COLLECTION);
 		new HoldController(dbController, ANGEL_COLLECTION);
-		new ExportController(dbController);
+		//new ExportController(dbController);
 	}
 
 	/**
