@@ -8,14 +8,18 @@
  */
 package controllers;
 
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 import angels.Angel;
 import angels.Attribute;
 import angels.Status;
 import customFX.Popup;
 import database.DatabaseController;
 import display.Displays;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
-import javafx.scene.Node;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
@@ -72,7 +76,8 @@ public class AddController extends Controller {
 	 * @param e KeyEvent that is triggered every time a button is pressed.
 	 */
 	@FXML
-	public void validateAngelID(KeyEvent e) {
+	public void validateAngelID(KeyEvent e)
+			throws InterruptedException, ExecutionException {
 		if (e.getCode() == KeyCode.TAB) {
 			String angelID = idInput.getText().toUpperCase();
 
@@ -83,13 +88,21 @@ public class AddController extends Controller {
 			}
 
 			// Checking to see that a character was included, else an A is added
-			if (!angelID.matches(".*[a-zA-Z]+.*"))
+			if (!angelID.matches(".*[a-zA-Z]+.*")) {
 				idInput.setText(angelID + "A");
+				angelID = angelID + "A";
+			}
 
 			// Checking to see if the angel id already exist in the database
-			if (dbController.contains(angelID, dbCollection)) {
+			Task<Boolean> task = dbController.contains(angelID, dbCollection);
+			Thread thread = new Thread(task);
+			thread.start();
+			thread.join(); // Force thread to finish before allowing more input
+
+			if (task.get()) {
 				showPopup("Invalid ID",
-						"Angel ID '" + idInput.getText() + "' already exists");
+						"Angel ID '" + angelID + "' already exists");
+				idInput.clear();
 				e.consume(); // Prevents next enabled Node to be auto selected
 			} else {
 				sexInput.setDisable(false);
@@ -109,8 +122,17 @@ public class AddController extends Controller {
 		if (e.getCode() == KeyCode.TAB) {
 			String input = sexInput.getText().toLowerCase();
 
+			if (input.equals("b")) {
+				sexInput.setText("boy");
+				input = "boy";
+			} else if (input.equals("g")) {
+				sexInput.setText("girl");
+				input = "girl";
+			}
+
 			if (!input.equals("boy") && !input.equals("girl")) {
 				showPopup("Invalid Gender", "Enter 'boy' or 'girl'");
+				sexInput.clear();
 				e.consume(); // Prevents next enabled Node from being selected
 			} else {
 				ageInput.setDisable(false);
@@ -134,6 +156,7 @@ public class AddController extends Controller {
 				age = Integer.valueOf(ageInput.getText());
 			} catch (NumberFormatException nfe) {
 				showPopup("Invalid Age", "Enter a number between 1 and 12");
+				ageInput.clear();
 				e.consume(); // Prevents next enabled Node from being selected
 				return;
 			}
@@ -141,6 +164,7 @@ public class AddController extends Controller {
 			// Valid ages are between 1 and 12, inclusive
 			if (age < 0 || age > 12) {
 				showPopup("Invalid Age", "Enter a number between 1 and 12");
+				ageInput.clear();
 				e.consume();
 			} else {
 				shoeInput.setDisable(false);
@@ -187,6 +211,7 @@ public class AddController extends Controller {
 				} catch (NumberFormatException nfe) {
 					showPopup("Invalid Shoe Size",
 							"Please enter a number indicating shoe size");
+					shoeInput.clear();
 					e.consume(); // Prevents next Node from being selected
 					return;
 				}
@@ -438,12 +463,18 @@ public class AddController extends Controller {
 		angel.addAttribute(Attribute.LOCATION, "Family Resource");
 
 		// If the angel was added reset the inputs and indicate success
-		if (dbController.insertAngel(angel, dbCollection)) {
-			showPopup("Successful", "Angel was added successfully");
+		Task<Boolean> task = dbController.insertAngel(angel, dbCollection);
+		ExecutorService exec = Executors.newSingleThreadExecutor();
+		exec.execute(task);
+		exec.shutdown();
+
+		task.setOnSucceeded(e -> {
+			showPopup("Successful", "Angel '" + idInput.getText()
+					+ "' + was added successfully");
 			resetInputs();
-		} else {
-			showPopup("Unsuccessful", "Angel addition was unsuccessfully");
-		}
+		});
+
+		task.setOnFailed(e -> showPopup("Error", "Angel could not be added"));
 	}
 
 	/**
@@ -469,6 +500,6 @@ public class AddController extends Controller {
 	 * @param message The message to display
 	 */
 	private void showPopup(String header, String message) {
-		Popup popup = new Popup(AlertType.WARNING, header, message);
+		new Popup(AlertType.WARNING, header, message);
 	}
 }

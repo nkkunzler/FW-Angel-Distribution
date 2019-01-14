@@ -15,6 +15,7 @@
 package controllers;
 
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -23,12 +24,10 @@ import angels.Attribute;
 import customFX.Popup;
 import database.DatabaseController;
 import display.Displays;
-import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -147,42 +146,25 @@ public class AngelSelectionController extends Controller {
 		grid.setHgap(10);
 		grid.setVgap(10);
 
-		// TODO: Seems like new thread pools are being created each time. I am
-		// not sure if this a good or bad thing. Research more into this.
-
 		// Creating the buttons corresponding to input id value. Done on
 		// Separate thread to prevent UI locking
-		Task<Void> task = new Task<Void>() {
-			@Override
-			protected Void call() throws Exception {
-				if (isCancelled())
-					return null;
-
-				// Run query if input has not changed in 1/2 a second.
-				Thread.sleep(650);
-				if (!idLabel.getText().equals(angelID)) {
-					super.cancel();
-					return null;
-				}
-				List<Angel> results = dbController.query(query);
-
-				// Updating GridPane to desired value
-				Platform.runLater(new Runnable() {
-					public void run() {
-						populateGrid(grid, results);
-					}
-				});
-				return null;
+		Task<List<Angel>> task = dbController.query(query);
+		task.setOnSucceeded(e -> {
+			try {
+				populateGrid(grid, task.get());
+			} catch (InterruptedException | ExecutionException e1) {
+				e1.printStackTrace();
 			}
-		};
+		});
 
 		task.setOnFailed(e -> {
 			new Popup(AlertType.ERROR, "Database Error",
-					"Database Retrail Error has occured");
+					"Database Retrieval Error has occured");
+			task.cancel();
 		});
 
 		ExecutorService exec = Executors.newSingleThreadExecutor();
-		exec.submit(task);
+		exec.execute(task);
 		exec.shutdown();
 
 		return grid;
@@ -213,6 +195,14 @@ public class AngelSelectionController extends Controller {
 			Angel angel = result.get(i);
 			Button btn = new Button((String) angel.get(Attribute.ID));
 			btn.setFont(new Font(FONT_SIZE));
+			
+			// Clicking on an angel id button
+			btn.setOnAction(e -> {
+				super.switchScene(Displays.ANGEL_STATUS);
+				StatusSelectController ssc = (StatusSelectController) super.getController(
+						Displays.ANGEL_STATUS);
+				ssc.setAngel(angel);
+			});
 
 			// Coloring button depending on gender
 			String sex = (String) angel.get(Attribute.SEX);
@@ -222,15 +212,6 @@ public class AngelSelectionController extends Controller {
 				btn.setStyle("-fx-background-color: lightpink;");
 
 			grid.add(btn, i % 3, i / 3); // GridPane is 3x3.
-
-			btn.setOnAction(e -> {
-				// Switching scenes to AngelStatus.fxml and passing the angel to
-				// the controller to be used by the scene.
-				super.switchScene(Displays.ANGEL_STATUS);
-				StatusSelectController ssc = (StatusSelectController) super.getController(
-						Displays.ANGEL_STATUS);
-				ssc.setAngel(angel);
-			});
 		}
 		return grid;
 	}

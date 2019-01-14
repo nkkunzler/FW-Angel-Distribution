@@ -10,23 +10,18 @@ package database;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.TimeUnit;
 
 import com.arangodb.ArangoCursor;
 import com.arangodb.entity.BaseDocument;
 
 import angels.Angel;
 import angels.Attribute;
+import javafx.concurrent.Task;
 
 public class DatabaseController {
 
 	private Database db;
-	private static boolean inactive = false;
-	private ScheduledExecutorService exec;
-
+	
 	/**
 	 * Creates a new database controller based off of a database. This allows
 	 * for data entry and access.
@@ -35,29 +30,6 @@ public class DatabaseController {
 	 */
 	public DatabaseController(Database db) {
 		this.db = db;
-
-		exec = Executors.newScheduledThreadPool(1, new ThreadFactory() {
-			
-			@Override
-			public Thread newThread(Runnable r) {
-				Thread thread = new Thread(r);
-				thread.setDaemon(true);
-				return thread;
-			}
-		});
-		
-		final Runnable dbDisconnect = new Runnable() {
-			public void run() {
-				if (!inactive) {
-					inactive = true;
-					System.out.println("Database is inactive");
-				} else {
-					db.shutdown();
-					System.out.println("Closing connection to database");
-				}
-			}
-		};
-		exec.scheduleAtFixedRate(dbDisconnect, 30, 60, TimeUnit.SECONDS);
 	}
 
 	/**
@@ -66,10 +38,19 @@ public class DatabaseController {
 	 * @param collectionName The name of the collection to add to the database.
 	 * @return True if the collection was added; otherwise false is returned.
 	 */
-	public boolean createCollection(String collectionName) {
-		inactive = false;
-		
-		return db.createCollection(collectionName);
+	public Task<Boolean> createCollection(String collectionName) {
+		Task<Boolean> task = new Task<Boolean>() {
+			@Override
+			protected Boolean call() throws Exception {
+				if (isCancelled())
+					return false;
+				
+				return db.createCollection(collectionName);
+			}
+		};
+
+		return task;
+
 	}
 
 	/**
@@ -80,11 +61,22 @@ public class DatabaseController {
 	 * @return True if the angel was successfully added to the collection;
 	 *         otherwise false is returned.
 	 */
-	public boolean insertAngel(Angel angel, String collection) {
-		inactive = false;
-		
-		return db.insert((String) angel.get(Attribute.ID),
-				angel.getAttributes(), collection);
+	public Task<Boolean> insertAngel(Angel angel, String collection) {
+		Task<Boolean> task = new Task<Boolean>() {
+			@Override
+			protected Boolean call() throws Exception {
+				if (isCancelled())
+					return false;
+				
+				Thread.sleep(5000);
+				
+				return db.insert((String) angel.get(Attribute.ID),
+						angel.getAttributes(), collection);
+			}
+		};
+
+		return task;
+
 	}
 
 	/**
@@ -95,23 +87,31 @@ public class DatabaseController {
 	 * @return A list containing the results of the query. Null is returned if
 	 *         the query is inconclusive.
 	 */
-	public List<Angel> query(String query) {
-		inactive = false;
-		
-		List<Angel> results = new ArrayList<>();
-		ArangoCursor<BaseDocument> documents = db.query(query);
-
-		if (documents == null)
-			return null;
-
-		for (BaseDocument doc : documents) {
-			Angel angel = new Angel();
-			for (Attribute attr : Attribute.values()) {
-				angel.addAttribute(attr, doc.getAttribute(attr.toString()));
+	public Task<List<Angel>> query(String query) {
+		Task<List<Angel>> task = new Task<List<Angel>>() {
+			// Executor will call this method when passing it the task
+			@Override
+			protected List<Angel> call() throws Exception {
+				List<Angel> results = new ArrayList<>();
+				
+				if (isCancelled())
+					return results;
+				
+				ArangoCursor<BaseDocument> documents = db.query(query);
+				if (documents == null)
+					return null;
+				for (BaseDocument doc : documents) {
+					Angel angel = new Angel();
+					for (Attribute attr : Attribute.values()) {
+						angel.addAttribute(attr,
+								doc.getAttribute(attr.toString()));
+					}
+					results.add(angel);
+				}
+				return results;
 			}
-			results.add(angel);
-		}
-		return results;
+		};
+		return task;
 	}
 
 	/**
@@ -123,9 +123,17 @@ public class DatabaseController {
 	 * @return True if the angel exists within the collection; otherwise false
 	 *         is returned.
 	 */
-	public boolean contains(String key, String collection) {
-		inactive = false;
-		return db.contains(key, collection);
+	public Task<Boolean> contains(String key, String collection) {
+		Task<Boolean> task = new Task<Boolean>() {
+			@Override
+			protected Boolean call() throws Exception {
+				if (isCancelled())
+					return false;
+				return db.contains(key, collection);
+			}
+		};
+
+		return task;
 	}
 
 	/**
@@ -138,13 +146,24 @@ public class DatabaseController {
 	 * @param value      The value of the new attribute
 	 * @param collection The collection in which to search for the key
 	 */
-	public void update(String key, Object attribute, Object values,
+	public Task<Void> update(String key, Object attribute, Object values,
 			String collection) {
-		inactive = false;
-		String updateQuery = "UPDATE {_key: '" + key + "'} "
-				+ "WITH {" + attribute.toString() + ": '" + values + "'} "
-				+ "IN " + collection;
-		db.query(updateQuery);
+		Task<Void> task = new Task<Void>() {
+			@Override
+			protected Void call() throws Exception {
+				if (isCancelled())
+					return null;
+				
+				String updateQuery = "UPDATE {_key: '" + key + "'} "
+						+ "WITH {" + attribute.toString() + ": '" + values
+						+ "'} "
+						+ "IN " + collection;
+				db.query(updateQuery);
+				return null;
+			}
+		};
+
+		return task;
 	}
 
 	/**
@@ -155,22 +174,23 @@ public class DatabaseController {
 	 * @return True if the document with the desired key was deleted; otherwise
 	 *         false is deleted.
 	 */
-	public boolean delete(String key, String collection) {
-		inactive = false;
-		return db.delete(key, collection);
+	public Task<Boolean> delete(String key, String collection) {
+		Task<Boolean> task = new Task<Boolean>() {
+			@Override
+			protected Boolean call() throws Exception {
+				if (isCancelled())
+					return false;
+				return db.delete(key, collection);
+			}
+		};
+
+		return task;
 	}
 
 	/**
 	 * Closes the connection to the database.
 	 */
 	public void close() {
-		exec.shutdownNow();
-		try {
-			exec.awaitTermination(500, TimeUnit.MILLISECONDS);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
 		db.shutdown();
 	}
-
 }

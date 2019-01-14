@@ -16,6 +16,8 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import angels.Angel;
 import angels.Attribute;
@@ -24,6 +26,7 @@ import customFX.Popup;
 import database.DatabaseController;
 import display.Displays;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Alert.AlertType;
@@ -130,11 +133,12 @@ public class HoldController extends Controller {
 	 */
 	private VBox newSection(String sectionName, List<String> sectionItems) {
 		VBox section = new VBox();
+		section.setSpacing(10);
 
 		// The label for the section
 		Label label = new Label(sectionName.toUpperCase());
 		label.setUnderline(true);
-		label.setFont(Font.font("System", FontWeight.BOLD, 20));
+		label.setFont(Font.font("System", FontWeight.NORMAL, 22));
 		section.getChildren().add(label);
 
 		// Creating the GridPane for the items in the section
@@ -161,13 +165,16 @@ public class HoldController extends Controller {
 		int numChars = 0;
 		Set<String> itemSet = new HashSet<>(
 				(List<String>) angel.get(Attribute.MISSING));
+
 		for (int i = 0; i < items.size(); ++i) {
+			// CheckBox on the left of the screen
 			CheckBox cb = new CheckBox(items.get(i).toUpperCase());
-			cb.setFont(new Font(18));
+			cb.setFont(Font.font("System", FontWeight.BOLD, 20));
+
 			cb.setOnAction(e -> {
 				if (cb.isSelected()) { // Adds label showing new missing item
 					Label label = new Label(cb.getText());
-					label.setFont(new Font(18));
+					label.setFont(Font.font("System", FontWeight.BOLD, 20));
 					selectedItemsVBox.getChildren().add(label);
 				} else { // Removes unselected CheckBox from missing items list
 					selectedItemsVBox.getChildren().removeIf(
@@ -185,11 +192,14 @@ public class HoldController extends Controller {
 				col++;
 				numChars = 0;
 			}
+
 			pane.add(cb, row++ % 2, col++ / 2);
 
 			// If items are in hold then pre-check the CheckBox
-			if (itemSet.contains(cb.getText()))
+			if (itemSet.contains(cb.getText())) {
+				System.out.println("CONTAINS: " + cb.getText());
 				cb.fire();
+			}
 		}
 		return pane;
 	}
@@ -205,6 +215,8 @@ public class HoldController extends Controller {
 		// TODO: Figure out a way to insert an array into the database without
 		// have to convert the array into a string.
 		String missingItems = convertArrToStr(selectedItemsVBox.getChildren());
+		System.out.println(selectedItemsVBox.getChildren());
+		System.out.println("MISSING ITEMS: " + missingItems);
 
 		// If no missingItems, [], ask if the item should be marked as complete
 		if (missingItems.equals("[]")) {
@@ -216,22 +228,28 @@ public class HoldController extends Controller {
 					ButtonType.YES,
 					ButtonType.NO);
 			if (popup.getSelection() == ButtonType.YES) {
-				dbController.update((String) angel.get(Attribute.ID),
+				runTask(dbController.update((String) angel.get(Attribute.ID),
 						Attribute.STATUS, Status.COMPLETE,
-						collection);
+						collection));
 			}
 		} else { // Missing items indicate that item needs to go on hold
-			dbController.update((String) angel.get(Attribute.ID),
-					Attribute.STATUS, Status.HOLD, collection);
+			runTask(dbController.update((String) angel.get(Attribute.ID),
+					Attribute.STATUS, Status.HOLD, collection));
 		}
 
 		// Changing the missing items in the database to newly selected items
-		dbController.query(
+		runTask(dbController.query(
 				"UPDATE {_key: '" + angel.get(Attribute.ID) + "'} WITH {'"
 						+ Attribute.MISSING + "':" + missingItems + "} "
-						+ "IN " + collection);
+						+ "IN " + collection));
 
 		super.switchScene(Displays.ANGEL_SELECTION);
+	}
+
+	private void runTask(Task<?> task) {
+		ExecutorService exec = Executors.newSingleThreadExecutor();
+		exec.execute(task);
+		exec.shutdown();
 	}
 
 	/**
