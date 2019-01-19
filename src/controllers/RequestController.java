@@ -19,6 +19,7 @@ public class RequestController extends Controller{
 	
 	private DatabaseController dbController;
 	private String dbCollection;
+	
 	public RequestController(DatabaseController dbController, String dbCollection ) {
 		super(Displays.REQUEST_DISPLAY);
 		this.dbController=dbController;

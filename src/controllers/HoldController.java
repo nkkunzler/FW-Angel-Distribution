@@ -16,8 +16,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import angels.Angel;
 import angels.Attribute;
@@ -30,6 +28,7 @@ import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
@@ -169,10 +168,9 @@ public class HoldController extends Controller {
 		for (int i = 0; i < items.size(); ++i) {
 			// CheckBox on the left of the screen
 			CheckBox cb = createCheckBox(items.get(i));
-			
+
 			// If items are in hold then pre-check the CheckBox
 			if (itemSet.contains(cb.getText())) {
-				System.out.println("CONTAINS: " + cb.getText());
 				cb.fire();
 			}
 
@@ -238,20 +236,39 @@ public class HoldController extends Controller {
 					ButtonType.YES, ButtonType.NO);
 
 			if (popup.getSelection() == ButtonType.YES) {
-				dbController.update((String) angel.get(Attribute.ID),
+				Task<Void> task = dbController.update(
+						(String) angel.get(Attribute.ID),
 						Attribute.STATUS, Status.COMPLETE,
 						collection);
+				task.setOnSucceeded(e -> System.out
+						.println("Finished updating status to hold for empty hold"));
+				task.setOnFailed(e -> System.out
+						.println("Could not update status to hold for empty hold"));
 			}
 		} else { // Missing items indicate that item needs to go on hold
-			dbController.update((String) angel.get(Attribute.ID),
+			Task<Void> task = dbController.update(
+					(String) angel.get(Attribute.ID),
 					Attribute.STATUS, Status.HOLD, collection);
+			task.setOnSucceeded(e -> System.out
+					.println("Finished updating status to hold"));
+			task.setOnFailed(
+					e -> System.out.println("Could not update status to hold"));
 		}
 
 		// Changing the missing items in the database to newly selected items
-		dbController.query(
+		Task<List<Angel>> task = dbController.query(
 				"UPDATE {_key: '" + angel.get(Attribute.ID) + "'} WITH {'"
 						+ Attribute.MISSING + "':" + missingItems + "} "
 						+ "IN " + collection);
+		System.out.println("UPDATE {_key: '" + angel.get(Attribute.ID) + "'} WITH {'"
+						+ Attribute.MISSING + "':" + missingItems + "} "
+						+ "IN " + collection);
+		task.setOnSucceeded(e -> super.switchScene(Displays.ANGEL_SELECTION));
+
+		task.setOnFailed(e -> {
+			new Popup(Alert.AlertType.ERROR,
+					"Unable to update status to hold.");
+		});
 
 		super.switchScene(Displays.ANGEL_SELECTION);
 	}

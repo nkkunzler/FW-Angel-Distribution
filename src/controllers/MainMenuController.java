@@ -31,7 +31,7 @@ public class MainMenuController extends Controller {
 	public void switchToAddAngel() {
 		super.switchScene(Displays.ADD_DISPLAY);
 	}
-	
+
 	/**
 	 * Switches the scene from the MainMenu to the EditAngel.fxml display.
 	 * 
@@ -42,22 +42,26 @@ public class MainMenuController extends Controller {
 	public void switchToAngelSelection() {
 		super.switchScene(Displays.ANGEL_SELECTION);
 	}
-	
+
 	/**
 	 * Switches the scene from the MainMenu to the ExportDisplay.fxml display.
 	 * 
-	 * This method is called by the MainMenu.fxml file when the 'Export'
-	 * button has an action.
+	 * This method is called by the MainMenu.fxml file when the 'Export' button
+	 * has an action.
 	 */
 	@FXML
 	public void switchToExportDisplay() {
 		super.switchScene(Displays.EXPORT_DISPLAY);
 	}
-	// TODO : add comments
+
+	/**
+	 * Switches the scene from the MainMenu to the RequestDisplay.fxml display.
+	 * 
+	 * This method is called by the MainMenu.fxml file when the 'Request Angel'
+	 * button has an action.
+	 */
 	@FXML
 	public void switchToRequestDisplay() {
 		super.switchScene(Displays.REQUEST_DISPLAY);
 	}
 }
-
-

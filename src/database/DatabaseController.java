@@ -10,9 +10,6 @@ package database;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
 
 import com.arangodb.ArangoCursor;
 import com.arangodb.entity.BaseDocument;
@@ -24,16 +21,9 @@ import javafx.concurrent.Task;
 public class DatabaseController {
 
 	private Database db;
-	
-	private static final ExecutorService exec = Executors.newFixedThreadPool(2, new ThreadFactory() {
-		
-		@Override
-		public Thread newThread(Runnable r) {
-			Thread t = Executors.defaultThreadFactory().newThread(r);
-			t.setDaemon(true);
-			return t;
-		}
-	});
+
+	// final ExecutorService exec = new ThreadPoolExecutor(0, 1, 0,
+	// TimeUnit.SECONDS, new SynchronousQueue<>());
 
 	/**
 	 * Creates a new database controller based off of a database. This allows
@@ -63,7 +53,7 @@ public class DatabaseController {
 			}
 		};
 		
-		exec.execute(task);
+		runTask(task);
 
 		return task;
 
@@ -88,8 +78,8 @@ public class DatabaseController {
 						angel.getAttributes(), collection);
 			}
 		};
-		
-		exec.execute(task);
+
+		runTask(task);
 
 		return task;
 
@@ -99,7 +89,7 @@ public class DatabaseController {
 	 * Queries the database collection based on the query string.
 	 * 
 	 * @param query      The aql query command for the collection
-	 * @param collection The collection used when quering the collection
+	 * @param collection The collection used when querying the collection
 	 * @return Task that returns a list containing the results of the query.
 	 *         Null is returned if the query is inconclusive.
 	 */
@@ -128,8 +118,8 @@ public class DatabaseController {
 			}
 		};
 		
-		exec.execute(task);
-		
+		runTask(task);
+
 		return task;
 	}
 
@@ -152,7 +142,7 @@ public class DatabaseController {
 			}
 		};
 		
-		exec.execute(task);
+		runTask(task);
 
 		return task;
 	}
@@ -180,12 +170,13 @@ public class DatabaseController {
 						+ "WITH {" + attribute.toString() + ": '" + values
 						+ "'} "
 						+ "IN " + collection;
+				System.out.println(updateQuery);
 				db.query(updateQuery);
 				return null;
 			}
 		};
 		
-		exec.execute(task);
+		runTask(task);
 
 		return task;
 	}
@@ -208,16 +199,22 @@ public class DatabaseController {
 			}
 		};
 		
-		exec.execute(task);
+		runTask(task);
 
 		return task;
+	}
+	
+	private void runTask(Task<?> task) {
+		Thread t = new Thread(task);
+		t.setDaemon(true);
+		t.start();
+		this.close();
 	}
 
 	/**
 	 * Closes the connection to the database.
 	 */
 	public void close() {
-		exec.shutdownNow();
 		db.shutdown();
 	}
 }

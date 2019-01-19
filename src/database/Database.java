@@ -14,21 +14,22 @@
 package database;
 
 import java.util.Map;
+
 import com.arangodb.ArangoCursor;
 import com.arangodb.ArangoDB;
 import com.arangodb.ArangoDBException;
 import com.arangodb.entity.BaseDocument;
 
+import customFX.Popup;
+import javafx.scene.control.Alert;
+
 public class Database {
 
 	private String dbName;
-	private String user, password;
 	private ArangoDB arangoDB;
 
 	public Database(String dbName, String user, String password) {
 		this.dbName = dbName;
-		this.user = user;
-		this.password = password;
 		arangoDB = new ArangoDB.Builder().user(user).password(password).build();
 		createDatabase();
 	}
@@ -72,7 +73,8 @@ public class Database {
 						.insertDocument(doc);
 				return true;
 			} catch (ArangoDBException c) {
-				System.err.println(c.getMessage());
+				new Popup(Alert.AlertType.ERROR, c.getException(),
+						"Internal database error occured when inserting");
 			}
 		}
 		return false;
@@ -90,7 +92,8 @@ public class Database {
 			arangoDB.db(dbName).collection(collection).deleteDocument(key);
 			return true;
 		} catch (ArangoDBException e) {
-			System.err.println(e.getMessage());
+			new Popup(Alert.AlertType.ERROR, e.getException(),
+					"Internal database error occured when deleting");
 			return false;
 		}
 	}
@@ -109,7 +112,9 @@ public class Database {
 					BaseDocument.class);
 			return cursor;
 		} catch (ArangoDBException c) {
-			System.err.println(c.getMessage());
+			new Popup(Alert.AlertType.ERROR, c.getException(),
+					"Internal database error occured when querying:\n" + query);
+			System.out.println("HI");
 			return null;
 		}
 	}
@@ -132,7 +137,9 @@ public class Database {
 				arangoDB.db(dbName).createCollection(name);
 				return true;
 			} catch (ArangoDBException e) {
-				System.err.println(e.getMessage());
+				new Popup(Alert.AlertType.ERROR, e.getException(),
+						"Internal database error occured when creating a collection named:\n"
+								+ name);
 			}
 		}
 		return false;
@@ -150,7 +157,8 @@ public class Database {
 				arangoDB.createDatabase(dbName);
 				return true;
 			} catch (ArangoDBException e) {
-				System.err.println(e.getMessage());
+				new Popup(Alert.AlertType.ERROR, e.getException(),
+						"Internal database error occured when creating a database named:\n" + dbName);
 			}
 		}
 		return false;

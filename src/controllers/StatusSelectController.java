@@ -18,7 +18,6 @@ import database.DatabaseController;
 import display.Displays;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
@@ -81,6 +80,11 @@ public class StatusSelectController extends Controller {
 			if (popup.getSelection() == ButtonType.NO)
 				super.previousDisplay();
 		}
+
+		// All items must be off hold before being able to set as complete
+		if (status == Status.HOLD)
+			completedButton.setDisable(true);
+
 	}
 
 	@FXML
@@ -93,6 +97,7 @@ public class StatusSelectController extends Controller {
 				Attribute.STATUS.toString(),
 				Status.COMPLETE.toString(),
 				collection);
+
 		task.setOnSucceeded(e -> {
 			new Popup("The angel status has been altered to:\n'COMPLETE'");
 			super.previousDisplay();
