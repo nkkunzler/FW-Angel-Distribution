@@ -71,6 +71,7 @@ public class FWAngelDistribution extends Application {
 		new StatusSelectController(dbController, ANGEL_COLLECTION);
 		new HoldController(dbController, ANGEL_COLLECTION);
 		new ExportController(dbController);
+		new RequestController(dbController, ANGEL_COLLECTION);
 	}
 
 	/**
