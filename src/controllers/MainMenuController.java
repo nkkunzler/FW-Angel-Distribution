@@ -51,6 +51,6 @@ public class MainMenuController extends Controller {
 	 */
 	@FXML
 	public void switchToExportDisplay() {
-		//super.switchScene(Displays.EXPORT_DISPLAY);
+		super.switchScene(Displays.EXPORT_DISPLAY);
 	}
 }

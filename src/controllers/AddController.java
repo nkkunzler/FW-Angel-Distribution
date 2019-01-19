@@ -9,8 +9,6 @@
 package controllers;
 
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import angels.Angel;
 import angels.Attribute;
@@ -95,9 +93,6 @@ public class AddController extends Controller {
 
 			// Checking to see if the angel id already exist in the database
 			Task<Boolean> task = dbController.contains(angelID, dbCollection);
-			Thread thread = new Thread(task);
-			thread.start();
-			thread.join(); // Force thread to finish before allowing more input
 
 			if (task.get()) {
 				showPopup("Invalid ID",
@@ -440,7 +435,7 @@ public class AddController extends Controller {
 		Angel angel = new Angel();
 		// The basic angel attributes
 		angel.addAttribute(Attribute.ID, idInput.getText().toUpperCase());
-		angel.addAttribute(Attribute.SEX, sexInput.getText().toLowerCase());
+		angel.addAttribute(Attribute.GENDER, sexInput.getText().toLowerCase());
 		angel.addAttribute(Attribute.AGE, Integer.valueOf(ageInput.getText()));
 		angel.addAttribute(Attribute.SHOE_SIZE, shoeInput.getText());
 		angel.addAttribute(Attribute.CLOTHES_SIZE, clothesInput.getText());
@@ -464,13 +459,10 @@ public class AddController extends Controller {
 
 		// If the angel was added reset the inputs and indicate success
 		Task<Boolean> task = dbController.insertAngel(angel, dbCollection);
-		ExecutorService exec = Executors.newSingleThreadExecutor();
-		exec.execute(task);
-		exec.shutdown();
-
+		
 		task.setOnSucceeded(e -> {
 			showPopup("Successful", "Angel '" + idInput.getText()
-					+ "' + was added successfully");
+					+ "' was added successfully");
 			resetInputs();
 		});
 

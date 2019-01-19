@@ -16,8 +16,6 @@ package controllers;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import angels.Angel;
 import angels.Attribute;
@@ -160,12 +158,7 @@ public class AngelSelectionController extends Controller {
 		task.setOnFailed(e -> {
 			new Popup(AlertType.ERROR, "Database Error",
 					"Database Retrieval Error has occured");
-			task.cancel();
 		});
-
-		ExecutorService exec = Executors.newSingleThreadExecutor();
-		exec.execute(task);
-		exec.shutdown();
 
 		return grid;
 	}
@@ -193,6 +186,7 @@ public class AngelSelectionController extends Controller {
 		// Creating the buttons for each of the results
 		for (int i = 0; i < result.size(); ++i) {
 			Angel angel = result.get(i);
+			
 			Button btn = new Button((String) angel.get(Attribute.ID));
 			btn.setFont(new Font(FONT_SIZE));
 			
@@ -205,7 +199,7 @@ public class AngelSelectionController extends Controller {
 			});
 
 			// Coloring button depending on gender
-			String sex = (String) angel.get(Attribute.SEX);
+			String sex = (String) angel.get(Attribute.GENDER);
 			if (sex.equalsIgnoreCase("boy"))
 				btn.setStyle("-fx-background-color: lightblue;");
 			else

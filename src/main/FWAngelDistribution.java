@@ -5,6 +5,7 @@ import angels.Attribute;
 import angels.Status;
 import controllers.AddController;
 import controllers.AngelSelectionController;
+import controllers.ExportController;
 import controllers.HoldController;
 import controllers.MainMenuController;
 import controllers.StatusSelectController;
@@ -69,7 +70,7 @@ public class FWAngelDistribution extends Application {
 		new AngelSelectionController(dbController, ANGEL_COLLECTION);
 		new StatusSelectController(dbController, ANGEL_COLLECTION);
 		new HoldController(dbController, ANGEL_COLLECTION);
-		//new ExportController(dbController);
+		new ExportController(dbController);
 	}
 
 	/**
@@ -107,7 +108,7 @@ public class FWAngelDistribution extends Application {
 				"headphones", "lol dolls", "puzzles", "baseball bat",
 				"dodgeball", "soccer ball" };
 
-		for (int angelNum = 1; angelNum <= 10; angelNum++) {
+		for (int angelNum = 1; angelNum <= 250; angelNum++) {
 			for (int charIndex = 0; charIndex < Math.random() * 6
 					+ 1; ++charIndex) {
 				int row = angelNum;
@@ -146,7 +147,7 @@ public class FWAngelDistribution extends Application {
 				Angel angel = new Angel();
 				// The basic angel attributes
 				angel.addAttribute(Attribute.ID, id);
-				angel.addAttribute(Attribute.SEX, sex);
+				angel.addAttribute(Attribute.GENDER, sex);
 				angel.addAttribute(Attribute.AGE, age);
 				angel.addAttribute(Attribute.SHOE_SIZE, shoe_size);
 				angel.addAttribute(Attribute.CLOTHES_SIZE, clothes_size);
