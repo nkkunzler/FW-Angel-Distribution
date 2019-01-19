@@ -53,4 +53,11 @@ public class MainMenuController extends Controller {
 	public void switchToExportDisplay() {
 		super.switchScene(Displays.EXPORT_DISPLAY);
 	}
+	// TODO : add comments
+	@FXML
+	public void switchToRequestDisplay() {
+		super.switchScene(Displays.REQUEST_DISPLAY);
+	}
 }
+
+
