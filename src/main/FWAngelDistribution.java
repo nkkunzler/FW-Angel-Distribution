@@ -8,6 +8,7 @@ import controllers.AngelSelectionController;
 import controllers.ExportController;
 import controllers.HoldController;
 import controllers.MainMenuController;
+import controllers.RequestController;
 import controllers.StatusSelectController;
 import database.Database;
 import database.DatabaseController;
