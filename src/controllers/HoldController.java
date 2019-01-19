@@ -168,24 +168,17 @@ public class HoldController extends Controller {
 
 		for (int i = 0; i < items.size(); ++i) {
 			// CheckBox on the left of the screen
-			CheckBox cb = new CheckBox(items.get(i).toUpperCase());
-			cb.setFont(Font.font("System", FontWeight.BOLD, 20));
-
-			cb.setOnAction(e -> {
-				if (cb.isSelected()) { // Adds label showing new missing item
-					Label label = new Label(cb.getText());
-					label.setFont(Font.font("System", FontWeight.BOLD, 20));
-					selectedItemsVBox.getChildren().add(label);
-				} else { // Removes unselected CheckBox from missing items list
-					selectedItemsVBox.getChildren().removeIf(
-							p -> cb.getText().equals(((Labeled) p).getText()));
-				}
-			});
-
-			numChars += cb.getText().length();
+			CheckBox cb = createCheckBox(items.get(i));
+			
+			// If items are in hold then pre-check the CheckBox
+			if (itemSet.contains(cb.getText())) {
+				System.out.println("CONTAINS: " + cb.getText());
+				cb.fire();
+			}
 
 			// If text in CheckBox is longer than 20 characters, new CheckBoxes
 			// within the section are moved down one column.
+			numChars += cb.getText().length();
 			if (numChars >= 20 && col <= 1) {
 				if (items.size() != 1)
 					row++;
@@ -194,14 +187,35 @@ public class HoldController extends Controller {
 			}
 
 			pane.add(cb, row++ % 2, col++ / 2);
-
-			// If items are in hold then pre-check the CheckBox
-			if (itemSet.contains(cb.getText())) {
-				System.out.println("CONTAINS: " + cb.getText());
-				cb.fire();
-			}
 		}
 		return pane;
+	}
+
+	/**
+	 * Creates a CheckBox that is used when display all the items associated
+	 * with the angel. These items include clothes, shoes, wishes, special
+	 * items, and books.
+	 * 
+	 * @param text String that will be placed to the right of the CheckBox
+	 * @return CheckBox that that is unselected and has the given text to the
+	 *         right of the CheckBox.
+	 */
+	private CheckBox createCheckBox(String text) {
+		CheckBox cb = new CheckBox(text.toUpperCase());
+		cb.setFont(Font.font("System", FontWeight.BOLD, 20));
+
+		cb.setOnAction(e -> {
+			if (cb.isSelected()) { // Adds label showing new missing item
+				Label label = new Label(cb.getText());
+				label.setFont(Font.font("System", FontWeight.BOLD, 20));
+				selectedItemsVBox.getChildren().add(label);
+			} else { // Removes unselected CheckBox from missing items list
+				selectedItemsVBox.getChildren().removeIf(
+						p -> cb.getText().equals(((Labeled) p).getText()));
+			}
+		});
+
+		return cb;
 	}
 
 	/**
@@ -215,41 +229,31 @@ public class HoldController extends Controller {
 		// TODO: Figure out a way to insert an array into the database without
 		// have to convert the array into a string.
 		String missingItems = convertArrToStr(selectedItemsVBox.getChildren());
-		System.out.println(selectedItemsVBox.getChildren());
-		System.out.println("MISSING ITEMS: " + missingItems);
 
 		// If no missingItems, [], ask if the item should be marked as complete
 		if (missingItems.equals("[]")) {
 			String contentText = "This angel has nothing on hold.\n"
 					+ "Would you like to mark it as complete?";
-			Popup popup = new Popup(
-					AlertType.INFORMATION,
-					"", contentText,
-					ButtonType.YES,
-					ButtonType.NO);
+			Popup popup = new Popup(AlertType.INFORMATION, contentText,
+					ButtonType.YES, ButtonType.NO);
+
 			if (popup.getSelection() == ButtonType.YES) {
-				runTask(dbController.update((String) angel.get(Attribute.ID),
+				dbController.update((String) angel.get(Attribute.ID),
 						Attribute.STATUS, Status.COMPLETE,
-						collection));
+						collection);
 			}
 		} else { // Missing items indicate that item needs to go on hold
-			runTask(dbController.update((String) angel.get(Attribute.ID),
-					Attribute.STATUS, Status.HOLD, collection));
+			dbController.update((String) angel.get(Attribute.ID),
+					Attribute.STATUS, Status.HOLD, collection);
 		}
 
 		// Changing the missing items in the database to newly selected items
-		runTask(dbController.query(
+		dbController.query(
 				"UPDATE {_key: '" + angel.get(Attribute.ID) + "'} WITH {'"
 						+ Attribute.MISSING + "':" + missingItems + "} "
-						+ "IN " + collection));
+						+ "IN " + collection);
 
 		super.switchScene(Displays.ANGEL_SELECTION);
-	}
-
-	private void runTask(Task<?> task) {
-		ExecutorService exec = Executors.newSingleThreadExecutor();
-		exec.execute(task);
-		exec.shutdown();
 	}
 
 	/**
@@ -271,11 +275,11 @@ public class HoldController extends Controller {
 			strArray += "]";
 		} else {
 			for (int i = 0; i < array.size() - 1; ++i) {
-				Label label = (Label) array.get(i);
-				strArray += "'" + label.getText() + "', ";
+				String text = ((Label) array.get(i)).getText();
+				strArray += "'" + text + "', ";
 			}
-			Label label = (Label) array.get(array.size() - 1);
-			strArray += "'" + label.getText() + "']";
+			String text = ((Label) array.get(array.size() - 1)).getText();
+			strArray += "'" + text + "']";
 		}
 		return strArray;
 	}
