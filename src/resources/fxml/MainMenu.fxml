@@ -22,6 +22,11 @@
                   <Font size="24.0" />
                </font>
             </Button>
+            <Button fx:id="requestButton" mnemonicParsing="false" onAction="#switchToRequestDisplay" text="Request Angel">
+               <font>
+                  <Font size="24.0" />
+               </font>
+            </Button>
             <Button fx:id="editStatusButton" mnemonicParsing="false" onAction="#switchToAngelSelection" text="Edit Status">
                <font>
                   <Font size="24.0" />
