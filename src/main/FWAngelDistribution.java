@@ -27,15 +27,15 @@ public class FWAngelDistribution extends Application {
 	private static DatabaseController dbController;
 
 	public static void main(String[] args) {
-		String user = System.getenv("ArangoDB_user");
-		String password = System.getenv("ArangoDB_password");
+		String user = "root";
+		String password = "04191961Jt";
 
 		Database db = new Database(DB_NAME, user, password);
 		dbController = new DatabaseController(db);
 		dbController.createCollection(ANGEL_COLLECTION);
 
 		// Uncomment if you want to generate angels within the angels database.
-		//populateDatabase();
+		populateDatabase();
 		
 		launch();
 	}
