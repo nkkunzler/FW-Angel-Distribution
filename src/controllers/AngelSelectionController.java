@@ -175,13 +175,13 @@ public class AngelSelectionController extends Controller {
 	 * @param result A list, containing zero or more Angels, that are used to
 	 *               generate buttons with text corresponding to the Angel ID.
 	 */
-	private GridPane populateGrid(GridPane grid, List<Angel> result) {
+	private void populateGrid(GridPane grid, List<Angel> result) {
 		// Do nothing if there are no results
 		if (result.size() == 0) {
 			Label label = new Label("No Results Found");
 			label.setFont(new Font(FONT_SIZE));
 			grid.add(label, 1, 1);
-			return grid;
+			return;
 		}
 		// Creating the buttons for each of the results
 		for (int i = 0; i < result.size(); ++i) {
@@ -207,7 +207,6 @@ public class AngelSelectionController extends Controller {
 
 			grid.add(btn, i % 3, i / 3); // GridPane is 3x3.
 		}
-		return grid;
 	}
 
 	@FXML
