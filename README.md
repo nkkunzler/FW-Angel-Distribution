@@ -4,4 +4,4 @@ Application to assist in FW angel distribution program.
 
 # Goals
 
-Move database operations into a seperate thread to prevent application from freezing in case of slow database retrievals
+Altering the way values are inserted and retrieved from the ArangoDB database. Will now use a BaseDocument when inserting and retrieving from the database. All the returned BaseDocuments will be stored as an Angel to be used later.
