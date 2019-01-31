@@ -15,18 +15,14 @@
 package controllers;
 
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 import angels.Angel;
 import angels.Attribute;
-import customFX.Popup;
 import database.DatabaseController;
 import display.Displays;
-import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -146,19 +142,7 @@ public class AngelSelectionController extends Controller {
 
 		// Creating the buttons corresponding to input id value. Done on
 		// Separate thread to prevent UI locking
-		Task<List<Angel>> task = dbController.query(query);
-		task.setOnSucceeded(e -> {
-			try {
-				populateGrid(grid, task.get());
-			} catch (InterruptedException | ExecutionException e1) {
-				e1.printStackTrace();
-			}
-		});
-
-		task.setOnFailed(e -> {
-			new Popup(AlertType.ERROR, "Database Error",
-					"Database Retrieval Error has occured");
-		});
+		populateGrid(grid, dbController.query(query));
 
 		return grid;
 	}

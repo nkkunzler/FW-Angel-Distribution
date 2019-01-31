@@ -13,7 +13,6 @@ import display.Displays;
 import javafx.fxml.FXML;
 
 public class MainMenuController extends Controller {
-
 	/**
 	 * Constructor that connects the MainMenu.fxml file to this controller.
 	 */

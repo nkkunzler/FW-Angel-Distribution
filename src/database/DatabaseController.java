@@ -16,7 +16,6 @@ import com.arangodb.entity.BaseDocument;
 
 import angels.Angel;
 import angels.Attribute;
-import javafx.concurrent.Task;
 
 public class DatabaseController {
 
@@ -42,21 +41,8 @@ public class DatabaseController {
 	 * @return Task that returns true if the collection was added; otherwise
 	 *         false is returned.
 	 */
-	public Task<Boolean> createCollection(String collectionName) {
-		Task<Boolean> task = new Task<Boolean>() {
-			@Override
-			protected Boolean call() throws Exception {
-				if (isCancelled())
-					return false;
-
-				return db.createCollection(collectionName);
-			}
-		};
-		
-		runTask(task);
-
-		return task;
-
+	public boolean createCollection(String collectionName) {
+		return db.createCollection(collectionName);
 	}
 
 	/**
@@ -67,22 +53,9 @@ public class DatabaseController {
 	 * @return Task that returns true if the angel was successfully added to the
 	 *         collection; otherwise false is returned.
 	 */
-	public Task<Boolean> insertAngel(Angel angel, String collection) {
-		Task<Boolean> task = new Task<Boolean>() {
-			@Override
-			protected Boolean call() throws Exception {
-				if (isCancelled())
-					return false;
-
-				return db.insert((String) angel.get(Attribute.ID),
-						angel.getAttributes(), collection);
-			}
-		};
-
-		runTask(task);
-
-		return task;
-
+	public boolean insertAngel(Angel angel, String collection) {
+		return db.insert((String) angel.get(Attribute.ID),
+				angel.getAttributes(), collection);
 	}
 
 	/**
@@ -93,34 +66,18 @@ public class DatabaseController {
 	 * @return Task that returns a list containing the results of the query.
 	 *         Null is returned if the query is inconclusive.
 	 */
-	public Task<List<Angel>> query(String query) {
-		Task<List<Angel>> task = new Task<List<Angel>>() {
-			// Executor will call this method when passing it the task
-			@Override
-			protected List<Angel> call() throws Exception {
-				List<Angel> results = new ArrayList<>();
+	public List<Angel> query(String query) {
+		// Executor will call this method when passing it the task
+		List<Angel> results = new ArrayList<>();
 
-				if (isCancelled())
-					return results;
+		ArangoCursor<BaseDocument> documents = db.query(query);
+		if (documents == null)
+			return null;
 
-				ArangoCursor<BaseDocument> documents = db.query(query);
-				if (documents == null)
-					return null;
-				for (BaseDocument doc : documents) {
-					Angel angel = new Angel();
-					for (Attribute attr : Attribute.values()) {
-						angel.addAttribute(attr,
-								doc.getAttribute(attr.toString()));
-					}
-					results.add(angel);
-				}
-				return results;
-			}
-		};
+		for (BaseDocument doc : documents)
+			results.add(new Angel(doc));
 		
-		runTask(task);
-
-		return task;
+		return results;
 	}
 
 	/**
@@ -132,19 +89,8 @@ public class DatabaseController {
 	 * @return Task that returns true if the angel exists within the collection;
 	 *         otherwise false is returned.
 	 */
-	public Task<Boolean> contains(String key, String collection) {
-		Task<Boolean> task = new Task<Boolean>() {
-			@Override
-			protected Boolean call() throws Exception {
-				if (isCancelled())
-					return false;
-				return db.contains(key, collection);
-			}
-		};
-		
-		runTask(task);
-
-		return task;
+	public boolean contains(String key, String collection) {
+		return db.contains(key, collection);
 	}
 
 	/**
@@ -158,27 +104,13 @@ public class DatabaseController {
 	 * @param collection The collection in which to search for the key
 	 * @return A Task that returns void. Nothing is returned.
 	 */
-	public Task<Void> update(String key, Object attribute, Object values,
+	public void update(String key, Object attribute, Object values,
 			String collection) {
-		Task<Void> task = new Task<Void>() {
-			@Override
-			protected Void call() throws Exception {
-				if (isCancelled())
-					return null;
-
-				String updateQuery = "UPDATE {_key: '" + key + "'} "
-						+ "WITH {" + attribute.toString() + ": '" + values
-						+ "'} "
-						+ "IN " + collection;
-				System.out.println(updateQuery);
-				db.query(updateQuery);
-				return null;
-			}
-		};
-		
-		runTask(task);
-
-		return task;
+		String updateQuery = "UPDATE {_key: '" + key + "'} "
+				+ "WITH {" + attribute.toString() + ": '" + values
+				+ "'} "
+				+ "IN " + collection;
+		db.query(updateQuery);
 	}
 
 	/**
@@ -189,26 +121,8 @@ public class DatabaseController {
 	 * @return A Task that returns true if the document with the desired key was
 	 *         deleted; otherwise false is deleted.
 	 */
-	public Task<Boolean> delete(String key, String collection) {
-		Task<Boolean> task = new Task<Boolean>() {
-			@Override
-			protected Boolean call() throws Exception {
-				if (isCancelled())
-					return false;
-				return db.delete(key, collection);
-			}
-		};
-		
-		runTask(task);
-
-		return task;
-	}
-	
-	private void runTask(Task<?> task) {
-		Thread t = new Thread(task);
-		t.setDaemon(true);
-		t.start();
-		this.close();
+	public boolean delete(String key, String collection) {
+		return db.delete(key, collection);
 	}
 
 	/**

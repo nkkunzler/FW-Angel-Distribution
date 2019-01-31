@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
 
 import angels.Angel;
 import angels.Attribute;
@@ -17,7 +16,6 @@ import database.DatabaseController;
 import display.Displays;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -61,7 +59,7 @@ public class ExportController extends Controller {
 
 	private void excelTest() {
 		Map<String, List<String>> values = new LinkedHashMap<>();
-		
+
 		List<String> idValues = new ArrayList<>();
 		idValues.add("1A");
 		idValues.add("1B");
@@ -398,43 +396,37 @@ public class ExportController extends Controller {
 
 		System.out.println(query);
 
-		Task<List<Angel>> result = dbController.query(query);
-		result.setOnSucceeded(e -> {
-			try {
-				PrintWriter pw = null;
-				try {
-					pw = new PrintWriter(new File(
-							filePath.getText() + "\\" + fileName.getText()
-									+ ".csv"));
-				} catch (IOException e1) {
-					e1.printStackTrace();
-				}
-				for (Angel angel : result.get()) {
-					String values = "";
-					for (Node node : attributesContainer.getChildren()) {
-						ComboBox<String> box = (ComboBox<String>) ((HBox) node)
-								.getChildren().get(0);
-						String strAtt = box.getValue().replace(" ", "_")
-								.toUpperCase();
-						Attribute attr = Attribute.valueOf(strAtt);
-						System.out.println("VALUE: " + angel.get(attr));
-						String value = formatString((String) angel.get(attr));
-						values += "=" + "\"" + value + "\",";
-					}
-					values += "\n";
-					builder.append(values);
-					values = "";
-				}
-				pw.write(builder.toString());
-				pw.close();
-				Alert alert = new Alert(AlertType.CONFIRMATION);
-				alert.setContentText("EXPORT SUCCESSFUL");
-				alert.showAndWait();
-			} catch (InterruptedException | ExecutionException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
+		List<Angel> result = dbController.query(query);
+		PrintWriter pw = null;
+		try {
+			pw = new PrintWriter(new File(
+					filePath.getText() + "\\" + fileName.getText()
+							+ ".csv"));
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+
+		for (Angel angel : result) {
+			String values = "";
+			for (Node node : attributesContainer.getChildren()) {
+				ComboBox<String> box = (ComboBox<String>) ((HBox) node)
+						.getChildren().get(0);
+				String strAtt = box.getValue().replace(" ", "_")
+						.toUpperCase();
+				Attribute attr = Attribute.valueOf(strAtt);
+				System.out.println("VALUE: " + angel.get(attr));
+				String value = formatString((String) angel.get(attr));
+				values += "=" + "\"" + value + "\",";
 			}
-		});
+			values += "\n";
+			builder.append(values);
+			values = "";
+		}
+		pw.write(builder.toString());
+		pw.close();
+		Alert alert = new Alert(AlertType.CONFIRMATION);
+		alert.setContentText("EXPORT SUCCESSFUL");
+		alert.showAndWait();
 	}
 
 	private String formatString(String string) {

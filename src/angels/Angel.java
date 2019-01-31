@@ -6,12 +6,19 @@
  */
 package angels;
 
-import java.util.HashMap;
-import java.util.Map;
+import com.arangodb.entity.BaseDocument;
 
 public class Angel {
 
-	private Map<String, Object> attrValues = new HashMap<>();
+	private BaseDocument baseDocument = new BaseDocument();
+	
+	public Angel() {
+		
+	}
+	
+	public Angel(BaseDocument baseDocument) {
+		this.baseDocument = baseDocument;
+	}
 
 	/**
 	 * Adds a new attribute and its value to the map of attributes.
@@ -20,7 +27,10 @@ public class Angel {
 	 * @param value     The value assigned to the attribute.
 	 */
 	public void addAttribute(Attribute attribute, Object value) {
-		attrValues.put(attribute.toString(), value);
+		if (attribute == Attribute.ID)
+			baseDocument.setKey(value.toString());
+		
+		baseDocument.addAttribute(attribute.toString(), value);
 	}
 
 	/**
@@ -30,8 +40,12 @@ public class Angel {
 	 * 
 	 * @return A map containing the angels attributes and their values
 	 */
-	public Map<String, Object> getAttributes() {
-		return attrValues;
+	public BaseDocument getAttributes() {
+		return baseDocument;
+	}
+	
+	public void setAttributes(BaseDocument newbaseDocument) {
+		baseDocument = newbaseDocument;
 	}
 
 	/**
@@ -41,7 +55,7 @@ public class Angel {
 	 * @return A string representing the value associated with the attribute.
 	 */
 	public Object get(Attribute attribute) {
-		return attrValues.get(attribute.toString());
+		return baseDocument.getAttribute(attribute.toString());
 	}
 
 }

@@ -16,7 +16,6 @@ import angels.Status;
 import customFX.Popup;
 import database.DatabaseController;
 import display.Displays;
-import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
@@ -92,9 +91,9 @@ public class AddController extends Controller {
 			}
 
 			// Checking to see if the angel id already exist in the database
-			Task<Boolean> task = dbController.contains(angelID, dbCollection);
+			boolean contains = dbController.contains(angelID, dbCollection);
 
-			if (task.get()) {
+			if (contains) {
 				showPopup("Invalid ID",
 						"Angel ID '" + angelID + "' already exists");
 				idInput.clear();
@@ -453,20 +452,20 @@ public class AddController extends Controller {
 		angel.addAttribute(Attribute.SPECIAL, specs);
 
 		// Default values when the angels are first created
-		angel.addAttribute(Attribute.STATUS, Status.AWAITING);
+		angel.addAttribute(Attribute.STATUS, Status.AWAITING.toString());
 		angel.addAttribute(Attribute.MISSING, new String[0]);
 		angel.addAttribute(Attribute.LOCATION, "Family Resource");
 
 		// If the angel was added reset the inputs and indicate success
-		Task<Boolean> task = dbController.insertAngel(angel, dbCollection);
-		
-		task.setOnSucceeded(e -> {
+		boolean success = dbController.insertAngel(angel, dbCollection);
+
+		if (success) {
 			showPopup("Successful", "Angel '" + idInput.getText()
 					+ "' was added successfully");
 			resetInputs();
-		});
-
-		task.setOnFailed(e -> showPopup("Error", "Angel could not be added"));
+		} else {
+			showPopup("Error", "Angel could not be added");
+		}
 	}
 
 	/**

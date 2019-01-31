@@ -1,27 +1,27 @@
 package controllers;
 
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 import angels.Angel;
 import angels.Attribute;
 import angels.Status;
 import database.DatabaseController;
 import display.Displays;
-import javafx.concurrent.Task;
 import javafx.fxml.FXML;
+import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
+import javafx.scene.text.Font;
 
 public class RequestController extends Controller {
 
 	@FXML
 	private TextField requesteeField;
 	@FXML
-	private TextField angelField;
+	private TextField angelRequest;
 	@FXML
 	private Button listButton;
 	@FXML
@@ -39,37 +39,38 @@ public class RequestController extends Controller {
 		this.dbCollection = dbCollection;
 	}
 
-	public GridPane generateList() {
-		String query = "For doc IN " + dbController + " FILTER doc."
-				+ Attribute.STATUS + " == " + Status.AWAITING + " LIMIT "
-				+ angelField.getText() + " RETURN doc";
-		Task<List<Angel>> results = dbController.query(query);
+	public void generateList() {
+		String query = "FOR doc IN " + dbCollection + " FILTER doc."
+				+ Attribute.STATUS + " == '" + Status.AWAITING + "' LIMIT "
+				+ angelRequest.getText() + " RETURN doc";
+		
 		GridPane grid = new GridPane();
+		grid.setAlignment(Pos.CENTER);
 		grid.setHgap(10);
 		grid.setVgap(10);
-		results.setOnSucceeded(e -> {
-
-			try {
-				createGridPane(grid, results.get());
-			} catch (InterruptedException | ExecutionException e1) {
-				e1.printStackTrace();
-			}
-		});
-		System.out.println("HI");
+		
+		createGridPane(grid, dbController.query(query));
+		
 		scrollPane.setContent(grid);
-		return grid;
 
 	}
 
 	private void createGridPane(GridPane pane, List<Angel> results) {
 		if (results.size() == 0) {
-			pane.add(new Label("No Angels to give out"), 0, 0);
+			Label label = new Label("No angels left to distribute");
+			label.setFont(new Font(22));
+			pane.add(label, 0, 0);
 			return;
 		}
 
 		for (int i = 0; i < results.size(); i++) {
 			Angel angel = results.get(i);
 			Label label = new Label((String) angel.get(Attribute.ID));
+			label.setFont(new Font(22));
+			if (angel.get(Attribute.GENDER).equals("boy"))
+				label.setStyle("-fx-background-color: lightblue;");
+			else
+				label.setStyle("-fx-background-color: lightpink;");
 			pane.add(label, i % 3, i / 3);
 		}
 

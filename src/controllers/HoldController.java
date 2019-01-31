@@ -1,7 +1,7 @@
 /**
  * This class is the controller to connect between the HoldDisplay.fxml file 
  * and the JavaFX Node objects within the file. The purpose for this class is
- * to allow for the user to select the varity of reasons for why the angel
+ * to allow for the user to select the variety of reasons for why the angel
  * is going into hold. 
  * 
  * The reasons for hold include missing: shirts, pants, underwear, shoes,
@@ -24,11 +24,9 @@ import customFX.Popup;
 import database.DatabaseController;
 import display.Displays;
 import javafx.collections.ObservableList;
-import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
@@ -136,8 +134,8 @@ public class HoldController extends Controller {
 
 		// The label for the section
 		Label label = new Label(sectionName.toUpperCase());
-		label.setUnderline(true);
 		label.setFont(Font.font("System", FontWeight.NORMAL, 22));
+		label.setUnderline(true);
 		section.getChildren().add(label);
 
 		// Creating the GridPane for the items in the section
@@ -236,39 +234,24 @@ public class HoldController extends Controller {
 					ButtonType.YES, ButtonType.NO);
 
 			if (popup.getSelection() == ButtonType.YES) {
-				Task<Void> task = dbController.update(
-						(String) angel.get(Attribute.ID),
-						Attribute.STATUS, Status.COMPLETE,
-						collection);
-				task.setOnSucceeded(e -> System.out
-						.println("Finished updating status to hold for empty hold"));
-				task.setOnFailed(e -> System.out
-						.println("Could not update status to hold for empty hold"));
+				dbController.update((String) angel.get(Attribute.ID),
+						Attribute.STATUS, Status.COMPLETE, collection);
 			}
 		} else { // Missing items indicate that item needs to go on hold
-			Task<Void> task = dbController.update(
+			dbController.update(
 					(String) angel.get(Attribute.ID),
 					Attribute.STATUS, Status.HOLD, collection);
-			task.setOnSucceeded(e -> System.out
-					.println("Finished updating status to hold"));
-			task.setOnFailed(
-					e -> System.out.println("Could not update status to hold"));
 		}
 
 		// Changing the missing items in the database to newly selected items
-		Task<List<Angel>> task = dbController.query(
+		dbController.query(
 				"UPDATE {_key: '" + angel.get(Attribute.ID) + "'} WITH {'"
 						+ Attribute.MISSING + "':" + missingItems + "} "
 						+ "IN " + collection);
-		System.out.println("UPDATE {_key: '" + angel.get(Attribute.ID) + "'} WITH {'"
+		System.out.println(
+				"UPDATE {_key: '" + angel.get(Attribute.ID) + "'} WITH {'"
 						+ Attribute.MISSING + "':" + missingItems + "} "
 						+ "IN " + collection);
-		task.setOnSucceeded(e -> super.switchScene(Displays.ANGEL_SELECTION));
-
-		task.setOnFailed(e -> {
-			new Popup(Alert.AlertType.ERROR,
-					"Unable to update status to hold.");
-		});
 
 		super.switchScene(Displays.ANGEL_SELECTION);
 	}

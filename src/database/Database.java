@@ -13,8 +13,6 @@
 
 package database;
 
-import java.util.Map;
-
 import com.arangodb.ArangoCursor;
 import com.arangodb.ArangoDB;
 import com.arangodb.ArangoDBException;
@@ -57,26 +55,18 @@ public class Database {
 	 * @return True if the document was successfully added; otherwise false is
 	 *         returned.
 	 */
-	protected boolean insert(String key, Map<String, Object> attributes,
-			String collection) {
-		// Creating a document if it does not exist
+	protected boolean insert(String key, BaseDocument object, String collection) {
 		if (!contains(key, collection)) {
-			BaseDocument doc = new BaseDocument();
-			doc.setKey(key);
-
-			// Adding attributes to the document
-			for (String keyVal : attributes.keySet())
-				doc.addAttribute(keyVal, attributes.get(keyVal));
-
 			try {
 				arangoDB.db(dbName).collection(collection)
-						.insertDocument(doc);
-				return true;
-			} catch (ArangoDBException c) {
-				new Popup(Alert.AlertType.ERROR, c.getException(),
+						.insertDocument(object);
+			} catch (ArangoDBException e) {
+				new Popup(Alert.AlertType.ERROR, e.getException(),
 						"Internal database error occured when inserting");
 			}
+			return true;
 		}
+		
 		return false;
 	}
 
@@ -158,7 +148,8 @@ public class Database {
 				return true;
 			} catch (ArangoDBException e) {
 				new Popup(Alert.AlertType.ERROR, e.getException(),
-						"Internal database error occured when creating a database named:\n" + dbName);
+						"Internal database error occured when creating a database named:\n"
+								+ dbName);
 			}
 		}
 		return false;
