@@ -42,7 +42,9 @@ public class Database {
 	 *         false is returned.
 	 */
 	protected boolean contains(String key, String collection) {
-		return arangoDB.db(dbName).collection(collection).documentExists(key);
+		boolean contains = arangoDB.db(dbName).collection(collection).documentExists(key);
+		arangoDB.shutdown();
+		return contains;
 	}
 
 	/**
@@ -64,6 +66,7 @@ public class Database {
 				new Popup(Alert.AlertType.ERROR, e.getException(),
 						"Internal database error occured when inserting");
 			}
+			arangoDB.shutdown();
 			return true;
 		}
 		
@@ -80,10 +83,12 @@ public class Database {
 	protected boolean delete(String key, String collection) {
 		try {
 			arangoDB.db(dbName).collection(collection).deleteDocument(key);
+			arangoDB.shutdown();
 			return true;
 		} catch (ArangoDBException e) {
 			new Popup(Alert.AlertType.ERROR, e.getException(),
 					"Internal database error occured when deleting");
+			arangoDB.shutdown();
 			return false;
 		}
 	}
@@ -100,11 +105,12 @@ public class Database {
 		try {
 			ArangoCursor<BaseDocument> cursor = arangoDB.db(dbName).query(query,
 					BaseDocument.class);
+			arangoDB.shutdown();
 			return cursor;
 		} catch (ArangoDBException c) {
 			new Popup(Alert.AlertType.ERROR, c.getException(),
 					"Internal database error occured when querying:\n" + query);
-			System.out.println("HI");
+			arangoDB.shutdown();
 			return null;
 		}
 	}
@@ -125,6 +131,7 @@ public class Database {
 			// The collection does not exist so try to create it
 			try {
 				arangoDB.db(dbName).createCollection(name);
+				arangoDB.shutdown();
 				return true;
 			} catch (ArangoDBException e) {
 				new Popup(Alert.AlertType.ERROR, e.getException(),
@@ -145,6 +152,7 @@ public class Database {
 			// The database does not exists so try to create one
 			try {
 				arangoDB.createDatabase(dbName);
+				arangoDB.shutdown();
 				return true;
 			} catch (ArangoDBException e) {
 				new Popup(Alert.AlertType.ERROR, e.getException(),

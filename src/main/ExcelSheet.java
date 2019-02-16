@@ -2,9 +2,7 @@ package main;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.List;
 import java.util.Map;
 
@@ -21,39 +19,116 @@ import javafx.scene.control.Alert.AlertType;
 
 public class ExcelSheet {
 
-	private final int MAX_COL = 47;
-	private final int MAX_ROW = 20;
+	private final int DEFAULT_COL_WIDTH = 2048;
+	private final int MAX_COL_WIDTH = 28000;
+	private final int MAX_COL = 14;
+	private final int MAX_ROW = 33;
 
 	private Workbook workbook;
 	private Sheet sheet;
 
+	private int entriesPerRow;
+
 	public ExcelSheet(String sheetName,
-			Map<String, List<String>> columnValues, boolean showHeader) {
+			Map<String, List<String>> columnValues,
+			Map<Integer, Integer> columnWidths, boolean showHeader) {
 		workbook = new XSSFWorkbook();
 		sheet = workbook.createSheet(sheetName);
 
-		// Creating a new row for the header text
-		Row header = sheet.createRow(0);
+		int singleEntryWidth = DEFAULT_COL_WIDTH * columnValues.size();
+		if (columnWidths != null) {
+			singleEntryWidth = DEFAULT_COL_WIDTH
+					* (columnValues.size() - columnWidths.size());
 
-		Object[] keySet = columnValues.keySet().toArray();
+			for (Integer col : columnWidths.keySet())
+				singleEntryWidth += columnWidths.get(col);
+		}
+
+		entriesPerRow = MAX_COL_WIDTH / singleEntryWidth;
 
 		// If there are headers display on the header row
-		if (showHeader) {
-			for (int i = 0; i < keySet.length; ++i)
-				// Creating a new cell to store the headers in each cell
-				createCell(header, i, keySet[i].toString());
-		}
+		writeHeaderRow(columnValues, showHeader);
 
-		// Need to limit the number of columns, to be print friendly
-		for (int i = 0; i < keySet.length; ++i) {
-			int currRow = showHeader ? 1 : 0;
-			for (int j = 0; j < columnValues.get(keySet[i]).size(); ++j) {
-				Row row = sheet.getRow(j);
-				if (row == null)
-					row = sheet.createRow(currRow++);
-				createCell(row, i, columnValues.get(keySet[i]).get(j));
+		writeData(columnValues);
+	}
+
+	/**
+	 * 
+	 * @param columnValues
+	 * @param showHeader
+	 */
+	private void writeHeaderRow(Map<String, List<String>> columnValues,
+			boolean showHeader) {
+
+		if (!showHeader)
+			return;
+
+		// Creating a new row for the header text
+		Row headerRow = sheet.createRow(0);
+
+		Object[] keySet = columnValues.keySet().toArray();
+		int columnWidth = 0;
+
+		if (columnWidth > MAX_COL_WIDTH)
+			new Popup("To many columns. Some information will be missing");
+	}
+
+	/**
+	 * 
+	 * @param colValues
+	 * @param showheader
+	 */
+	private void writeData(Map<String, List<String>> colValues) {
+
+		Object[] keySet = colValues.keySet().toArray();
+
+		// int maxRow = colValues.get(keySet[0]).size() / entriesPerRow;
+		int maxCol = colValues.size() * entriesPerRow;
+		int index = 0;
+		int i = 0;
+
+		int entryCol = 1;
+		int rowNum = 1;
+		int maxRow = MAX_ROW;
+		int entry = 0;
+
+		while (true) {
+			Row row = sheet.getRow(rowNum);
+			if (row == null)
+				row = sheet.createRow(rowNum);
+			for (int col = entryCol - 1; col < entryCol * colValues.size(); ++col) {
+				entry++;
+				if (entry > colValues.get(keySet[0]).size())
+					return;
+				if (index >= colValues.get(keySet[i]).size())
+					return;
+				createCell(row, col, colValues.get(keySet[i])
+						.get(index));
+			}
+			rowNum++;
+			if (rowNum > MAX_ROW) {
+				rowNum = maxRow - MAX_ROW;
+				entryCol++;
+			}
+			if (entryCol > entriesPerRow) {
+				maxRow += MAX_ROW;
+				rowNum = MAX_ROW;
+				entryCol = 0;
 			}
 		}
+
+//		for (int rowNum = 1; rowNum <= maxRow; ++rowNum) {
+//			Row row = sheet.createRow(rowNum);
+//			row = sheet.getRow(rowNum);
+//			for (int col = 0; col < maxCol; ++col) {
+//				index = (col / colValues.size()) * MAX_ROW + rowNum - 1;
+//				i = col % colValues.size();
+//				if (index >= colValues.get(keySet[i]).size())
+//					break;
+//				createCell(row, col, colValues.get(keySet[i])
+//						.get(index));
+//			}
+//		}
 	}
 
 	/**
@@ -67,7 +142,8 @@ public class ExcelSheet {
 	 */
 	private void createCell(Row row, int column, String cellValue) {
 		CellStyle style = workbook.createCellStyle();
-		BorderStyle borderStyle = BorderStyle.THICK;
+
+		BorderStyle borderStyle = BorderStyle.MEDIUM;
 		style.setBorderBottom(borderStyle);
 		style.setBorderLeft(borderStyle);
 		style.setBorderRight(borderStyle);
@@ -76,18 +152,6 @@ public class ExcelSheet {
 		Cell cell = row.createCell(column);
 		cell.setCellStyle(style);
 		cell.setCellValue(cellValue);
-	}
-
-	/**
-	 * Using a map which resizes the column width,specified by the key of map,
-	 * to the desired width, the value.
-	 * 
-	 * @param columnWidths Map<Integer, Integer> that maps the column to the
-	 *                     desired width
-	 */
-	public void setColumnWidths(Map<Integer, Integer> columnWidths) {
-		for (Integer col : columnWidths.keySet())
-			sheet.setColumnWidth(col, columnWidths.get(col));
 	}
 
 	/**

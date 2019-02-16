@@ -59,28 +59,33 @@ public class ExportController extends Controller {
 
 	private void excelTest() {
 		Map<String, List<String>> values = new LinkedHashMap<>();
-
+		int numAngels = 5;
 		List<String> idValues = new ArrayList<>();
-		idValues.add("1A");
-		idValues.add("1B");
-		idValues.add("2A");
+		for (int i = 1; i <= numAngels; i++)
+			idValues.add(i + "A");
 		values.put(Attribute.ID.toString(), idValues);
 
 		List<String> genderValues = new ArrayList<>();
-		genderValues.add("B");
-		genderValues.add("G");
-		genderValues.add("B");
+		for (int i = 1; i <= numAngels; i++)
+			genderValues.add("B");
 		values.put(Attribute.GENDER.toString(), genderValues);
+		
+		List<String> location = new ArrayList<>();
+		for (int i = 1; i <= numAngels; i++)
+			location.add("X");
+		values.put(Attribute.LOCATION.toString(), location);
+		
+		List<String> status = new ArrayList<>();
+		for (int i = 1; i <= numAngels; i++)
+			status.add("H");
+		values.put(Attribute.STATUS.toString(), status);
 
-		Map<Integer, Integer> columns = new HashMap<>();
-		columns.put(0, 2000);
-		columns.put(1, 2000);
-		columns.put(2, 2000);
-		columns.put(3, 2000);
+//		Map<Integer, Integer> columnWidths = new HashMap<>();
+//		columnWidths.put(0, 500);
 
-		ExcelSheet sheet = new ExcelSheet("EXPORTS", values, false);
-		sheet.setColumnWidths(columns);
+		ExcelSheet sheet = new ExcelSheet("EXPORTS", values, null, false);
 		sheet.save("C:/Users/nkkun/Desktop/Angel Exports/", "test");
+		System.out.println("CREATED EXCEL FILE");
 	}
 
 	private HBox filterInput() {
