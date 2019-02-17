@@ -7,18 +7,13 @@
  */
 package controllers;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
 import angels.Angel;
 import angels.Attribute;
 import angels.Status;
 import customFX.Popup;
 import database.DatabaseController;
 import display.Displays;
-import javafx.concurrent.Task;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
@@ -67,8 +62,10 @@ public class StatusSelectController extends Controller {
 	public void setAngel(Angel angelToChange) {
 		angel = angelToChange;
 
+		// Converts an Angel's string status to a STATUS object
 		Status status = Status.valueOf(angel.get(Attribute.STATUS).toString());
 
+		// Label below the scene title
 		angelIDLabel.setText(angel.get(Attribute.ID) + " - " + status);
 
 		// Show warning if the angel is suppose to be pulled
@@ -78,27 +75,32 @@ public class StatusSelectController extends Controller {
 							+ "' needs to be pulled.\nAlter Status?",
 					ButtonType.NO, ButtonType.YES);
 
+			// If the user does not want to alter the status, go back
 			if (popup.getSelection() == ButtonType.NO)
 				super.previousDisplay();
 		}
+
+		// All items must be off hold before being able to set as complete
+		if (status == Status.HOLD)
+			completedButton.setDisable(true);
+
 	}
 
 	@FXML
 	/**
 	 * This method handles the onActionEvent() method for the green complete
 	 * button on the AngelStatus.fxml display.
+	 * 
+	 * TODO: Prompt for additional information before going to complete
 	 */
 	public void completeHandler() {
-		Task<Void> task = dbController.update((String) angel.get(Attribute.ID),
+		dbController.update((String) angel.get(Attribute.ID),
 				Attribute.STATUS.toString(),
 				Status.COMPLETE.toString(),
 				collection);
-		task.setOnSucceeded(e -> {
-			new Popup("The angel status has been altered to:\n'COMPLETE'");
-			super.previousDisplay();
-		});
 
-		runTask(task);
+		new Popup("The angel status has been altered to:\n'COMPLETE'");
+		super.previousDisplay();
 	}
 
 	@FXML
@@ -122,24 +124,21 @@ public class StatusSelectController extends Controller {
 	 * on the AngelStatus.fxml display.
 	 */
 	public void pullHandler() {
+		// Ask the user if they want to pull the angel
 		Popup popup = new Popup(AlertType.WARNING,
 				"Do you want to pull this angel?",
 				ButtonType.YES, ButtonType.NO);
 
 		// If YES on warning message, sets the status of angel to pull
 		if (popup.getSelection() == ButtonType.YES) {
-			Task<Void> task = dbController.update(
+			dbController.update(
 					(String) angel.get(Attribute.ID),
 					Attribute.STATUS.toString(),
 					Status.PULL.toString(),
 					collection);
 
-			task.setOnSucceeded(e -> {
-				new Popup("The angel status has been altered to:\n'PULL'");
-				super.previousDisplay();
-			});
-
-			runTask(task);
+			new Popup("The angel status has been altered to:\n'PULL'");
+			super.previousDisplay();
 		}
 	}
 
@@ -149,18 +148,15 @@ public class StatusSelectController extends Controller {
 	 * button on the AngelStatus.fxml display.
 	 */
 	public void awaitingHandler() {
-		Task<Void> task = dbController.update((String) angel.get(Attribute.ID),
+		// Change status to "AWAITING"
+		dbController.update((String) angel.get(Attribute.ID),
 				Attribute.STATUS.toString(),
 				Status.AWAITING.toString(),
 				collection);
 
-		task.setOnSucceeded(e -> {
-			new Popup("The angel status has been altered to:\n'AWAITING'",
-					ButtonType.OK);
-			super.previousDisplay();
-		});
-
-		runTask(task);
+		new Popup("The angel status has been altered to:\n'AWAITING'",
+				ButtonType.OK);
+		super.previousDisplay();
 	}
 
 	@FXML
@@ -169,19 +165,16 @@ public class StatusSelectController extends Controller {
 	 * the AngelStatus.fxml display.
 	 */
 	public void outHandler() {
-		Task<Void> task = dbController.update((String) angel.get(Attribute.ID),
+		// Change status to "OUT"
+		dbController.update((String) angel.get(Attribute.ID),
 				Attribute.STATUS.toString(),
 				Status.OUT.toString(),
 				collection);
 
 		// TODO: Change to display dealing with handing out angels
-		task.setOnSucceeded(e -> {
-			new Popup("The angel status has been altered to:\n'OUT'",
-					ButtonType.OK);
-			super.previousDisplay();
-		});
-
-		runTask(task);
+		new Popup("The angel status has been altered to:\n'OUT'",
+				ButtonType.OK);
+		super.previousDisplay();
 	}
 
 	@FXML
@@ -190,11 +183,5 @@ public class StatusSelectController extends Controller {
 	 */
 	public void toPreviousDisplay() {
 		super.previousDisplay();
-	}
-
-	private void runTask(Task<?> task) {
-		ExecutorService exec = Executors.newSingleThreadExecutor();
-		exec.execute(task);
-		exec.shutdown();
 	}
 }

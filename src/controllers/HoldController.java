@@ -1,7 +1,7 @@
 /**
  * This class is the controller to connect between the HoldDisplay.fxml file 
  * and the JavaFX Node objects within the file. The purpose for this class is
- * to allow for the user to select the varity of reasons for why the angel
+ * to allow for the user to select the variety of reasons for why the angel
  * is going into hold. 
  * 
  * The reasons for hold include missing: shirts, pants, underwear, shoes,
@@ -16,8 +16,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import angels.Angel;
 import angels.Attribute;
@@ -26,7 +24,6 @@ import customFX.Popup;
 import database.DatabaseController;
 import display.Displays;
 import javafx.collections.ObservableList;
-import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Alert.AlertType;
@@ -137,8 +134,8 @@ public class HoldController extends Controller {
 
 		// The label for the section
 		Label label = new Label(sectionName.toUpperCase());
-		label.setUnderline(true);
 		label.setFont(Font.font("System", FontWeight.NORMAL, 22));
+		label.setUnderline(true);
 		section.getChildren().add(label);
 
 		// Creating the GridPane for the items in the section
@@ -169,15 +166,14 @@ public class HoldController extends Controller {
 		for (int i = 0; i < items.size(); ++i) {
 			// CheckBox on the left of the screen
 			CheckBox cb = createCheckBox(items.get(i));
-			
+
 			// If items are in hold then pre-check the CheckBox
 			if (itemSet.contains(cb.getText())) {
-				System.out.println("CONTAINS: " + cb.getText());
 				cb.fire();
 			}
 
-			// If text in CheckBox is longer than 20 characters, new CheckBoxes
-			// within the section are moved down one column.
+			// If text for a CheckBox is longer than 20 characters, new
+			// CheckBoxes within the section are moved down one column.
 			numChars += cb.getText().length();
 			if (numChars >= 20 && col <= 1) {
 				if (items.size() != 1)
@@ -185,9 +181,9 @@ public class HoldController extends Controller {
 				col++;
 				numChars = 0;
 			}
-
-			pane.add(cb, row++ % 2, col++ / 2);
+			pane.add(cb, row++ % 2, col++ / 2); // Adding CheckBox to pane
 		}
+		
 		return pane;
 	}
 
@@ -237,13 +233,14 @@ public class HoldController extends Controller {
 			Popup popup = new Popup(AlertType.INFORMATION, contentText,
 					ButtonType.YES, ButtonType.NO);
 
+			// User wants to put item on hold, so do so.
 			if (popup.getSelection() == ButtonType.YES) {
 				dbController.update((String) angel.get(Attribute.ID),
-						Attribute.STATUS, Status.COMPLETE,
-						collection);
+						Attribute.STATUS, Status.COMPLETE, collection);
 			}
 		} else { // Missing items indicate that item needs to go on hold
-			dbController.update((String) angel.get(Attribute.ID),
+			dbController.update(
+					(String) angel.get(Attribute.ID),
 					Attribute.STATUS, Status.HOLD, collection);
 		}
 
@@ -257,6 +254,9 @@ public class HoldController extends Controller {
 	}
 
 	/**
+	 * TODO: TRY TO REMOVE THE NEED TO DO THIS IN THE FUTURE
+	 * 
+	 * 
 	 * Converts an ObservableList<Node> into a string form usable by an arangodb
 	 * database query.
 	 * 

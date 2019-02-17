@@ -15,19 +15,24 @@
       </Label>
    </top>
    <center>
-      <VBox alignment="CENTER" spacing="20.0" BorderPane.alignment="CENTER">
+      <VBox alignment="CENTER" maxWidth="-Infinity" spacing="20.0" BorderPane.alignment="CENTER">
          <children>
-            <Button fx:id="addAngelButton" alignment="CENTER" mnemonicParsing="false" onAction="#switchToAddAngel" text="Add Angel">
+            <Button fx:id="addAngelButton" alignment="CENTER" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#switchToAddAngel" text="Add Angel">
                <font>
                   <Font size="24.0" />
                </font>
             </Button>
-            <Button fx:id="editStatusButton" mnemonicParsing="false" onAction="#switchToAngelSelection" text="Edit Status">
+            <Button fx:id="requestButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#switchToRequestDisplay" text="Request Angel">
                <font>
                   <Font size="24.0" />
                </font>
             </Button>
-            <Button fx:id="exportButton" mnemonicParsing="false" onAction="#switchToExportDisplay" text="Export">
+            <Button fx:id="editStatusButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#switchToAngelSelection" text="Edit Status">
+               <font>
+                  <Font size="24.0" />
+               </font>
+            </Button>
+            <Button fx:id="exportButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#switchToExportDisplay" text="Export">
                <font>
                   <Font size="24.0" />
                </font>

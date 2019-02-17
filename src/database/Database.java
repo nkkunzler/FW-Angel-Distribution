@@ -13,22 +13,28 @@
 
 package database;
 
-import java.util.Map;
 import com.arangodb.ArangoCursor;
 import com.arangodb.ArangoDB;
 import com.arangodb.ArangoDBException;
 import com.arangodb.entity.BaseDocument;
 
+import customFX.Popup;
+import javafx.scene.control.Alert;
+
 public class Database {
 
 	private String dbName;
-	private String user, password;
 	private ArangoDB arangoDB;
 
+	/**
+	 * TODO: Add error throwing 
+	 * 
+	 * @param dbName   The name of desired database
+	 * @param user     The username for the database
+	 * @param password The password for the database
+	 */
 	public Database(String dbName, String user, String password) {
 		this.dbName = dbName;
-		this.user = user;
-		this.password = password;
 		arangoDB = new ArangoDB.Builder().user(user).password(password).build();
 		createDatabase();
 	}
@@ -43,7 +49,10 @@ public class Database {
 	 *         false is returned.
 	 */
 	protected boolean contains(String key, String collection) {
-		return arangoDB.db(dbName).collection(collection).documentExists(key);
+		boolean contains = arangoDB.db(dbName).collection(collection)
+				.documentExists(key);
+		arangoDB.shutdown();
+		return contains;
 	}
 
 	/**
@@ -56,25 +65,20 @@ public class Database {
 	 * @return True if the document was successfully added; otherwise false is
 	 *         returned.
 	 */
-	protected boolean insert(String key, Map<String, Object> attributes,
+	protected boolean insert(String key, BaseDocument object,
 			String collection) {
-		// Creating a document if it does not exist
 		if (!contains(key, collection)) {
-			BaseDocument doc = new BaseDocument();
-			doc.setKey(key);
-
-			// Adding attributes to the document
-			for (String keyVal : attributes.keySet())
-				doc.addAttribute(keyVal, attributes.get(keyVal));
-
 			try {
 				arangoDB.db(dbName).collection(collection)
-						.insertDocument(doc);
-				return true;
-			} catch (ArangoDBException c) {
-				System.err.println(c.getMessage());
+						.insertDocument(object);
+			} catch (ArangoDBException e) {
+				new Popup(Alert.AlertType.ERROR, e.getException(),
+						"Internal database error occured when inserting");
 			}
+			arangoDB.shutdown();
+			return true;
 		}
+
 		return false;
 	}
 
@@ -88,9 +92,12 @@ public class Database {
 	protected boolean delete(String key, String collection) {
 		try {
 			arangoDB.db(dbName).collection(collection).deleteDocument(key);
+			arangoDB.shutdown();
 			return true;
 		} catch (ArangoDBException e) {
-			System.err.println(e.getMessage());
+			new Popup(Alert.AlertType.ERROR, e.getException(),
+					"Internal database error occured when deleting");
+			arangoDB.shutdown();
 			return false;
 		}
 	}
@@ -107,9 +114,12 @@ public class Database {
 		try {
 			ArangoCursor<BaseDocument> cursor = arangoDB.db(dbName).query(query,
 					BaseDocument.class);
+			arangoDB.shutdown();
 			return cursor;
 		} catch (ArangoDBException c) {
-			System.err.println(c.getMessage());
+			new Popup(Alert.AlertType.ERROR, c.getException(),
+					"Internal database error occured when querying:\n" + query);
+			arangoDB.shutdown();
 			return null;
 		}
 	}
@@ -130,9 +140,12 @@ public class Database {
 			// The collection does not exist so try to create it
 			try {
 				arangoDB.db(dbName).createCollection(name);
+				arangoDB.shutdown();
 				return true;
 			} catch (ArangoDBException e) {
-				System.err.println(e.getMessage());
+				new Popup(Alert.AlertType.ERROR, e.getException(),
+						"Internal database error occured when creating a collection named:\n"
+								+ name);
 			}
 		}
 		return false;
@@ -148,9 +161,12 @@ public class Database {
 			// The database does not exists so try to create one
 			try {
 				arangoDB.createDatabase(dbName);
+				arangoDB.shutdown();
 				return true;
 			} catch (ArangoDBException e) {
-				System.err.println(e.getMessage());
+				new Popup(Alert.AlertType.ERROR, e.getException(),
+						"Internal database error occured when creating a database named:\n"
+								+ dbName);
 			}
 		}
 		return false;

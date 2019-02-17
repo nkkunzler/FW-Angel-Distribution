@@ -25,6 +25,9 @@ public enum Displays {
 	// Displays where the user adds the items holding the angel
 	HOLD_DISPLAY("resources/fxml/HoldDisplay.fxml"),
 	
+	// Displays where the user can request angels for distribution
+	REQUEST_DISPLAY("resources/fxml/RequestDisplay.fxml"),
+	
 	// Displays where the user can export the database
 	EXPORT_DISPLAY("resources/fxml/ExportDisplay.fxml");
 

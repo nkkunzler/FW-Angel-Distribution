@@ -8,6 +8,7 @@ import controllers.AngelSelectionController;
 import controllers.ExportController;
 import controllers.HoldController;
 import controllers.MainMenuController;
+import controllers.RequestController;
 import controllers.StatusSelectController;
 import database.Database;
 import database.DatabaseController;
@@ -27,7 +28,7 @@ public class FWAngelDistribution extends Application {
 
 	public static void main(String[] args) {
 		String user = System.getenv("ArangoDB_user");
-		String password = System.getenv("ArangoDB_password");
+		String password = System.getenv("ArangoDB_password");;
 
 		Database db = new Database(DB_NAME, user, password);
 		dbController = new DatabaseController(db);
@@ -71,6 +72,7 @@ public class FWAngelDistribution extends Application {
 		new StatusSelectController(dbController, ANGEL_COLLECTION);
 		new HoldController(dbController, ANGEL_COLLECTION);
 		new ExportController(dbController);
+		new RequestController(dbController, ANGEL_COLLECTION);
 	}
 
 	/**
@@ -159,7 +161,7 @@ public class FWAngelDistribution extends Application {
 				angel.addAttribute(Attribute.SPECIAL, special);
 
 				// Default values when the angels are first created
-				angel.addAttribute(Attribute.STATUS, Status.AWAITING);
+				angel.addAttribute(Attribute.STATUS, Status.AWAITING.toString());
 				angel.addAttribute(Attribute.MISSING, new String[0]);
 				angel.addAttribute(Attribute.LOCATION, "Family Resource");
 

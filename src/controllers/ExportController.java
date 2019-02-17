@@ -8,16 +8,15 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
 
 import angels.Angel;
 import angels.Attribute;
 import angels.Status;
 import database.DatabaseController;
 import display.Displays;
+import export.ExcelSheet;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -32,7 +31,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.DirectoryChooser;
-import main.ExcelSheet;
 
 public class ExportController extends Controller {
 
@@ -61,28 +59,33 @@ public class ExportController extends Controller {
 
 	private void excelTest() {
 		Map<String, List<String>> values = new LinkedHashMap<>();
-		
+		int numAngels = 5;
 		List<String> idValues = new ArrayList<>();
-		idValues.add("1A");
-		idValues.add("1B");
-		idValues.add("2A");
+		for (int i = 1; i <= numAngels; i++)
+			idValues.add(i + "A");
 		values.put(Attribute.ID.toString(), idValues);
 
 		List<String> genderValues = new ArrayList<>();
-		genderValues.add("B");
-		genderValues.add("G");
-		genderValues.add("B");
+		for (int i = 1; i <= numAngels; i++)
+			genderValues.add("B");
 		values.put(Attribute.GENDER.toString(), genderValues);
+		
+		List<String> location = new ArrayList<>();
+		for (int i = 1; i <= numAngels; i++)
+			location.add("X");
+		values.put(Attribute.LOCATION.toString(), location);
+		
+		List<String> status = new ArrayList<>();
+		for (int i = 1; i <= numAngels; i++)
+			status.add("H");
+		values.put(Attribute.STATUS.toString(), status);
 
-		Map<Integer, Integer> columns = new HashMap<>();
-		columns.put(0, 2000);
-		columns.put(1, 2000);
-		columns.put(2, 2000);
-		columns.put(3, 2000);
+//		Map<Integer, Integer> columnWidths = new HashMap<>();
+//		columnWidths.put(0, 500);
 
-		ExcelSheet sheet = new ExcelSheet("EXPORTS", values, false);
-		sheet.setColumnWidths(columns);
+		ExcelSheet sheet = new ExcelSheet("EXPORTS", values, null, false);
 		sheet.save("C:/Users/nkkun/Desktop/Angel Exports/", "test");
+		System.out.println("CREATED EXCEL FILE");
 	}
 
 	private HBox filterInput() {
@@ -398,43 +401,37 @@ public class ExportController extends Controller {
 
 		System.out.println(query);
 
-		Task<List<Angel>> result = dbController.query(query);
-		result.setOnSucceeded(e -> {
-			try {
-				PrintWriter pw = null;
-				try {
-					pw = new PrintWriter(new File(
-							filePath.getText() + "\\" + fileName.getText()
-									+ ".csv"));
-				} catch (IOException e1) {
-					e1.printStackTrace();
-				}
-				for (Angel angel : result.get()) {
-					String values = "";
-					for (Node node : attributesContainer.getChildren()) {
-						ComboBox<String> box = (ComboBox<String>) ((HBox) node)
-								.getChildren().get(0);
-						String strAtt = box.getValue().replace(" ", "_")
-								.toUpperCase();
-						Attribute attr = Attribute.valueOf(strAtt);
-						System.out.println("VALUE: " + angel.get(attr));
-						String value = formatString((String) angel.get(attr));
-						values += "=" + "\"" + value + "\",";
-					}
-					values += "\n";
-					builder.append(values);
-					values = "";
-				}
-				pw.write(builder.toString());
-				pw.close();
-				Alert alert = new Alert(AlertType.CONFIRMATION);
-				alert.setContentText("EXPORT SUCCESSFUL");
-				alert.showAndWait();
-			} catch (InterruptedException | ExecutionException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
+		List<Angel> result = dbController.query(query);
+		PrintWriter pw = null;
+		try {
+			pw = new PrintWriter(new File(
+					filePath.getText() + "\\" + fileName.getText()
+							+ ".csv"));
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+
+		for (Angel angel : result) {
+			String values = "";
+			for (Node node : attributesContainer.getChildren()) {
+				ComboBox<String> box = (ComboBox<String>) ((HBox) node)
+						.getChildren().get(0);
+				String strAtt = box.getValue().replace(" ", "_")
+						.toUpperCase();
+				Attribute attr = Attribute.valueOf(strAtt);
+				System.out.println("VALUE: " + angel.get(attr));
+				String value = formatString((String) angel.get(attr));
+				values += "=" + "\"" + value + "\",";
 			}
-		});
+			values += "\n";
+			builder.append(values);
+			values = "";
+		}
+		pw.write(builder.toString());
+		pw.close();
+		Alert alert = new Alert(AlertType.CONFIRMATION);
+		alert.setContentText("EXPORT SUCCESSFUL");
+		alert.showAndWait();
 	}
 
 	private String formatString(String string) {

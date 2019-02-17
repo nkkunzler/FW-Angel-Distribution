@@ -10,13 +10,14 @@ package controllers;
 
 import java.util.concurrent.ExecutionException;
 
+import com.arangodb.entity.BaseDocument;
+
 import angels.Angel;
 import angels.Attribute;
 import angels.Status;
 import customFX.Popup;
 import database.DatabaseController;
 import display.Displays;
-import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
@@ -30,14 +31,14 @@ import javafx.scene.layout.VBox;
 public class AddController extends Controller {
 
 	// Maximum number of characters allowed for book, wish, and special inputs.
-	// This is so that the text can fit onto an angel.
+	// This is so that the text can fit onto an angel when printing.
 	private final int MAX_BOOK_CHARS = 35;
 	private final int MAX_WISH_CHARS = 85;
 	private final int MAX_SPECIAL_CHARS = 60;
 
 	@FXML
 	// All the TextFields input within the AddAngel.fxml display
-	private TextField idInput, sexInput, ageInput, shoeInput, clothesInput,
+	private TextField idInput, genderInput, ageInput, shoeInput, clothesInput,
 			shirtInput, pantsInput, bookInput;
 	@FXML
 	private VBox inputsContainer;
@@ -69,14 +70,16 @@ public class AddController extends Controller {
 	 * Checking to make sure that the angel id is valid.
 	 * 
 	 * A valid angel id is one that does not already exist within the databases
-	 * collection specified within the constructor.
+	 * collection, which was set within the constructor.
 	 * 
-	 * @param e KeyEvent that is triggered every time a button is pressed.
+	 * @param e KeyEvent that is triggered every time a value is entered into
+	 *          the corresponding TextField.
 	 */
 	@FXML
 	public void validateAngelID(KeyEvent e)
 			throws InterruptedException, ExecutionException {
-		if (e.getCode() == KeyCode.TAB) {
+
+		if (e.getCode() == KeyCode.TAB) { // Indicates movement to next field
 			String angelID = idInput.getText().toUpperCase();
 
 			if (angelID.equals("")) { // Can't have an empty angel id
@@ -92,45 +95,46 @@ public class AddController extends Controller {
 			}
 
 			// Checking to see if the angel id already exist in the database
-			Task<Boolean> task = dbController.contains(angelID, dbCollection);
+			boolean contains = dbController.contains(angelID, dbCollection);
 
-			if (task.get()) {
+			if (contains) {
 				showPopup("Invalid ID",
 						"Angel ID '" + angelID + "' already exists");
 				idInput.clear();
 				e.consume(); // Prevents next enabled Node to be auto selected
 			} else {
-				sexInput.setDisable(false);
+				genderInput.setDisable(false); // Valid input, can go on
 			}
 		}
 	}
 
 	/**
-	 * Checking to make sure the sex of the angel is valid.
+	 * Checking to make sure the gender of the angel is valid.
 	 * 
-	 * A valid sex is either a 'boy' or 'girl', capitalization does not matter.
+	 * A valid gender is either a 'boy' or 'girl', capitalization does not
+	 * matter.
 	 * 
-	 * @param e KeyEvent that is triggered every time a button is pressed.
+	 * @param e KeyEvent triggered when the sex TextField is focused, selected
 	 */
 	@FXML
 	public void validateSex(KeyEvent e) {
 		if (e.getCode() == KeyCode.TAB) {
-			String input = sexInput.getText().toLowerCase();
+			String input = genderInput.getText();
 
-			if (input.equals("b")) {
-				sexInput.setText("boy");
+			if (input.equalsIgnoreCase("b")) {
+				genderInput.setText("boy");
 				input = "boy";
-			} else if (input.equals("g")) {
-				sexInput.setText("girl");
+			} else if (input.equalsIgnoreCase("g")) {
+				genderInput.setText("girl");
 				input = "girl";
 			}
 
 			if (!input.equals("boy") && !input.equals("girl")) {
 				showPopup("Invalid Gender", "Enter 'boy' or 'girl'");
-				sexInput.clear();
+				genderInput.clear();
 				e.consume(); // Prevents next enabled Node from being selected
 			} else {
-				ageInput.setDisable(false);
+				ageInput.setDisable(false); // Valid input, can go on
 			}
 		}
 	}
@@ -140,7 +144,7 @@ public class AddController extends Controller {
 	 * 
 	 * A valid age is any values between 0 and 12, inclusive.
 	 * 
-	 * @param e KeyEvent that is triggered every time a button is pressed.
+	 * @param e KeyEvent triggered when the age TextField is focused, selected
 	 */
 	@FXML
 	public void validateAge(KeyEvent e) {
@@ -162,7 +166,7 @@ public class AddController extends Controller {
 				ageInput.clear();
 				e.consume();
 			} else {
-				shoeInput.setDisable(false);
+				shoeInput.setDisable(false); // Valid input, can move on
 			}
 		}
 	}
@@ -170,14 +174,15 @@ public class AddController extends Controller {
 	/**
 	 * Checking to make sure the shoe size of the angel is valid.
 	 * 
-	 * A valid shoe will contain a 'M', 'W', 'K', or 'W' to indicated men,
-	 * women, or kid, size shoe. 'W' indicates a wide shoe size.
+	 * A valid shoe will contain a 'M', 'W', or 'K', 'W' to indicated men,
+	 * women, or kid, size shoe. 'W' at end of shoe size indicates a wide shoe
+	 * size.
 	 * 
 	 * Input does not require that these are added as they will be added
 	 * automatically if not specified. If specified that values entered will
 	 * remain.
 	 * 
-	 * @param e KeyEvent that is triggered every time a button is pressed.
+	 * @param e KeyEvent triggered when the shoe TextField is focused, selected
 	 */
 	@FXML
 	public void validateShoe(KeyEvent e) {
@@ -190,12 +195,12 @@ public class AddController extends Controller {
 				return;
 			}
 
-			char firstChar = text.charAt(0); // Checking for prefix
-			if (firstChar != 'w' && firstChar != 'm' && firstChar != 'k') {
+			char prefix = text.charAt(0); // Checking for prefix
+			if (prefix != 'w' && prefix != 'm' && prefix != 'k') {
 				// Check to see if last character is a W, meaning a wide shoe
 				char wide = text.charAt(text.length() - 1) == 'w' ? 'W' : '\0';
 
-				// Need to check for 'W' for proper parsing of shoe size
+				// Need to check for 'W', wide, for proper parsing of shoe size
 				int shoeSize;
 				try {
 					if (wide == 'W')
@@ -215,7 +220,7 @@ public class AddController extends Controller {
 				int age = Integer.valueOf(ageInput.getText());
 				char ageLevel = 'K';
 				if (age >= 8 && shoeSize >= 1) {
-					if (sexInput.getText().equalsIgnoreCase("boy"))
+					if (genderInput.getText().equalsIgnoreCase("boy"))
 						ageLevel = 'M';
 					else
 						ageLevel = 'W';
@@ -236,7 +241,8 @@ public class AddController extends Controller {
 	 * If 'S', 'M', 'L', 'XL' are input, then those values will be automatically
 	 * converted to a clothes size, such as 10/12.
 	 * 
-	 * @param e KeyEvent that is triggered every time a button is pressed.
+	 * @param e KeyEvent triggered when the clothes TextField is focused,
+	 *          selected
 	 */
 	@FXML
 	public void validateClothesSize(KeyEvent e) {
@@ -245,7 +251,8 @@ public class AddController extends Controller {
 			if (clothesInput.getText().equals("")) {
 				clothesInput.setText("none");
 			} else {
-				String size = convertClothesSizeToDimensions(sexInput.getText(),
+				String size = convertClothesSizeToDimensions(
+						genderInput.getText(),
 						clothesInput.getText());
 				clothesInput.setText(size);
 			}
@@ -260,7 +267,7 @@ public class AddController extends Controller {
 	 * 
 	 * If the input is empty, then the clothes size provided will be inserted.
 	 * 
-	 * @param e KeyEvent that is triggered every time a button is pressed.
+	 * @param e KeyEvent triggered when the shirt TextField is focused, selected
 	 */
 	@FXML
 	public void validateShirtSize(KeyEvent e) {
@@ -269,7 +276,8 @@ public class AddController extends Controller {
 			if (shirtInput.getText().equals("")) {
 				shirtInput.setText(clothesInput.getText());
 			} else {
-				String size = convertClothesSizeToDimensions(sexInput.getText(),
+				String size = convertClothesSizeToDimensions(
+						genderInput.getText(),
 						shirtInput.getText());
 				shirtInput.setText(size);
 			}
@@ -284,7 +292,7 @@ public class AddController extends Controller {
 	 * 
 	 * If the input is empty, then the clothes size provided will be inserted.
 	 * 
-	 * @param e KeyEvent that is triggered every time a button is pressed.
+	 * @param e KeyEvent triggered when the pant TextField is focused, selected
 	 */
 	@FXML
 	public void validatePantSize(KeyEvent e) {
@@ -293,7 +301,8 @@ public class AddController extends Controller {
 			if (pantsInput.getText().equals("")) {
 				pantsInput.setText(clothesInput.getText());
 			} else {
-				String size = convertClothesSizeToDimensions(sexInput.getText(),
+				String size = convertClothesSizeToDimensions(
+						genderInput.getText(),
 						pantsInput.getText());
 				pantsInput.setText(size);
 			}
@@ -306,26 +315,26 @@ public class AddController extends Controller {
 	 * This method converts the standard clothes size of 'S', 'M', 'L', and 'XL'
 	 * to their corresponding sizes.
 	 * 
-	 * @param sex  The sex of the angel, either 'boy' or 'girl'
-	 * @param size The size of the clothing
+	 * @param gender The gender of the angel, either 'boy' or 'girl'
+	 * @param size   The size of the clothing
 	 * @return The new size of the clothing.
 	 */
-	private String convertClothesSizeToDimensions(String sex, String size) {
+	private String convertClothesSizeToDimensions(String gender, String size) {
 		switch (size.toLowerCase()) {
 		case "s":
-			if (sex.equalsIgnoreCase("boy")) // Boys have larger sizes
+			if (gender.equalsIgnoreCase("boy")) // Boys have larger sizes
 				return "8/10";
 			return "7/8";
 		case "m":
-			if (sex.equalsIgnoreCase("boy"))
+			if (gender.equalsIgnoreCase("boy"))
 				return "10/12";
 			return "10";
 		case "l":
-			if (sex.equalsIgnoreCase("boy"))
+			if (gender.equalsIgnoreCase("boy"))
 				return "14/16";
 			return "12/14";
 		case "xl":
-			if (sex.equalsIgnoreCase("boy"))
+			if (gender.equalsIgnoreCase("boy"))
 				return "18/20";
 			return "14/16";
 		default:
@@ -340,7 +349,7 @@ public class AddController extends Controller {
 	 * empty, then the string 'Age Appropriate' is automatically added as the
 	 * input.
 	 * 
-	 * @param e KeyEvent that is triggered every time a button is pressed.
+	 * @param e KeyEvent triggered when the wish TextField is focused, selected
 	 */
 	@FXML
 	public void validateWish(KeyEvent e) {
@@ -364,7 +373,8 @@ public class AddController extends Controller {
 	 * empty, then the string 'Age Appropriate' is automatically added as the
 	 * input.
 	 * 
-	 * @param e KeyEvent that is triggered every time a button is pressed.
+	 * @param e e KeyEvent triggered when the book TextField is focused,
+	 *          selected
 	 */
 	@FXML
 	public void validateBook(KeyEvent e) {
@@ -388,7 +398,8 @@ public class AddController extends Controller {
 	 * special is empty, then the string 'Age Appropriate' is automatically
 	 * added as the input.
 	 * 
-	 * @param e KeyEvent that is triggered every time a button is pressed.
+	 * @param e e KeyEvent triggered when the special TextField is focused,
+	 *          selected
 	 */
 	@FXML
 	public void validateSpecial(KeyEvent e) {
@@ -432,15 +443,17 @@ public class AddController extends Controller {
 	 */
 	@FXML
 	public void addButtonHandler() {
-		Angel angel = new Angel();
+		Angel agl = new Angel();
+
 		// The basic angel attributes
-		angel.addAttribute(Attribute.ID, idInput.getText().toUpperCase());
-		angel.addAttribute(Attribute.GENDER, sexInput.getText().toLowerCase());
-		angel.addAttribute(Attribute.AGE, Integer.valueOf(ageInput.getText()));
-		angel.addAttribute(Attribute.SHOE_SIZE, shoeInput.getText());
-		angel.addAttribute(Attribute.CLOTHES_SIZE, clothesInput.getText());
-		angel.addAttribute(Attribute.SHIRT_SIZE, shirtInput.getText());
-		angel.addAttribute(Attribute.PANT_SIZE, pantsInput.getText());
+		agl.addAttribute(Attribute.ID, idInput.getText().toUpperCase());
+		agl.addAttribute(Attribute.GENDER,
+				genderInput.getText().toLowerCase());
+		agl.addAttribute(Attribute.AGE, Integer.valueOf(ageInput.getText()));
+		agl.addAttribute(Attribute.SHOE_SIZE, shoeInput.getText());
+		agl.addAttribute(Attribute.CLOTHES_SIZE, clothesInput.getText());
+		agl.addAttribute(Attribute.SHIRT_SIZE, shirtInput.getText());
+		agl.addAttribute(Attribute.PANT_SIZE, pantsInput.getText());
 
 		// Converting into lists as there are multiple values
 		String[] wishes = wishInput.getText().replaceAll(", ", ",").split(",");
@@ -448,25 +461,25 @@ public class AddController extends Controller {
 		String[] specs = specialInput.getText().replaceAll(", ", ",")
 				.split(",");
 
-		angel.addAttribute(Attribute.WISH, wishes);
-		angel.addAttribute(Attribute.BOOK, books);
-		angel.addAttribute(Attribute.SPECIAL, specs);
+		agl.addAttribute(Attribute.WISH, wishes);
+		agl.addAttribute(Attribute.BOOK, books);
+		agl.addAttribute(Attribute.SPECIAL, specs);
 
 		// Default values when the angels are first created
-		angel.addAttribute(Attribute.STATUS, Status.AWAITING);
-		angel.addAttribute(Attribute.MISSING, new String[0]);
-		angel.addAttribute(Attribute.LOCATION, "Family Resource");
+		agl.addAttribute(Attribute.STATUS, Status.AWAITING.toString());
+		agl.addAttribute(Attribute.MISSING, new String[0]);
+		agl.addAttribute(Attribute.LOCATION, "Family Resource");
 
 		// If the angel was added reset the inputs and indicate success
-		Task<Boolean> task = dbController.insertAngel(angel, dbCollection);
-		
-		task.setOnSucceeded(e -> {
-			showPopup("Successful", "Angel '" + idInput.getText()
+		boolean success = dbController.insertAngel(agl, dbCollection);
+
+		if (success) {
+			showPopup("Successfully Added", "Angel '" + idInput.getText()
 					+ "' was added successfully");
 			resetInputs();
-		});
-
-		task.setOnFailed(e -> showPopup("Error", "Angel could not be added"));
+		} else {
+			showPopup("Error", "Angel could not be added");
+		}
 	}
 
 	/**
