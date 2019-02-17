@@ -10,9 +10,9 @@ package angels;
 
 public enum Status {
 
-	COMPLETE,
-	HOLD,
-	PULL,
-	AWAITING,
-	OUT;
+	COMPLETE, 	// Angel is complete
+	HOLD, 		// Angel is missing items
+	PULL, 		// The angel needs to be pulled for unknown reasons
+	AWAITING, 	// Angel is waiting to be given out or started
+	OUT; 		// Angel is out at a different location
 }

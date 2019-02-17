@@ -62,8 +62,10 @@ public class StatusSelectController extends Controller {
 	public void setAngel(Angel angelToChange) {
 		angel = angelToChange;
 
+		// Converts an Angel's string status to a STATUS object
 		Status status = Status.valueOf(angel.get(Attribute.STATUS).toString());
 
+		// Label below the scene title
 		angelIDLabel.setText(angel.get(Attribute.ID) + " - " + status);
 
 		// Show warning if the angel is suppose to be pulled
@@ -73,6 +75,7 @@ public class StatusSelectController extends Controller {
 							+ "' needs to be pulled.\nAlter Status?",
 					ButtonType.NO, ButtonType.YES);
 
+			// If the user does not want to alter the status, go back
 			if (popup.getSelection() == ButtonType.NO)
 				super.previousDisplay();
 		}
@@ -87,6 +90,8 @@ public class StatusSelectController extends Controller {
 	/**
 	 * This method handles the onActionEvent() method for the green complete
 	 * button on the AngelStatus.fxml display.
+	 * 
+	 * TODO: Prompt for additional information before going to complete
 	 */
 	public void completeHandler() {
 		dbController.update((String) angel.get(Attribute.ID),
@@ -119,6 +124,7 @@ public class StatusSelectController extends Controller {
 	 * on the AngelStatus.fxml display.
 	 */
 	public void pullHandler() {
+		// Ask the user if they want to pull the angel
 		Popup popup = new Popup(AlertType.WARNING,
 				"Do you want to pull this angel?",
 				ButtonType.YES, ButtonType.NO);
@@ -142,6 +148,7 @@ public class StatusSelectController extends Controller {
 	 * button on the AngelStatus.fxml display.
 	 */
 	public void awaitingHandler() {
+		// Change status to "AWAITING"
 		dbController.update((String) angel.get(Attribute.ID),
 				Attribute.STATUS.toString(),
 				Status.AWAITING.toString(),
@@ -158,6 +165,7 @@ public class StatusSelectController extends Controller {
 	 * the AngelStatus.fxml display.
 	 */
 	public void outHandler() {
+		// Change status to "OUT"
 		dbController.update((String) angel.get(Attribute.ID),
 				Attribute.STATUS.toString(),
 				Status.OUT.toString(),

@@ -172,8 +172,8 @@ public class HoldController extends Controller {
 				cb.fire();
 			}
 
-			// If text in CheckBox is longer than 20 characters, new CheckBoxes
-			// within the section are moved down one column.
+			// If text for a CheckBox is longer than 20 characters, new
+			// CheckBoxes within the section are moved down one column.
 			numChars += cb.getText().length();
 			if (numChars >= 20 && col <= 1) {
 				if (items.size() != 1)
@@ -181,9 +181,9 @@ public class HoldController extends Controller {
 				col++;
 				numChars = 0;
 			}
-
-			pane.add(cb, row++ % 2, col++ / 2);
+			pane.add(cb, row++ % 2, col++ / 2); // Adding CheckBox to pane
 		}
+		
 		return pane;
 	}
 
@@ -233,6 +233,7 @@ public class HoldController extends Controller {
 			Popup popup = new Popup(AlertType.INFORMATION, contentText,
 					ButtonType.YES, ButtonType.NO);
 
+			// User wants to put item on hold, so do so.
 			if (popup.getSelection() == ButtonType.YES) {
 				dbController.update((String) angel.get(Attribute.ID),
 						Attribute.STATUS, Status.COMPLETE, collection);
@@ -248,15 +249,14 @@ public class HoldController extends Controller {
 				"UPDATE {_key: '" + angel.get(Attribute.ID) + "'} WITH {'"
 						+ Attribute.MISSING + "':" + missingItems + "} "
 						+ "IN " + collection);
-		System.out.println(
-				"UPDATE {_key: '" + angel.get(Attribute.ID) + "'} WITH {'"
-						+ Attribute.MISSING + "':" + missingItems + "} "
-						+ "IN " + collection);
 
 		super.switchScene(Displays.ANGEL_SELECTION);
 	}
 
 	/**
+	 * TODO: TRY TO REMOVE THE NEED TO DO THIS IN THE FUTURE
+	 * 
+	 * 
 	 * Converts an ObservableList<Node> into a string form usable by an arangodb
 	 * database query.
 	 * 

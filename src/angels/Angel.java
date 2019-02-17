@@ -11,11 +11,18 @@ import com.arangodb.entity.BaseDocument;
 public class Angel {
 
 	private BaseDocument baseDocument = new BaseDocument();
-	
+
 	public Angel() {
-		
-	}
-	
+	};
+
+	/**
+	 * Creates a new instance of an Angel with the given values from the given
+	 * BaseDocument
+	 * 
+	 * @param baseDocument Document containing direct information from the
+	 *                     database a specific angel
+	 * 
+	 */
 	public Angel(BaseDocument baseDocument) {
 		this.baseDocument = baseDocument;
 	}
@@ -29,7 +36,7 @@ public class Angel {
 	public void addAttribute(Attribute attribute, Object value) {
 		if (attribute == Attribute.ID)
 			baseDocument.setKey(value.toString());
-		
+
 		baseDocument.addAttribute(attribute.toString(), value);
 	}
 
@@ -38,21 +45,18 @@ public class Angel {
 	 * does not exists for the angel, null will be returned when trying to
 	 * access the attribute.
 	 * 
-	 * @return A map containing the angels attributes and their values
+	 * @return A BaseDocument containing the angels attributes and their values
 	 */
 	public BaseDocument getAttributes() {
 		return baseDocument;
-	}
-	
-	public void setAttributes(BaseDocument newbaseDocument) {
-		baseDocument = newbaseDocument;
 	}
 
 	/**
 	 * Returns the value associated with the attribute.
 	 * 
 	 * @param attribute The attribute to find the value for.
-	 * @return A string representing the value associated with the attribute.
+	 * @return A string, in form of an object, representing the value associated
+	 *         with the attribute.
 	 */
 	public Object get(Attribute attribute) {
 		return baseDocument.getAttribute(attribute.toString());

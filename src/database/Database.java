@@ -26,6 +26,13 @@ public class Database {
 	private String dbName;
 	private ArangoDB arangoDB;
 
+	/**
+	 * TODO: Add error throwing 
+	 * 
+	 * @param dbName   The name of desired database
+	 * @param user     The username for the database
+	 * @param password The password for the database
+	 */
 	public Database(String dbName, String user, String password) {
 		this.dbName = dbName;
 		arangoDB = new ArangoDB.Builder().user(user).password(password).build();
@@ -42,7 +49,8 @@ public class Database {
 	 *         false is returned.
 	 */
 	protected boolean contains(String key, String collection) {
-		boolean contains = arangoDB.db(dbName).collection(collection).documentExists(key);
+		boolean contains = arangoDB.db(dbName).collection(collection)
+				.documentExists(key);
 		arangoDB.shutdown();
 		return contains;
 	}
@@ -57,7 +65,8 @@ public class Database {
 	 * @return True if the document was successfully added; otherwise false is
 	 *         returned.
 	 */
-	protected boolean insert(String key, BaseDocument object, String collection) {
+	protected boolean insert(String key, BaseDocument object,
+			String collection) {
 		if (!contains(key, collection)) {
 			try {
 				arangoDB.db(dbName).collection(collection)
@@ -69,7 +78,7 @@ public class Database {
 			arangoDB.shutdown();
 			return true;
 		}
-		
+
 		return false;
 	}
 

@@ -14,6 +14,7 @@ import angels.Attribute;
 import angels.Status;
 import database.DatabaseController;
 import display.Displays;
+import export.ExcelSheet;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
@@ -30,7 +31,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.DirectoryChooser;
-import main.ExcelSheet;
 
 public class ExportController extends Controller {
 

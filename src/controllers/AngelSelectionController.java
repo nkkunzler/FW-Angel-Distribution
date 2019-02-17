@@ -134,17 +134,9 @@ public class AngelSelectionController extends Controller {
 				+ " SORT doc." + Attribute.ID // Sort the ID, a -> z
 				+ " RETURN doc";
 
-		// Creating GridPane used to display the found angels
-		final GridPane grid = new GridPane();
-		grid.setAlignment(Pos.CENTER);
-		grid.setHgap(10);
-		grid.setVgap(10);
-
 		// Creating the buttons corresponding to input id value. Done on
 		// Separate thread to prevent UI locking
-		populateGrid(grid, dbController.query(query));
-
-		return grid;
+		return createResultGrid(dbController.query(query));
 	}
 
 	/**
@@ -154,27 +146,33 @@ public class AngelSelectionController extends Controller {
 	 * to allow for a selection of changing the status of the angel to complete,
 	 * on hold, or pull.
 	 * 
-	 * @param grid   GridPane to which to add the buttons corresponding to the
-	 *               angels within the result list.
 	 * @param result A list, containing zero or more Angels, that are used to
 	 *               generate buttons with text corresponding to the Angel ID.
 	 */
-	private void populateGrid(GridPane grid, List<Angel> result) {
+	private GridPane createResultGrid(List<Angel> result) {
+		// Creating GridPane used to display the found angels
+		GridPane grid = new GridPane();
+		grid.setAlignment(Pos.CENTER);
+		grid.setHgap(10);
+		grid.setVgap(10);
+
 		// Do nothing if there are no results
 		if (result.size() == 0) {
 			Label label = new Label("No Results Found");
 			label.setFont(new Font(FONT_SIZE));
 			grid.add(label, 1, 1);
-			return;
+			return grid;
 		}
+		
 		// Creating the buttons for each of the results
 		for (int i = 0; i < result.size(); ++i) {
 			Angel angel = result.get(i);
-			
+
 			Button btn = new Button((String) angel.get(Attribute.ID));
 			btn.setFont(new Font(FONT_SIZE));
-			
-			// Clicking on an angel id button
+
+			// Clicking on an angel id button switches to status selection
+			// display
 			btn.setOnAction(e -> {
 				super.switchScene(Displays.ANGEL_STATUS);
 				StatusSelectController ssc = (StatusSelectController) super.getController(
@@ -191,6 +189,7 @@ public class AngelSelectionController extends Controller {
 
 			grid.add(btn, i % 3, i / 3); // GridPane is 3x3.
 		}
+		return grid;
 	}
 
 	@FXML
