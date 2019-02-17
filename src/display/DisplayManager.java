@@ -76,18 +76,19 @@ public class DisplayManager {
 	 * When called, the stage will replace the current scene being viewed with
 	 * the scene that moved you to the current scene.
 	 */
-	public static void previousDisplay() {
+	public static Displays previousDisplay() {
 		if (sceneStack.isEmpty()) {
 			System.err.println("There is no previous scene");
-			return;
+			return null;
 		}
 
 		// Removing previous style classes that were loaded to display
 		if (stage.getScene().getRoot().getStyleClass().size() > 1)
 			stage.getScene().getRoot().getStyleClass().remove(0);
 
+		Displays prevDisplay = null;
 		try {
-			Displays prevDisplay = sceneStack.pop();
+			prevDisplay = sceneStack.pop();
 			FXMLLoader loader = new FXMLLoader(DisplayManager.class
 					.getClassLoader().getResource(prevDisplay.getFile()));
 			loader.setController(displays.get(prevDisplay));
@@ -95,6 +96,7 @@ public class DisplayManager {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		return prevDisplay;
 	}
 
 	/**

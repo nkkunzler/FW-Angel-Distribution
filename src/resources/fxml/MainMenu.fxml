@@ -22,12 +22,17 @@
                   <Font size="24.0" />
                </font>
             </Button>
-            <Button fx:id="requestButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#switchToRequestDisplay" text="Request Angel">
+            <Button fx:id="editStatusButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#switchToAngelSelection" text="Edit Status">
                <font>
                   <Font size="24.0" />
                </font>
             </Button>
-            <Button fx:id="editStatusButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#switchToAngelSelection" text="Edit Status">
+            <Button fx:id="searchButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#switchToSearchDisplay" text="Search">
+               <font>
+                  <Font size="24.0" />
+               </font>
+            </Button>
+            <Button fx:id="requestButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#switchToRequestDisplay" text="Request Angel">
                <font>
                   <Font size="24.0" />
                </font>

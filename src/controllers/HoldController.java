@@ -183,7 +183,7 @@ public class HoldController extends Controller {
 			}
 			pane.add(cb, row++ % 2, col++ / 2); // Adding CheckBox to pane
 		}
-		
+
 		return pane;
 	}
 
@@ -250,7 +250,7 @@ public class HoldController extends Controller {
 						+ Attribute.MISSING + "':" + missingItems + "} "
 						+ "IN " + collection);
 
-		super.switchScene(Displays.ANGEL_SELECTION);
+		super.previousDisplay();
 	}
 
 	/**
@@ -290,9 +290,10 @@ public class HoldController extends Controller {
 	 */
 	@FXML
 	public void cancelButtonHandler() {
-		super.previousDisplay();
-		StatusSelectController controller = (StatusSelectController) super.getController(
-				Displays.ANGEL_STATUS);
-		controller.setAngel(angel);
+		if (super.previousDisplay() == Displays.ANGEL_STATUS) {
+			StatusSelectController controller = (StatusSelectController) super.getController(
+					Displays.ANGEL_STATUS);
+			controller.setAngel(angel);
+		}
 	}
 }

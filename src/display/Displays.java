@@ -29,7 +29,10 @@ public enum Displays {
 	REQUEST_DISPLAY("resources/fxml/RequestDisplay.fxml"),
 	
 	// Displays where the user can export the database
-	EXPORT_DISPLAY("resources/fxml/ExportDisplay.fxml");
+	EXPORT_DISPLAY("resources/fxml/ExportDisplay.fxml"),
+	
+	// Displays where the user can search the database
+	SEARCH_DISPLAY("resources/fxml/SearchDisplay.fxml");
 
 	private final String fxmlFile;
 	

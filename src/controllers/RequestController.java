@@ -76,8 +76,9 @@ public class RequestController extends Controller {
 
 	}
 
-	public void previousDisplay() {
+	public Displays previousDisplay() {
 		super.switchScene(Displays.MAIN_MENU);
+		return null;
 	}
 
 }

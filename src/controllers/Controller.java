@@ -42,8 +42,8 @@ public class Controller {
 	 * Uses the DisplayManager's perviousDisplay() method in order to switch to
 	 * the display that called the current display using the Display
 	 */
-	protected void previousDisplay() {
-		DisplayManager.previousDisplay();
+	protected Displays previousDisplay() {
+		return DisplayManager.previousDisplay();
 	}
 
 	/**

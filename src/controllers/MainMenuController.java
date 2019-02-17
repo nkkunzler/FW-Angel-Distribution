@@ -63,4 +63,15 @@ public class MainMenuController extends Controller {
 	public void switchToRequestDisplay() {
 		super.switchScene(Displays.REQUEST_DISPLAY);
 	}
+
+	/**
+	 * Switches the scene from the MainMenu to the SearchDisplay.fxml display.
+	 * 
+	 * This method is called by the MainMenu.fxml file when the 'Search' button
+	 * has an action.
+	 */
+	@FXML
+	public void switchToSearchDisplay() {
+		super.switchScene(Displays.SEARCH_DISPLAY);
+	}
 }

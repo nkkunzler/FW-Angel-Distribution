@@ -9,6 +9,7 @@ import controllers.ExportController;
 import controllers.HoldController;
 import controllers.MainMenuController;
 import controllers.RequestController;
+import controllers.SearchDisplayController;
 import controllers.StatusSelectController;
 import database.Database;
 import database.DatabaseController;
@@ -73,6 +74,7 @@ public class FWAngelDistribution extends Application {
 		new HoldController(dbController, ANGEL_COLLECTION);
 		new ExportController(dbController);
 		new RequestController(dbController, ANGEL_COLLECTION);
+		new SearchDisplayController(dbController, ANGEL_COLLECTION);
 	}
 
 	/**

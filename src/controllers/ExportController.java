@@ -54,7 +54,7 @@ public class ExportController extends Controller {
 
 		this.dbController = dbController;
 
-		excelTest();
+		//excelTest();
 	}
 
 	private void excelTest() {
