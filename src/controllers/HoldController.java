@@ -27,6 +27,7 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
@@ -44,6 +45,8 @@ public class HoldController extends Controller {
 	private VBox selectionArea;
 	@FXML
 	private VBox selectedItemsVBox;
+	@FXML
+	private Button cancelButton;
 
 	private Angel angel;
 	private DatabaseController dbController;
@@ -229,14 +232,13 @@ public class HoldController extends Controller {
 		// If no missingItems, [], ask if the item should be marked as complete
 		if (missingItems.equals("[]")) {
 			String contentText = "This angel has nothing on hold.\n"
-					+ "Would you like to mark it as complete?";
+					+ "Would you like to take off hold?";
 			Popup popup = new Popup(AlertType.INFORMATION, contentText,
 					ButtonType.YES, ButtonType.NO);
 
-			// User wants to put item on hold, so do so.
 			if (popup.getSelection() == ButtonType.YES) {
 				dbController.update((String) angel.get(Attribute.ID),
-						Attribute.STATUS, Status.COMPLETE, collection);
+						Attribute.STATUS, Status.AWAITING, collection);
 			}
 		} else { // Missing items indicate that item needs to go on hold
 			dbController.update(
@@ -249,8 +251,13 @@ public class HoldController extends Controller {
 				"UPDATE {_key: '" + angel.get(Attribute.ID) + "'} WITH {'"
 						+ Attribute.MISSING + "':" + missingItems + "} "
 						+ "IN " + collection);
-
-		super.previousDisplay();
+		
+		List<Angel> updateAngel = dbController.query("FOR doc IN " + collection
+				+ " FILTER doc.ID == '"
+				+ angel.get(Attribute.ID).toString() + "' LIMIT 1 RETURN doc");
+		angel = updateAngel.get(0);
+		
+		cancelButton.fire();
 	}
 
 	/**

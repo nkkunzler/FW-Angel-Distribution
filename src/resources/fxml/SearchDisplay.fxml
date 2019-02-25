@@ -7,7 +7,6 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.layout.AnchorPane?>
 
-
 <BorderPane prefHeight="800.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <top>
       <VBox alignment="TOP_CENTER" prefHeight="200.0" prefWidth="100.0" spacing="20.0" BorderPane.alignment="CENTER">
@@ -28,12 +27,12 @@
                      <children>
                         <HBox alignment="CENTER" spacing="20.0">
                            <children>
+                              <ComboBox fx:id="attributeComboBox" promptText="Select Attribute" />
                               <TextField fx:id="keywordTextField" promptText="Keyword">
                                  <font>
                                     <Font size="20.0" />
                                  </font>
                               </TextField>
-                              <ComboBox fx:id="attributeComboBox" promptText="Select Attribute" />
                               <Button fx:id="addSearch" mnemonicParsing="false" onAction="#addSearchController" text="+">
                                  <font>
                                     <Font size="16.0" />
@@ -50,6 +49,11 @@
                   </VBox>
                </children>
             </HBox>
+            <CheckBox fx:id="exactMatchCheckBox" mnemonicParsing="false" text="Exact Match">
+               <font>
+                  <Font size="18.0" />
+               </font>
+            </CheckBox>
             <Button fx:id="searchButton" mnemonicParsing="false" onAction="#search" text="Search">
                <font>
                   <Font size="20.0" />

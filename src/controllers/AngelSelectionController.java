@@ -18,6 +18,8 @@ import java.util.List;
 
 import angels.Angel;
 import angels.Attribute;
+import angels.Status;
+import customFX.StatusButton;
 import database.DatabaseController;
 import display.Displays;
 import javafx.event.ActionEvent;
@@ -163,30 +165,17 @@ public class AngelSelectionController extends Controller {
 			grid.add(label, 1, 1);
 			return grid;
 		}
-		
+
 		// Creating the buttons for each of the results
 		for (int i = 0; i < result.size(); ++i) {
 			Angel angel = result.get(i);
-
-			Button btn = new Button((String) angel.get(Attribute.ID));
-			btn.setFont(new Font(FONT_SIZE));
-
-			// Clicking on an angel id button switches to status selection
-			// display
+			StatusButton btn = new StatusButton(angel);
 			btn.setOnAction(e -> {
 				super.switchScene(Displays.ANGEL_STATUS);
 				StatusSelectController ssc = (StatusSelectController) super.getController(
 						Displays.ANGEL_STATUS);
 				ssc.setAngel(angel);
 			});
-
-			// Coloring button depending on gender
-			String sex = (String) angel.get(Attribute.GENDER);
-			if (sex.equalsIgnoreCase("boy"))
-				btn.setStyle("-fx-background-color: lightblue;");
-			else
-				btn.setStyle("-fx-background-color: lightpink;");
-
 			grid.add(btn, i % 3, i / 3); // GridPane is 3x3.
 		}
 		return grid;

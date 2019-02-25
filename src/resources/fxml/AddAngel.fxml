@@ -97,7 +97,7 @@
                               <Font size="16.0" />
                            </font>
                         </TextField>
-                        <TextField fx:id="sexInput" disable="true" onKeyPressed="#validateSex" promptText="Sex">
+                        <TextField fx:id="genderInput" disable="true" onKeyPressed="#validateGender" promptText="Gender">
                            <font>
                               <Font size="16.0" />
                            </font>

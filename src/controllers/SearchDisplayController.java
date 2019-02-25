@@ -1,15 +1,17 @@
 package controllers;
 
+import java.util.Arrays;
 import java.util.List;
 
 import angels.Angel;
 import angels.Attribute;
+import customFX.StatusButton;
 import database.DatabaseController;
 import display.Displays;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
@@ -34,6 +36,8 @@ public class SearchDisplayController extends Controller {
 	private ScrollPane resultPane;
 	@FXML
 	private GridPane resultGridPane;
+	@FXML
+	private CheckBox exactMatchCheckBox;
 
 	private DatabaseController dbController;
 	private String collection;
@@ -72,9 +76,8 @@ public class SearchDisplayController extends Controller {
 		});
 
 		// Add all the attributes for an angel to the combo box
-		for (Object obj : Attribute.values()) {
+		for (Object obj : Attribute.values())
 			box.getItems().add(obj.toString());
-		}
 
 	}
 
@@ -110,7 +113,7 @@ public class SearchDisplayController extends Controller {
 		rmSearchBtn.setFont(new Font(16));
 		rmSearchBtn.setOnAction(e -> keywordVBox.getChildren().remove(hb));
 
-		hb.getChildren().addAll(field, cb, addSearchBtn, rmSearchBtn);
+		hb.getChildren().addAll(cb, field, addSearchBtn, rmSearchBtn);
 		return hb;
 	}
 
@@ -131,7 +134,7 @@ public class SearchDisplayController extends Controller {
 	@FXML
 	public void search() {
 		String query = createSearchQuery();
-		
+
 		if (query == null)
 			return;
 
@@ -153,8 +156,16 @@ public class SearchDisplayController extends Controller {
 		// Creating a new button for each angel returned, allowing to view angel
 		for (int i = 0; i < results.size(); i++) {
 			Angel angel = results.get(i);
-			Button btn = resultButton(angel);
-			resultGridPane.add(btn, i % 5, i / 5);
+			StatusButton btn = new StatusButton(angel, 32, 8);
+			// Go to HoldDisplay.fxml display when pressed
+			btn.setOnAction(e -> {
+				super.switchScene(Displays.HOLD_DISPLAY);
+				HoldController controller = (HoldController) super.getController(
+						Displays.HOLD_DISPLAY);
+				controller.addAngel(angel);
+			});
+
+			resultGridPane.add(btn, i % 4, i / 4);
 		}
 	}
 
@@ -176,8 +187,8 @@ public class SearchDisplayController extends Controller {
 		// keywordVBox is where the keyword TextField and CB are located
 		for (int i = 0; i < keywordVBox.getChildren().size(); ++i) {
 			keywordHBox = (HBox) keywordVBox.getChildren().get(i);
-			keywordTF = (TextField) keywordHBox.getChildren().get(0);
-			keywordCB = (ComboBox<String>) keywordHBox.getChildren().get(1);
+			keywordTF = (TextField) keywordHBox.getChildren().get(1);
+			keywordCB = (ComboBox<String>) keywordHBox.getChildren().get(0);
 
 			// Do not include empty filters
 			if (keywordTF.getText().isEmpty())
@@ -186,46 +197,22 @@ public class SearchDisplayController extends Controller {
 			if (keywordCB.getValue() == null)
 				keywordCB.setValue("ID");
 			containsFilter = true;
-			query += " FILTER CONTAINS(LOWER(doc." + keywordCB.getValue()
-					+ "), LOWER('" + keywordTF.getText() + "'))\n";
+
+			// Only exact match on the ID search
+			if (keywordCB.getValue().equals("ID")
+					&& exactMatchCheckBox.isSelected()) {
+				query += " FILTER LIKE(LOWER(doc." + keywordCB.getValue()
+						+ "), LOWER('" + keywordTF.getText() + "_'))\n";
+			} else {
+				query += " FILTER CONTAINS(LOWER(doc." + keywordCB.getValue()
+						+ "), LOWER('" + keywordTF.getText() + "'))\n";
+			}
 		}
-		query += " RETURN doc";
-		
+		query += "SORT doc.ID ASC RETURN doc";
+
 		if (containsFilter)
 			return query;
 		return null;
-	}
-
-	/**
-	 * Creates a button, with colors corresponding to the two genders. The
-	 * buttons are linked to go the HoldDisplay.fxml display to show which items
-	 * the angel possess.
-	 * 
-	 * @param angel The angel corresponding to the button
-	 * @return A button with the color corresponding to the angel color and
-	 *         linked to transfer to HoldDisplay Display when pressed.
-	 */
-	private Button resultButton(Angel angel) {
-		Button btn = new Button();
-		btn.setAlignment(Pos.CENTER);
-		btn.setFont(new Font(24));
-		btn.setText(angel.get(Attribute.ID).toString());
-
-		// Go to HoldDisplay.fxml display when pressed
-		btn.setOnAction(e -> {
-			super.switchScene(Displays.HOLD_DISPLAY);
-			HoldController controller = (HoldController) super.getController(
-					Displays.HOLD_DISPLAY);
-			controller.addAngel(angel);
-		});
-
-		// Coloring button depending on gender
-		String sex = (String) angel.get(Attribute.GENDER);
-		if (sex.equalsIgnoreCase("boy"))
-			btn.setStyle("-fx-background-color: lightblue;");
-		else
-			btn.setStyle("-fx-background-color: lightpink;");
-		return btn;
 	}
 
 	@FXML

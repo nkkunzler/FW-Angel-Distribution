@@ -87,7 +87,12 @@ public class AddController extends Controller {
 				idInput.requestFocus();
 				return;
 			}
-
+			
+			if (!(angelID.charAt(0) + "").matches(".*[0-9]+.*")) {
+				showPopup("Invalid ID", "An Angel ID must start with a number");
+				idInput.requestFocus();
+				return;
+			}
 			// Checking to see that a character was included, else an A is added
 			if (!angelID.matches(".*[a-zA-Z]+.*")) {
 				idInput.setText(angelID + "A");
@@ -117,14 +122,14 @@ public class AddController extends Controller {
 	 * @param e KeyEvent triggered when the sex TextField is focused, selected
 	 */
 	@FXML
-	public void validateSex(KeyEvent e) {
+	public void validateGender(KeyEvent e) {
 		if (e.getCode() == KeyCode.TAB) {
 			String input = genderInput.getText();
 
-			if (input.equalsIgnoreCase("b")) {
+			if (input.equalsIgnoreCase("b")) { // Auto fill is input is 'B'
 				genderInput.setText("boy");
 				input = "boy";
-			} else if (input.equalsIgnoreCase("g")) {
+			} else if (input.equalsIgnoreCase("g")) { // Auto fill input 'G'
 				genderInput.setText("girl");
 				input = "girl";
 			}
