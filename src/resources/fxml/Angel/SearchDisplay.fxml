@@ -59,7 +59,7 @@
                   <Font size="20.0" />
                </font>
             </Button>
-            <Label text="Results" underline="true">
+            <Label fx:id="resultsLabel" text="Results" underline="true">
                <font>
                   <Font name="System Bold" size="32.0" />
                </font>

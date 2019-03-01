@@ -10,6 +10,8 @@ import database.DBCollection;
 import database.DatabaseController;
 import displays.AngelDisplays;
 import displays.Display;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -40,6 +42,8 @@ public class SearchDisplayController extends Controller {
 	private GridPane resultGridPane;
 	@FXML
 	private CheckBox exactMatchCheckBox;
+	@FXML
+	private Label resultsLabel;
 
 	private DatabaseController dbController;
 	private DBCollection collection;
@@ -80,7 +84,6 @@ public class SearchDisplayController extends Controller {
 		// Add all the attributes for an angel to the combo box
 		for (Object obj : Attribute.values())
 			box.getItems().add(obj.toString());
-
 	}
 
 	/**
@@ -146,6 +149,8 @@ public class SearchDisplayController extends Controller {
 
 		// Results of the query
 		List<Angel> results = dbController.querySorted(query);
+		
+		resultsLabel.setText("RESULTS - " + results.size() + " FOUND");
 
 		// Display a unique message when there are no results
 		if (results.size() == 0) {

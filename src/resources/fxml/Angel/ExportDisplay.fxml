@@ -108,17 +108,17 @@
       </HBox>
    </bottom>
    <top>
-      <VBox alignment="CENTER" spacing="10.0">
+      <VBox alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" spacing="10.0">
          <children>
             <Label text="EXPORT">
                <font>
                   <Font name="System Bold" size="24.0" />
                </font>
             </Label>
-            <GridPane alignment="CENTER" hgap="10.0" vgap="20.0" BorderPane.alignment="CENTER">
+            <GridPane alignment="CENTER" hgap="10.0" maxWidth="1.7976931348623157E308" vgap="20.0" BorderPane.alignment="CENTER">
               <columnConstraints>
                 <ColumnConstraints minWidth="10.0" />
-                <ColumnConstraints minWidth="10.0" />
+                <ColumnConstraints hgrow="ALWAYS" maxWidth="1.7976931348623157E308" />
                   <ColumnConstraints minWidth="10.0" />
               </columnConstraints>
               <rowConstraints>
@@ -149,6 +149,9 @@
                         <Font size="20.0" />
                      </font></Button>
                </children>
+               <padding>
+                  <Insets left="20.0" right="20.0" />
+               </padding>
             </GridPane>
          </children>
          <BorderPane.margin>

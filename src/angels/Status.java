@@ -15,5 +15,5 @@ public enum Status {
 	PULL, 		// The angel needs to be pulled for unknown reasons
 	FILLING, 	// Angel is waiting to be given out or started
 	OUT, 		// Angel is out at a different location
-	NOT_STARTED;
+	NOT_STARTED;// Angel that is non of the above
 }

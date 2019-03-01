@@ -13,6 +13,7 @@ import angels.Angel;
 import angels.Attribute;
 import angels.Status;
 import controllers.Controller;
+import customFX.Popup;
 import database.DBCollection;
 import database.DatabaseController;
 import displays.AngelDisplays;
@@ -58,21 +59,28 @@ public class ExportController extends Controller {
 	}
 
 	public void exportMasterList() {
+		if (fileName.getText().isEmpty() || filePath.getText().isEmpty()) {
+			new Popup(AlertType.ERROR,
+					"Please provide a file name or file path");
+			return;
+		}
+
 		Alert alert = new Alert(AlertType.INFORMATION);
-		alert.setHeaderText("EXPORTING");
+		alert.getDialogPane().setStyle("-fx-font-size: " + 22);
+		alert.setHeaderText("EXPORTING MASTER LIST");
 		alert.setContentText(
-				"Exporting - Please Wait.\nDialog will close when export is complete.");
+				"Exporting - Please Wait.\nMessage will close when complete.");
 		alert.show();
-		
+
 		// Getting all the angels from the database, sorted in ascending order
 		List<Angel> angelList = dbController.querySorted(
-				"FOR doc IN " + DBCollection.ANGELS.toString()
-						+ " SORT doc.ID ASC RETURN doc");
-		
-		Map<Integer, Integer> columnWidths = new LinkedHashMap<>();
-		columnWidths.put(0, 1800);
-		for (int i = 1; i < 4; ++i)
-			columnWidths.put(i, 800);
+				"FOR doc IN " + DBCollection.ANGELS.toString() + " RETURN doc");
+
+		Map<Integer, Integer> colWidth = new LinkedHashMap<>();
+		colWidth.put(0, 1500);
+		colWidth.put(1, 800);
+		for (int i = 2; i < 4; ++i)
+			colWidth.put(i, 800);
 
 		// Creating a map to store all the values need for the excel sheet
 		Map<String, List<String>> values = new LinkedHashMap<>();
@@ -85,14 +93,20 @@ public class ExportController extends Controller {
 		Status status = null;
 		for (Angel angel : angelList) {
 			ids.add(angel.get(Attribute.ID) + "");
-			genders.add(angel.get(Attribute.GENDER).toString().toUpperCase().charAt(0) + "");
+			genders.add(angel.get(Attribute.GENDER).toString().toUpperCase()
+					.charAt(0) + "");
 
 			status = Status.valueOf(angel.get(Attribute.STATUS).toString());
 
 			if (status == Status.HOLD || status == Status.COMPLETE) {
-				if (angel.get(Attribute.LOCATION).equals("Family Resource"))
+				if (angel.get(Attribute.LOCATION).equals("on_site"))
 					location.add("X");
+				else
+					location.add("-1"); // Error code
 				statusList.add(status.toString().charAt(0) + "");
+			} else if (status == Status.PULL) {
+				statusList.add("P");
+				location.add("P");
 			} else {
 				statusList.add(" ");
 				location.add(" ");
@@ -103,14 +117,13 @@ public class ExportController extends Controller {
 		values.put(Attribute.LOCATION.toString(), location);
 		values.put(Attribute.STATUS.toString(), statusList);
 
-		ExcelSheet sheet = new ExcelSheet("Master List", values, columnWidths,
-				false);
-		sheet.save(filePath.getText(), fileName.getText());
+		ExcelSheet sheet = new ExcelSheet("Master List", values, colWidth);
+		sheet.save(filePath.getText() + "\\", fileName.getText());
 		alert.close();
 	}
 
 	public void exportHoldList() {
-
+		
 	}
 
 	private HBox filterInput() {

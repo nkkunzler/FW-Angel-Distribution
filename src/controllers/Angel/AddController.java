@@ -42,7 +42,6 @@ public class AddController extends Controller {
 			shirtInput, pantsInput, bookInput;
 	@FXML
 	private VBox inputsContainer;
-
 	@FXML
 	private TextArea wishInput, specialInput;
 	@FXML
@@ -62,8 +61,8 @@ public class AddController extends Controller {
 	 */
 	public AddController(DatabaseController controller,
 			DBCollection collection) {
-		super(AngelDisplays.ADD_DISPLAY); // Scene the controller is associated
-											// with
+		super(AngelDisplays.ADD_DISPLAY); // Controller associated with scene
+		
 		dbController = controller;
 		dbCollection = collection;
 	}

@@ -107,7 +107,7 @@ public class RequestController extends Controller {
 	}
 
 	public Display previousDisplay() {
-		super.switchScene(AngelDisplays.MAIN_MENU);
+		super.switchScene(AngelDisplays.ANGEL_MAIN_MENU);
 		return null;
 	}
 

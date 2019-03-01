@@ -3,13 +3,13 @@ package export;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -20,52 +20,40 @@ import javafx.scene.control.Alert.AlertType;
 
 public class ExcelSheet {
 
-	private final int DEFAULT_COL_WIDTH = 2048;
-	private final int MAX_COL_WIDTH = 28000;
-	private final int MAX_COL = 14;
-	private final int MAX_ROW = 33;
+	// Maximum width for a standard letter paper in landscape mode
+	private final int LANDSCAPE_WIDTH = 28672;
+	private final int MAX_ROW = 34;
+	
+	private int maxCol = 0;
 
 	private Workbook workbook;
 	private Sheet sheet;
 
 	public ExcelSheet(String sheetName,
 			Map<String, List<String>> columnValues,
-			Map<Integer, Integer> columnWidths, boolean showHeader) {
-		
+			Map<Integer, Integer> columnWidths) {
+
 		workbook = new XSSFWorkbook();
 		sheet = workbook.createSheet(sheetName);
 		
-		// Setting the widths of the desired columns
-		for (Integer col : columnWidths.keySet()) {
-			for (int colOffset = 0; colOffset < 12; colOffset += columnValues.size())
-				sheet.setColumnWidth(colOffset, columnWidths.get(col));
-		}
-		
-		// If there are headers display on the header row
-		writeHeaderRow(columnValues, showHeader);
+		if (columnWidths != null)
+			setWidths(columnWidths, columnValues.size());
 
 		writeData(columnValues);
 	}
-
-	/**
-	 * 
-	 * @param columnValues
-	 * @param showHeader
-	 */
-	private void writeHeaderRow(Map<String, List<String>> columnValues,
-			boolean showHeader) {
-
-		if (!showHeader)
-			return;
-
-		// Creating a new row for the header text
-		Row headerRow = sheet.createRow(0);
-
-		Object[] keySet = columnValues.keySet().toArray();
-		int columnWidth = 0;
-
-		if (columnWidth > MAX_COL_WIDTH)
-			new Popup("To many columns. Some information will be missing");
+	
+	private void setWidths(Map<Integer, Integer> columnWidths, int values) {
+		// Finds max number of columns that can fit on a landscape letter page
+		int currWidth = 0;
+		for (Integer colWidths : columnWidths.values())
+			currWidth += colWidths;
+		maxCol = LANDSCAPE_WIDTH / currWidth * values;
+		// Setting the widths of the columns
+		for (Integer column : columnWidths.keySet()) {
+			for (int offset = 0; offset <= maxCol; offset += values) {
+				sheet.setColumnWidth(column + offset, columnWidths.get(column));
+			}
+		}
 	}
 
 	/**
@@ -76,19 +64,19 @@ public class ExcelSheet {
 	private void writeData(Map<String, List<String>> colValues) {
 
 		Object[] keySet = colValues.keySet().toArray();
-		
+
 		int currMaxRow = MAX_ROW;
 		int rowNum = 0;
 		int colNum = 0;
 		int i = 0;
-		
+
 		while (true) {
-			if (rowNum > currMaxRow) {
-				rowNum = 0;
+			if (rowNum >= currMaxRow) {
+				rowNum -= MAX_ROW;
 				colNum += colValues.size();
 			}
-			if (colNum > MAX_COL) {
-				rowNum = ((rowNum / MAX_ROW) + 1 ) * MAX_ROW + 1;
+			if (colNum > maxCol) {
+				rowNum = currMaxRow;
 				currMaxRow += MAX_ROW;
 				colNum = 0;
 			}
@@ -97,48 +85,15 @@ public class ExcelSheet {
 				row = sheet.createRow(rowNum);
 			if (i >= colValues.get(keySet[0]).size())
 				return;
-			
-			for (int col = 0; col < keySet.length; col++)
-				createCell(row, colNum + col, colValues.get(keySet[col]).get(i));
-			
+
+			for (int col = 0; col < keySet.length; col++) {
+				createCell(row, colNum + col,
+						colValues.get(keySet[col]).get(i));
+			}
+
 			rowNum++;
 			i++;
 		}
-
-//		// int maxRow = colValues.get(keySet[0]).size() / entriesPerRow;
-//		int maxCol = colValues.size() * entriesPerRow;
-//		int index = 0;
-//		int i = 0;
-//
-//		int entryCol = 1;
-//		int rowNum = 1;
-//		int maxRow = MAX_ROW;
-//		int entry = 0;
-//
-//		while (true) {
-//			Row row = sheet.getRow(rowNum);
-//			if (row == null)
-//				row = sheet.createRow(rowNum);
-//			for (int col = entryCol - 1; col < entryCol * colValues.size(); ++col) {
-//				entry++;
-//				if (entry > colValues.get(keySet[0]).size())
-//					return;
-//				if (index >= colValues.get(keySet[i]).size())
-//					return;
-//				createCell(row, col, colValues.get(keySet[i])
-//						.get(index));
-//			}
-//			rowNum++;
-//			if (rowNum > MAX_ROW) {
-//				rowNum = maxRow - MAX_ROW;
-//				entryCol++;
-//			}
-//			if (entryCol > entriesPerRow) {
-//				maxRow += MAX_ROW;
-//				rowNum = MAX_ROW;
-//				entryCol = 0;
-//			}
-//		}
 	}
 
 	/**
@@ -153,12 +108,14 @@ public class ExcelSheet {
 	private void createCell(Row row, int column, String cellValue) {
 		CellStyle style = workbook.createCellStyle();
 
-		BorderStyle borderStyle = BorderStyle.MEDIUM;
+		BorderStyle borderStyle = BorderStyle.THIN;
 		style.setBorderBottom(borderStyle);
 		style.setBorderLeft(borderStyle);
 		style.setBorderRight(borderStyle);
 		style.setBorderTop(borderStyle);
-
+		
+		style.setAlignment(HorizontalAlignment.CENTER);
+		
 		Cell cell = row.createCell(column);
 		cell.setCellStyle(style);
 		cell.setCellValue(cellValue);
@@ -170,6 +127,7 @@ public class ExcelSheet {
 	 * 
 	 * @param path     The desired file path for the file
 	 * @param fileName The name of the file to save.
+	 * @throws IOException
 	 */
 	public void save(String path, String fileName) {
 		String fileLocation = path + fileName + ".xlsx";
@@ -178,21 +136,29 @@ public class ExcelSheet {
 		try {
 			outputStream = new FileOutputStream(fileLocation);
 		} catch (FileNotFoundException e1) {
-			new Popup(AlertType.ERROR, "Invalid file path provided.");
-		}
-
-		// Checking to make sure the file location is valid
-		if (outputStream == null) {
-			new Popup(AlertType.ERROR, "File was unable to be created.");
+			new Popup(AlertType.ERROR,
+					"Invalid file path provided.\nFile was unable to be created.");
+			try {
+				workbook.close();
+			} catch (IOException e) {
+				new Popup(AlertType.ERROR,
+						"Unable to close Excel File. Please relaunch application.");
+			}
 		}
 
 		// Saving the workbook to the specified file location
 		try {
 			workbook.write(outputStream);
-			workbook.close();
 		} catch (IOException e) {
 			new Popup(AlertType.ERROR,
 					"Excel writing error. Excel sheet my be already open or corrupted.");
+		} finally {
+			try {
+				workbook.close();
+			} catch (IOException e) {
+				new Popup(AlertType.ERROR,
+						"Unable to close Excel File. Please relaunch application.");
+			}
 		}
 	}
 

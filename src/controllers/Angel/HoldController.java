@@ -253,6 +253,10 @@ public class HoldController extends Controller {
 				"UPDATE {_key: '" + angel.get(Attribute.ID) + "'} WITH {'"
 						+ Attribute.MISSING + "':" + missingItems + "} "
 						+ "IN " + collection);
+		
+		// Updating status to be 'on site', meaning main location
+		dbController.update(angel.get(Attribute.ID).toString(),
+				Attribute.LOCATION.toString(), "on_site", collection);
 
 		List<Angel> updateAngel = dbController.query("FOR doc IN " + collection
 				+ " FILTER doc.ID == '"

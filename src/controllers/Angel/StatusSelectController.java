@@ -129,10 +129,15 @@ public class StatusSelectController extends Controller {
 		});
 		Optional<Pair<Boolean, Boolean>> result = dialog.showAndWait();
 		result.ifPresent(values -> {
-			dbController.update((String) angel.get(Attribute.ID),
+			// Updating the status of the angel to complete
+			dbController.update(angel.get(Attribute.ID).toString(),
 					Attribute.STATUS.toString(),
 					Status.COMPLETE.toString(),
 					collection);
+			
+			// Updating status to be 'on site', meaning main location
+			dbController.update(angel.get(Attribute.ID).toString(),
+					Attribute.LOCATION.toString(), "on_site", collection);
 
 			String todos = "TODO:";
 			if (!shoeCB.isSelected())
@@ -194,6 +199,10 @@ public class StatusSelectController extends Controller {
 				Attribute.STATUS.toString(),
 				Status.FILLING.toString(),
 				collection);
+	
+		// Updating status to be 'on site', meaning main location
+		dbController.update(angel.get(Attribute.ID).toString(),
+				Attribute.LOCATION.toString(), "on_site", collection);
 
 		new Popup("The angel status has been altered to 'Filling'",
 				ButtonType.OK);
