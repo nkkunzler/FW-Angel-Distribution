@@ -4,7 +4,6 @@
 <?import javafx.scene.control.*?>
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.layout.BorderPane?>
 
 <BorderPane prefHeight="800.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <top>
@@ -15,34 +14,24 @@
       </Label>
    </top>
    <center>
-      <VBox alignment="CENTER" maxWidth="-Infinity" spacing="20.0" BorderPane.alignment="CENTER">
+      <HBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" spacing="30.0" BorderPane.alignment="CENTER">
          <children>
-            <Button fx:id="addAngelButton" alignment="CENTER" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#switchToAddAngel" text="Add Angel">
+            <Button mnemonicParsing="false" onAction="#switchToAngelMenu" prefHeight="100.0" prefWidth="150.0" text="Angels">
                <font>
-                  <Font size="24.0" />
+                  <Font name="System Bold" size="28.0" />
                </font>
             </Button>
-            <Button fx:id="editStatusButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#switchToAngelSelection" text="Edit Status">
+            <Button mnemonicParsing="false" prefHeight="100.0" prefWidth="150.0" text="Shoes">
                <font>
-                  <Font size="24.0" />
+                  <Font name="System Bold" size="28.0" />
                </font>
             </Button>
-            <Button fx:id="searchButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#switchToSearchDisplay" text="Search">
+            <Button mnemonicParsing="false" prefHeight="100.0" prefWidth="150.0" text="Clothes">
                <font>
-                  <Font size="24.0" />
-               </font>
-            </Button>
-            <Button fx:id="requestButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#switchToRequestDisplay" text="Request Angel">
-               <font>
-                  <Font size="24.0" />
-               </font>
-            </Button>
-            <Button fx:id="exportButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#switchToExportDisplay" text="Export">
-               <font>
-                  <Font size="24.0" />
+                  <Font name="System Bold" size="28.0" />
                </font>
             </Button>
          </children>
-      </VBox>
+      </HBox>
    </center>
 </BorderPane>

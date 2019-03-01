@@ -6,18 +6,18 @@
  * 
  * @author Nicholas Kunzler
  */
-package controllers;
+package controllers.Angel;
 
 import java.util.concurrent.ExecutionException;
-
-import com.arangodb.entity.BaseDocument;
 
 import angels.Angel;
 import angels.Attribute;
 import angels.Status;
+import controllers.Controller;
 import customFX.Popup;
+import database.DBCollection;
 import database.DatabaseController;
-import display.Displays;
+import displays.AngelDisplays;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
@@ -49,7 +49,7 @@ public class AddController extends Controller {
 	private Button addAngelButton;
 
 	private DatabaseController dbController;
-	private String dbCollection;
+	private DBCollection dbCollection;
 
 	/**
 	 * Constructor for the controller used to validate and add a new angel from
@@ -60,8 +60,10 @@ public class AddController extends Controller {
 	 * @param collection The collection in which an angel will eventually be
 	 *                   added to.
 	 */
-	public AddController(DatabaseController controller, String collection) {
-		super(Displays.ADD_DISPLAY); // Scene the controller is associated with
+	public AddController(DatabaseController controller,
+			DBCollection collection) {
+		super(AngelDisplays.ADD_DISPLAY); // Scene the controller is associated
+											// with
 		dbController = controller;
 		dbCollection = collection;
 	}
@@ -87,7 +89,7 @@ public class AddController extends Controller {
 				idInput.requestFocus();
 				return;
 			}
-			
+
 			if (!(angelID.charAt(0) + "").matches(".*[0-9]+.*")) {
 				showPopup("Invalid ID", "An Angel ID must start with a number");
 				idInput.requestFocus();
@@ -134,7 +136,8 @@ public class AddController extends Controller {
 				input = "girl";
 			}
 
-			if (!input.equals("boy") && !input.equals("girl")) {
+			if (!input.equalsIgnoreCase("boy")
+					&& !input.equalsIgnoreCase("girl")) {
 				showPopup("Invalid Gender", "Enter 'boy' or 'girl'");
 				genderInput.clear();
 				e.consume(); // Prevents next enabled Node from being selected
@@ -471,7 +474,7 @@ public class AddController extends Controller {
 		agl.addAttribute(Attribute.SPECIAL, specs);
 
 		// Default values when the angels are first created
-		agl.addAttribute(Attribute.STATUS, Status.AWAITING.toString());
+		agl.addAttribute(Attribute.STATUS, Status.NOT_STARTED.toString());
 		agl.addAttribute(Attribute.MISSING, new String[0]);
 		agl.addAttribute(Attribute.LOCATION, "Family Resource");
 

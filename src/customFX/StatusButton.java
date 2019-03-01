@@ -45,7 +45,7 @@ public class StatusButton extends Button {
 
 		// Setting the bars at top and bottom of button, indicates status
 		if (indicatorHeight > 0) {
-			String color = "gray"; // Default color
+			String color = "transparent"; // Default color
 			Status angelStatus = Status
 					.valueOf(angel.get(Attribute.STATUS).toString());
 			if (angelStatus == Status.HOLD)
@@ -56,6 +56,8 @@ public class StatusButton extends Button {
 				color = "red";
 			else if (angelStatus == Status.OUT)
 				color = "orange";
+			else if (angelStatus == Status.FILLING)
+				color = "gray";
 
 			style += "-fx-effect: innershadow(three-pass-box, " + color
 					+ ", 0, 0, 0, " + indicatorHeight + ")";

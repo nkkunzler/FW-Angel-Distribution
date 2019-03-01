@@ -10,7 +10,7 @@
  * @author Nicholas Kunzler
  */
 
-package controllers;
+package controllers.Angel;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -20,9 +20,11 @@ import java.util.Set;
 import angels.Angel;
 import angels.Attribute;
 import angels.Status;
+import controllers.Controller;
 import customFX.Popup;
+import database.DBCollection;
 import database.DatabaseController;
-import display.Displays;
+import displays.AngelDisplays;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -50,7 +52,7 @@ public class HoldController extends Controller {
 
 	private Angel angel;
 	private DatabaseController dbController;
-	private String collection;
+	private DBCollection collection;
 
 	/**
 	 * Constructor for the controller used to put an angel on hold.
@@ -60,8 +62,8 @@ public class HoldController extends Controller {
 	 * @param collection The collection in which an angel will eventually be
 	 *                   added to.
 	 */
-	public HoldController(DatabaseController dbController, String collection) {
-		super(Displays.HOLD_DISPLAY);
+	public HoldController(DatabaseController dbController, DBCollection collection) {
+		super(AngelDisplays.HOLD_DISPLAY);
 
 		this.dbController = dbController;
 		this.collection = collection;
@@ -238,7 +240,7 @@ public class HoldController extends Controller {
 
 			if (popup.getSelection() == ButtonType.YES) {
 				dbController.update((String) angel.get(Attribute.ID),
-						Attribute.STATUS, Status.AWAITING, collection);
+						Attribute.STATUS, Status.FILLING, collection);
 			}
 		} else { // Missing items indicate that item needs to go on hold
 			dbController.update(
@@ -251,12 +253,12 @@ public class HoldController extends Controller {
 				"UPDATE {_key: '" + angel.get(Attribute.ID) + "'} WITH {'"
 						+ Attribute.MISSING + "':" + missingItems + "} "
 						+ "IN " + collection);
-		
+
 		List<Angel> updateAngel = dbController.query("FOR doc IN " + collection
 				+ " FILTER doc.ID == '"
 				+ angel.get(Attribute.ID).toString() + "' LIMIT 1 RETURN doc");
 		angel = updateAngel.get(0);
-		
+
 		cancelButton.fire();
 	}
 
@@ -297,9 +299,9 @@ public class HoldController extends Controller {
 	 */
 	@FXML
 	public void cancelButtonHandler() {
-		if (super.previousDisplay() == Displays.ANGEL_STATUS) {
+		if (super.previousDisplay() == AngelDisplays.ANGEL_STATUS) {
 			StatusSelectController controller = (StatusSelectController) super.getController(
-					Displays.ANGEL_STATUS);
+					AngelDisplays.ANGEL_STATUS);
 			controller.setAngel(angel);
 		}
 	}

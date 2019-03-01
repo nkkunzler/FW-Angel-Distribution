@@ -1,16 +1,18 @@
-package controllers;
+package controllers.Angel;
 
 import java.util.List;
 
 import angels.Angel;
 import angels.Attribute;
 import angels.Status;
+import controllers.Controller;
 import customFX.StatusButton;
+import database.DBCollection;
 import database.DatabaseController;
-import display.Displays;
+import displays.AngelDisplays;
+import displays.Display;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
@@ -37,18 +39,18 @@ public class RequestController extends Controller {
 	private GridPane resultGrid;
 
 	private DatabaseController dbController;
-	private String dbCollection;
+	private DBCollection dbCollection;
 
 	public RequestController(DatabaseController dbController,
-			String dbCollection) {
-		super(Displays.REQUEST_DISPLAY);
+			DBCollection dbCollection) {
+		super(AngelDisplays.REQUEST_DISPLAY);
 		this.dbController = dbController;
 		this.dbCollection = dbCollection;
 	}
 
 	public void generateList() {
 		String query = "FOR doc IN " + dbCollection + " FILTER doc."
-				+ Attribute.STATUS + " == '" + Status.AWAITING + "' LIMIT "
+				+ Attribute.STATUS + " == '" + Status.NOT_STARTED + "' LIMIT "
 				+ angelRequest.getText() + " RETURN doc";
 
 		resultGrid.getChildren().removeAll(resultGrid.getChildren());
@@ -82,9 +84,9 @@ public class RequestController extends Controller {
 				e.consume();
 			});
 			btn.setOnAction(e -> {
-				super.switchScene(Displays.HOLD_DISPLAY);
+				super.switchScene(AngelDisplays.HOLD_DISPLAY);
 				HoldController controller = (HoldController) super.getController(
-						Displays.HOLD_DISPLAY);
+						AngelDisplays.HOLD_DISPLAY);
 				controller.addAngel(angel);
 			});
 
@@ -104,8 +106,8 @@ public class RequestController extends Controller {
 		backButton.fire();
 	}
 
-	public Displays previousDisplay() {
-		super.switchScene(Displays.MAIN_MENU);
+	public Display previousDisplay() {
+		super.switchScene(AngelDisplays.MAIN_MENU);
 		return null;
 	}
 

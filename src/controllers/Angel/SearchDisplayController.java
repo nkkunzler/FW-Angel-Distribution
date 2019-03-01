@@ -1,13 +1,15 @@
-package controllers;
+package controllers.Angel;
 
-import java.util.Arrays;
 import java.util.List;
 
 import angels.Angel;
 import angels.Attribute;
+import controllers.Controller;
 import customFX.StatusButton;
+import database.DBCollection;
 import database.DatabaseController;
-import display.Displays;
+import displays.AngelDisplays;
+import displays.Display;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -40,11 +42,11 @@ public class SearchDisplayController extends Controller {
 	private CheckBox exactMatchCheckBox;
 
 	private DatabaseController dbController;
-	private String collection;
+	private DBCollection collection;
 
 	public SearchDisplayController(DatabaseController dbController,
-			String collection) {
-		super(Displays.SEARCH_DISPLAY);
+			DBCollection collection) {
+		super(AngelDisplays.SEARCH_DISPLAY);
 
 		this.dbController = dbController;
 		this.collection = collection;
@@ -143,7 +145,7 @@ public class SearchDisplayController extends Controller {
 		resultGridPane.getChildren().removeAll(resultGridPane.getChildren());
 
 		// Results of the query
-		List<Angel> results = dbController.query(query);
+		List<Angel> results = dbController.querySorted(query);
 
 		// Display a unique message when there are no results
 		if (results.size() == 0) {
@@ -159,9 +161,9 @@ public class SearchDisplayController extends Controller {
 			StatusButton btn = new StatusButton(angel, 32, 8);
 			// Go to HoldDisplay.fxml display when pressed
 			btn.setOnAction(e -> {
-				super.switchScene(Displays.HOLD_DISPLAY);
+				super.switchScene(AngelDisplays.HOLD_DISPLAY);
 				HoldController controller = (HoldController) super.getController(
-						Displays.HOLD_DISPLAY);
+						AngelDisplays.HOLD_DISPLAY);
 				controller.addAngel(angel);
 			});
 
@@ -220,7 +222,7 @@ public class SearchDisplayController extends Controller {
 	 * When the user presses the 'Back' button on the bottom of the display this
 	 * method is called.
 	 */
-	public Displays previousDisplay() {
+	public Display previousDisplay() {
 		return super.previousDisplay();
 	}
 

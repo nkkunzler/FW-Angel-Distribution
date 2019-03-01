@@ -3,6 +3,7 @@ package export;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -27,25 +28,19 @@ public class ExcelSheet {
 	private Workbook workbook;
 	private Sheet sheet;
 
-	private int entriesPerRow;
-
 	public ExcelSheet(String sheetName,
 			Map<String, List<String>> columnValues,
 			Map<Integer, Integer> columnWidths, boolean showHeader) {
+		
 		workbook = new XSSFWorkbook();
 		sheet = workbook.createSheet(sheetName);
-
-		int singleEntryWidth = DEFAULT_COL_WIDTH * columnValues.size();
-		if (columnWidths != null) {
-			singleEntryWidth = DEFAULT_COL_WIDTH
-					* (columnValues.size() - columnWidths.size());
-
-			for (Integer col : columnWidths.keySet())
-				singleEntryWidth += columnWidths.get(col);
+		
+		// Setting the widths of the desired columns
+		for (Integer col : columnWidths.keySet()) {
+			for (int colOffset = 0; colOffset < 12; colOffset += columnValues.size())
+				sheet.setColumnWidth(colOffset, columnWidths.get(col));
 		}
-
-		entriesPerRow = MAX_COL_WIDTH / singleEntryWidth;
-
+		
 		// If there are headers display on the header row
 		writeHeaderRow(columnValues, showHeader);
 
@@ -81,52 +76,67 @@ public class ExcelSheet {
 	private void writeData(Map<String, List<String>> colValues) {
 
 		Object[] keySet = colValues.keySet().toArray();
-
-		// int maxRow = colValues.get(keySet[0]).size() / entriesPerRow;
-		int maxCol = colValues.size() * entriesPerRow;
-		int index = 0;
+		
+		int currMaxRow = MAX_ROW;
+		int rowNum = 0;
+		int colNum = 0;
 		int i = 0;
-
-		int entryCol = 1;
-		int rowNum = 1;
-		int maxRow = MAX_ROW;
-		int entry = 0;
-
+		
 		while (true) {
+			if (rowNum > currMaxRow) {
+				rowNum = 0;
+				colNum += colValues.size();
+			}
+			if (colNum > MAX_COL) {
+				rowNum = ((rowNum / MAX_ROW) + 1 ) * MAX_ROW + 1;
+				currMaxRow += MAX_ROW;
+				colNum = 0;
+			}
 			Row row = sheet.getRow(rowNum);
 			if (row == null)
 				row = sheet.createRow(rowNum);
-			for (int col = entryCol - 1; col < entryCol * colValues.size(); ++col) {
-				entry++;
-				if (entry > colValues.get(keySet[0]).size())
-					return;
-				if (index >= colValues.get(keySet[i]).size())
-					return;
-				createCell(row, col, colValues.get(keySet[i])
-						.get(index));
-			}
+			if (i >= colValues.get(keySet[0]).size())
+				return;
+			
+			for (int col = 0; col < keySet.length; col++)
+				createCell(row, colNum + col, colValues.get(keySet[col]).get(i));
+			
 			rowNum++;
-			if (rowNum > MAX_ROW) {
-				rowNum = maxRow - MAX_ROW;
-				entryCol++;
-			}
-			if (entryCol > entriesPerRow) {
-				maxRow += MAX_ROW;
-				rowNum = MAX_ROW;
-				entryCol = 0;
-			}
+			i++;
 		}
 
-//		for (int rowNum = 1; rowNum <= maxRow; ++rowNum) {
-//			Row row = sheet.createRow(rowNum);
-//			row = sheet.getRow(rowNum);
-//			for (int col = 0; col < maxCol; ++col) {
-//				index = (col / colValues.size()) * MAX_ROW + rowNum - 1;
-//				i = col % colValues.size();
+//		// int maxRow = colValues.get(keySet[0]).size() / entriesPerRow;
+//		int maxCol = colValues.size() * entriesPerRow;
+//		int index = 0;
+//		int i = 0;
+//
+//		int entryCol = 1;
+//		int rowNum = 1;
+//		int maxRow = MAX_ROW;
+//		int entry = 0;
+//
+//		while (true) {
+//			Row row = sheet.getRow(rowNum);
+//			if (row == null)
+//				row = sheet.createRow(rowNum);
+//			for (int col = entryCol - 1; col < entryCol * colValues.size(); ++col) {
+//				entry++;
+//				if (entry > colValues.get(keySet[0]).size())
+//					return;
 //				if (index >= colValues.get(keySet[i]).size())
-//					break;
+//					return;
 //				createCell(row, col, colValues.get(keySet[i])
 //						.get(index));
+//			}
+//			rowNum++;
+//			if (rowNum > MAX_ROW) {
+//				rowNum = maxRow - MAX_ROW;
+//				entryCol++;
+//			}
+//			if (entryCol > entriesPerRow) {
+//				maxRow += MAX_ROW;
+//				rowNum = MAX_ROW;
+//				entryCol = 0;
 //			}
 //		}
 	}
@@ -182,7 +192,7 @@ public class ExcelSheet {
 			workbook.close();
 		} catch (IOException e) {
 			new Popup(AlertType.ERROR,
-					"Excel writing error. Excel sheet my be empty or corrupted.");
+					"Excel writing error. Excel sheet my be already open or corrupted.");
 		}
 	}
 

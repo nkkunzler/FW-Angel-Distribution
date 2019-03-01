@@ -13,6 +13,7 @@ public enum Status {
 	COMPLETE, 	// Angel is complete
 	HOLD, 		// Angel is missing items
 	PULL, 		// The angel needs to be pulled for unknown reasons
-	AWAITING, 	// Angel is waiting to be given out or started
-	OUT; 		// Angel is out at a different location
+	FILLING, 	// Angel is waiting to be given out or started
+	OUT, 		// Angel is out at a different location
+	NOT_STARTED;
 }

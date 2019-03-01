@@ -12,16 +12,17 @@
  * 
  * @author Nicholas Kunzler
  */
-package controllers;
+package controllers.Angel;
 
 import java.util.List;
 
 import angels.Angel;
 import angels.Attribute;
-import angels.Status;
+import controllers.Controller;
 import customFX.StatusButton;
+import database.DBCollection;
 import database.DatabaseController;
-import display.Displays;
+import displays.AngelDisplays;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
@@ -45,8 +46,8 @@ public class AngelSelectionController extends Controller {
 	@FXML
 	private BorderPane pane;
 
-	DatabaseController dbController;
-	String dbCollection;
+	private DatabaseController dbController;
+	private DBCollection dbCollection;
 
 	/**
 	 * Constructor for the controller used to accept an angel id and display the
@@ -58,8 +59,8 @@ public class AngelSelectionController extends Controller {
 	 *                   added to.
 	 */
 	public AngelSelectionController(DatabaseController dbController,
-			String dbCollection) {
-		super(Displays.ANGEL_SELECTION);
+			DBCollection dbCollection) {
+		super(AngelDisplays.ANGEL_SELECTION);
 
 		this.dbController = dbController;
 		this.dbCollection = dbCollection;
@@ -171,9 +172,9 @@ public class AngelSelectionController extends Controller {
 			Angel angel = result.get(i);
 			StatusButton btn = new StatusButton(angel);
 			btn.setOnAction(e -> {
-				super.switchScene(Displays.ANGEL_STATUS);
+				super.switchScene(AngelDisplays.ANGEL_STATUS);
 				StatusSelectController ssc = (StatusSelectController) super.getController(
-						Displays.ANGEL_STATUS);
+						AngelDisplays.ANGEL_STATUS);
 				ssc.setAngel(angel);
 			});
 			grid.add(btn, i % 3, i / 3); // GridPane is 3x3.
@@ -186,6 +187,6 @@ public class AngelSelectionController extends Controller {
 	 * Goes back to the scene that resulted in this scene to be displayed
 	 */
 	public void toMainMenu() {
-		super.switchScene(Displays.MAIN_MENU);
+		super.switchScene(AngelDisplays.ANGEL_MAIN_MENU);
 	}
 }

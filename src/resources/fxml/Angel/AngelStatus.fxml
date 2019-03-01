@@ -66,12 +66,17 @@
                   <Font name="System Bold" size="36.0" />
                </font>
             </Button>
-            <Button fx:id="awaitingButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#awaitingHandler" style="-fx-background-color: lightgray;" text="AWAITING" GridPane.columnIndex="1" GridPane.rowIndex="1">
+            <Button fx:id="fillingButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#fillingHandler" style="-fx-background-color: lightgray;" text="Filling" GridPane.columnIndex="1" GridPane.rowIndex="1">
                <font>
                   <Font name="System Bold" size="36.0" />
                </font>
             </Button>
             <Button fx:id="outButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#outHandler" style="-fx-background-color: coral;" text="OUT" GridPane.rowIndex="2">
+               <font>
+                  <Font name="System Bold" size="36.0" />
+               </font>
+            </Button>
+            <Button fx:id="infoButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#infoHandler" style="-fx-background-color: lightgray;" text="Information" GridPane.columnIndex="1" GridPane.rowIndex="2">
                <font>
                   <Font name="System Bold" size="36.0" />
                </font>

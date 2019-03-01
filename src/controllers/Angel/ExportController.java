@@ -1,4 +1,4 @@
-package controllers;
+package controllers.Angel;
 
 import java.io.File;
 import java.io.IOException;
@@ -12,8 +12,10 @@ import java.util.Map;
 import angels.Angel;
 import angels.Attribute;
 import angels.Status;
+import controllers.Controller;
+import database.DBCollection;
 import database.DatabaseController;
-import display.Displays;
+import displays.AngelDisplays;
 import export.ExcelSheet;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -50,48 +52,70 @@ public class ExportController extends Controller {
 	private Map<Attribute, String> filters = new HashMap<>();
 
 	public ExportController(DatabaseController dbController) {
-		super(Displays.EXPORT_DISPLAY);
+		super(AngelDisplays.EXPORT_DISPLAY);
 
 		this.dbController = dbController;
-
-		//excelTest();
 	}
 
-	private void excelTest() {
+	public void exportMasterList() {
+		Alert alert = new Alert(AlertType.INFORMATION);
+		alert.setHeaderText("EXPORTING");
+		alert.setContentText(
+				"Exporting - Please Wait.\nDialog will close when export is complete.");
+		alert.show();
+		
+		// Getting all the angels from the database, sorted in ascending order
+		List<Angel> angelList = dbController.querySorted(
+				"FOR doc IN " + DBCollection.ANGELS.toString()
+						+ " SORT doc.ID ASC RETURN doc");
+		
+		Map<Integer, Integer> columnWidths = new LinkedHashMap<>();
+		columnWidths.put(0, 1800);
+		for (int i = 1; i < 4; ++i)
+			columnWidths.put(i, 800);
+
+		// Creating a map to store all the values need for the excel sheet
 		Map<String, List<String>> values = new LinkedHashMap<>();
-		int numAngels = 5;
-		List<String> idValues = new ArrayList<>();
-		for (int i = 1; i <= numAngels; i++)
-			idValues.add(i + "A");
-		values.put(Attribute.ID.toString(), idValues);
 
-		List<String> genderValues = new ArrayList<>();
-		for (int i = 1; i <= numAngels; i++)
-			genderValues.add("B");
-		values.put(Attribute.GENDER.toString(), genderValues);
-		
+		// Lists to store each unique attribute
+		List<String> ids = new ArrayList<>();
+		List<String> genders = new ArrayList<>();
 		List<String> location = new ArrayList<>();
-		for (int i = 1; i <= numAngels; i++)
-			location.add("X");
+		List<String> statusList = new ArrayList<>();
+		Status status = null;
+		for (Angel angel : angelList) {
+			ids.add(angel.get(Attribute.ID) + "");
+			genders.add(angel.get(Attribute.GENDER).toString().toUpperCase().charAt(0) + "");
+
+			status = Status.valueOf(angel.get(Attribute.STATUS).toString());
+
+			if (status == Status.HOLD || status == Status.COMPLETE) {
+				if (angel.get(Attribute.LOCATION).equals("Family Resource"))
+					location.add("X");
+				statusList.add(status.toString().charAt(0) + "");
+			} else {
+				statusList.add(" ");
+				location.add(" ");
+			}
+		}
+		values.put(Attribute.ID.toString(), ids);
+		values.put(Attribute.GENDER.toString(), genders);
 		values.put(Attribute.LOCATION.toString(), location);
-		
-		List<String> status = new ArrayList<>();
-		for (int i = 1; i <= numAngels; i++)
-			status.add("H");
-		values.put(Attribute.STATUS.toString(), status);
+		values.put(Attribute.STATUS.toString(), statusList);
 
-//		Map<Integer, Integer> columnWidths = new HashMap<>();
-//		columnWidths.put(0, 500);
+		ExcelSheet sheet = new ExcelSheet("Master List", values, columnWidths,
+				false);
+		sheet.save(filePath.getText(), fileName.getText());
+		alert.close();
+	}
 
-		ExcelSheet sheet = new ExcelSheet("EXPORTS", values, null, false);
-		sheet.save("C:/Users/nkkun/Desktop/Angel Exports/", "test");
-		System.out.println("CREATED EXCEL FILE");
+	public void exportHoldList() {
+
 	}
 
 	private HBox filterInput() {
 		HBox hbox = new HBox();
 
-		System.out.println("Created filter Input");
 		ComboBox<String> combo = createComboBox(Attribute.values());
 		combo.valueProperty().addListener(new ChangeListener<String>() {
 			@Override

@@ -1,11 +1,11 @@
 /**
- * This class is responsible for switching between different displays within
+ * This class is responsible for switching between different Display within
  * the application.
  * 
  * @author Nicholas Kunzler
  */
 
-package display;
+package displays;
 
 import java.io.IOException;
 import java.util.ArrayDeque;
@@ -21,9 +21,9 @@ import javafx.stage.Stage;
 public class DisplayManager {
 
 	private static Stage stage;
-	private static Displays mainDisplay = null;
-	private static Map<Displays, Controller> displays;
-	private static Deque<Displays> sceneStack;
+	private static Display mainDisplay = null;
+	private static Map<Display, Controller> controllers;
+	private static Deque<Display> sceneStack;
 
 	/**
 	 * Stores the stage for which the scenes will be placed.
@@ -35,27 +35,25 @@ public class DisplayManager {
 
 		// Stack of scenes visited up to the current scene
 		sceneStack = new ArrayDeque<>(); // Stack
+		// preservedSceneStack = new ArrayDeque<>();
 
-		// Map that maps displays to their controllers
-		displays = new HashMap<>();
+		// Map that maps Display to their controllers
+		controllers = new HashMap<>();
 	}
 
-	public static void addDisplay(Displays display,
+	public static void addDisplay(Display display,
 			Controller controller) {
-		FXMLLoader loader = new FXMLLoader(DisplayManager.class
-				.getClassLoader().getResource(display.getFile()));
-		loader.setController(controller);
-		displays.put(display, controller);
+		controllers.put(display, controller);
 	}
 
 	/**
-	 * Switches between two different Displays.
+	 * Switches between two different Display.
 	 * 
 	 * @param currentScene    The scene you are currently one
 	 * @param sceneToSwitchTo The scene you would like to go to.
 	 */
-	public static void switchScene(Displays currentScene,
-			Displays sceneToSwitchTo) {
+	public static void switchScene(Display currentScene,
+			Display sceneToSwitchTo) {
 
 		// Removing previous style classes that were loaded to display
 		if (stage.getScene().getRoot().getStyleClass().size() > 1)
@@ -65,7 +63,31 @@ public class DisplayManager {
 			sceneStack.push(currentScene);
 			FXMLLoader loader = new FXMLLoader(DisplayManager.class
 					.getClassLoader().getResource(sceneToSwitchTo.getFile()));
-			loader.setController(displays.get(sceneToSwitchTo));
+			loader.setController(controllers.get(sceneToSwitchTo));
+			stage.getScene().setRoot(loader.load());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * Switches between two different Display while maintaining the information
+	 * on the current scene, currentScene.
+	 * 
+	 * @param currentScene    The scene you are currently one
+	 * @param sceneToSwitchTo The scene you would like to go to.
+	 */
+	public static void switchScenePreserve(Display currentScene,
+			Display sceneToSwitchTo) {
+		// Removing previous style classes that were loaded to display
+		if (stage.getScene().getRoot().getStyleClass().size() > 1)
+			stage.getScene().getRoot().getStyleClass().remove(0);
+
+		try {
+			sceneStack.push(currentScene);
+			FXMLLoader loader = new FXMLLoader(DisplayManager.class
+					.getClassLoader().getResource(sceneToSwitchTo.getFile()));
+			loader.setController(controllers.get(sceneToSwitchTo));
 			stage.getScene().setRoot(loader.load());
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -76,7 +98,7 @@ public class DisplayManager {
 	 * When called, the stage will replace the current scene being viewed with
 	 * the scene that moved you to the current scene.
 	 */
-	public static Displays previousDisplay() {
+	public static Display previousDisplay() {
 		if (sceneStack.isEmpty()) {
 			System.err.println("There is no previous scene");
 			return null;
@@ -86,12 +108,13 @@ public class DisplayManager {
 		if (stage.getScene().getRoot().getStyleClass().size() > 1)
 			stage.getScene().getRoot().getStyleClass().remove(0);
 
-		Displays prevDisplay = null;
+		Display prevDisplay = null;
 		try {
 			prevDisplay = sceneStack.pop();
-			FXMLLoader loader = new FXMLLoader(DisplayManager.class
+			FXMLLoader loader;
+			loader = new FXMLLoader(DisplayManager.class
 					.getClassLoader().getResource(prevDisplay.getFile()));
-			loader.setController(displays.get(prevDisplay));
+			loader.setController(controllers.get(prevDisplay));
 			stage.getScene().setRoot(loader.load());
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -105,8 +128,8 @@ public class DisplayManager {
 	 * @param display The display to get the controller for
 	 * @return The controller associated with the display.
 	 */
-	public static Controller getController(Displays display) {
-		return displays.get(display);
+	public static Controller getController(Display display) {
+		return controllers.get(display);
 	}
 
 	/**
@@ -115,7 +138,7 @@ public class DisplayManager {
 	 * 
 	 * @param display The display to make the main display.
 	 */
-	public static void setMainDisplay(Displays display) {
+	public static void setMainDisplay(Display display) {
 		if (mainDisplay != null)
 			return;
 		mainDisplay = display;
@@ -127,21 +150,21 @@ public class DisplayManager {
 	 * @return The root of the main display.
 	 */
 	public static Parent getMainDisplay() {
-		if (displays.get(mainDisplay) == null) {
+		if (controllers.get(mainDisplay) == null) {
 			System.err.println("Controller for main display does not exist");
 		}
 
 		try {
 			FXMLLoader loader = new FXMLLoader(DisplayManager.class
 					.getClassLoader().getResource(mainDisplay.getFile()));
-			loader.setController(displays.get(mainDisplay));
+			loader.setController(controllers.get(mainDisplay));
 			return loader.load();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		return null;
 	}
-	
+
 	/**
 	 * @return The instance of the stage
 	 */

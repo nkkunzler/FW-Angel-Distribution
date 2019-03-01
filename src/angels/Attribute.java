@@ -23,6 +23,6 @@ public enum Attribute {
 	BOOK, // Key word
 	SPECIAL, // Key word
 	STATUS, // ComboBox status select: Status values
-	MISSING,
-	LOCATION;
+	MISSING, // Items missing
+	LOCATION; // The current location of the angel
 }

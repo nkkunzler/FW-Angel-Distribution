@@ -8,7 +8,7 @@ package angels;
 
 import com.arangodb.entity.BaseDocument;
 
-public class Angel {
+public class Angel implements Comparable<Angel> {
 
 	private BaseDocument baseDocument = new BaseDocument();
 
@@ -62,4 +62,35 @@ public class Angel {
 		return baseDocument.getAttribute(attribute.toString());
 	}
 
+	/**
+	 * Method used to compare two angels. This comparison is done with the
+	 * angels ID values. Since ID values are unique this is the standard for
+	 * comparing.
+	 * 
+	 * This assumes that there are no leading zeros to the string ID values.
+	 * 
+	 * @param Angel o The angel to compare to this angel
+	 * @return -1 if this.ID <. o.ID, 1 if this.ID > o.ID, 0 means equal.
+	 */
+	@Override
+	public int compareTo(Angel o) {
+		String thisID = this.get(Attribute.ID).toString();
+		String oID = o.get(Attribute.ID).toString();
+
+		// If string length is larger, the value must be larger
+		if (thisID.length() > oID.length())
+			return 1;
+		else if (thisID.length() < oID.length())
+			return -1;
+
+		// Lengths equal so check 
+		int i = -1;
+		while (i++ < thisID.length()) {
+			if (thisID.charAt(i) > oID.charAt(i))
+				return 1;
+			else if (thisID.charAt(i) < oID.charAt(i))
+				return -1;
+		}
+		return 0; // ID's are equal
+	}
 }

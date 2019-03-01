@@ -9,6 +9,7 @@
 package database;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import com.arangodb.ArangoCursor;
@@ -41,8 +42,8 @@ public class DatabaseController {
 	 * @return Task that returns true if the collection was added; otherwise
 	 *         false is returned.
 	 */
-	public boolean createCollection(String collectionName) {
-		return db.createCollection(collectionName);
+	public boolean createCollection(DBCollection collection) {
+		return db.createCollection(collection.toString());
 	}
 
 	/**
@@ -53,9 +54,9 @@ public class DatabaseController {
 	 * @return Task that returns true if the angel was successfully added to the
 	 *         collection; otherwise false is returned.
 	 */
-	public boolean insertAngel(Angel angel, String collection) {
+	public boolean insertAngel(Angel angel, DBCollection collection) {
 		return db.insert((String) angel.get(Attribute.ID),
-				angel.getAttributes(), collection);
+				angel.getAttributes(), collection.toString());
 	}
 
 	/**
@@ -76,7 +77,22 @@ public class DatabaseController {
 
 		for (BaseDocument doc : documents)
 			results.add(new Angel(doc));
-		
+
+		return results;
+	}
+
+	/**
+	 * Queries the database collection based on the query string and then sorts
+	 * the results in ascending order by angel ID.
+	 * 
+	 * @param query      The aql query command for the collection
+	 * @param collection The collection used when querying the collection
+	 * @return Task that returns a list containing the results of the query.
+	 *         Null is returned if the query is inconclusive.
+	 */
+	public List<Angel> querySorted(String query) {
+		List<Angel> results = this.query(query);
+		Collections.sort(results);
 		return results;
 	}
 
@@ -89,8 +105,8 @@ public class DatabaseController {
 	 * @return Task that returns true if the angel exists within the collection;
 	 *         otherwise false is returned.
 	 */
-	public boolean contains(String key, String collection) {
-		return db.contains(key, collection);
+	public boolean contains(String key, DBCollection collection) {
+		return db.contains(key, collection.toString());
 	}
 
 	/**
@@ -105,11 +121,11 @@ public class DatabaseController {
 	 * @return A Task that returns void. Nothing is returned.
 	 */
 	public void update(String key, Object attribute, Object values,
-			String collection) {
+			DBCollection collection) {
 		String updateQuery = "UPDATE {_key: '" + key + "'} "
 				+ "WITH {" + attribute.toString() + ": '" + values
 				+ "'} "
-				+ "IN " + collection;
+				+ "IN " + collection.toString();
 		db.query(updateQuery);
 	}
 
@@ -121,8 +137,8 @@ public class DatabaseController {
 	 * @return A Task that returns true if the document with the desired key was
 	 *         deleted; otherwise false is deleted.
 	 */
-	public boolean delete(String key, String collection) {
-		return db.delete(key, collection);
+	public boolean delete(String key, DBCollection collection) {
+		return db.delete(key, collection.toString());
 	}
 
 	/**

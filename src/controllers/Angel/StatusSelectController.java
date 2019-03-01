@@ -5,16 +5,18 @@
  * 
  * @author Nicholas Kunzler
  */
-package controllers;
+package controllers.Angel;
 
 import java.util.Optional;
 
 import angels.Angel;
 import angels.Attribute;
 import angels.Status;
+import controllers.Controller;
 import customFX.Popup;
+import database.DBCollection;
 import database.DatabaseController;
-import display.Displays;
+import displays.AngelDisplays;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
@@ -38,7 +40,7 @@ public class StatusSelectController extends Controller {
 	private Angel angel;
 
 	private DatabaseController dbController;
-	private String collection;
+	private DBCollection collection;
 
 	/**
 	 * Constructor for the controller used to change the status of an angel. The
@@ -50,8 +52,8 @@ public class StatusSelectController extends Controller {
 	 *                   added to.
 	 */
 	public StatusSelectController(DatabaseController dbController,
-			String collection) {
-		super(Displays.ANGEL_STATUS);
+			DBCollection collection) {
+		super(AngelDisplays.ANGEL_STATUS);
 
 		this.dbController = dbController;
 		this.collection = collection;
@@ -131,11 +133,11 @@ public class StatusSelectController extends Controller {
 					Attribute.STATUS.toString(),
 					Status.COMPLETE.toString(),
 					collection);
-			
+
 			String todos = "TODO:";
 			if (!shoeCB.isSelected())
 				todos += " DECREASE SHOE INVENTORY BY 1\n";
-			if (!clothesCB.isSelected())	
+			if (!clothesCB.isSelected())
 				todos += " DECREASE CLOTHES INVENTORY BY 1\n";
 			new Popup("The angel status has been updated.\n" + todos);
 			super.previousDisplay();
@@ -151,9 +153,9 @@ public class StatusSelectController extends Controller {
 	 * user to select which items are causing the angel to go onto display.
 	 */
 	public void holdHandler() {
-		super.switchScene(Displays.HOLD_DISPLAY);
+		super.switchScene(AngelDisplays.HOLD_DISPLAY);
 		HoldController controller = (HoldController) super.getController(
-				Displays.HOLD_DISPLAY);
+				AngelDisplays.HOLD_DISPLAY);
 		controller.addAngel(angel);
 	}
 
@@ -186,16 +188,28 @@ public class StatusSelectController extends Controller {
 	 * This method handles the onActionEvent() method for the grey awaiting
 	 * button on the AngelStatus.fxml display.
 	 */
-	public void awaitingHandler() {
-		// Change status to "AWAITING"
+	public void fillingHandler() {
+		// Change status to "Filling"
 		dbController.update((String) angel.get(Attribute.ID),
 				Attribute.STATUS.toString(),
-				Status.AWAITING.toString(),
+				Status.FILLING.toString(),
 				collection);
 
-		new Popup("The angel status has been altered to:\n'AWAITING'",
+		new Popup("The angel status has been altered to 'Filling'",
 				ButtonType.OK);
 		super.previousDisplay();
+	}
+
+	@FXML
+	/**
+	 * Switching the display to a display that shows all information in regards
+	 * to the angel.
+	 */
+	public void infoHandler() {
+		super.switchScenePreserve(AngelDisplays.ANGEL_INFO_DISPLAY);
+		AngelInfoController controller = (AngelInfoController) super.getController(
+				AngelDisplays.ANGEL_INFO_DISPLAY);
+		controller.addAngel(angel);
 	}
 
 	@FXML

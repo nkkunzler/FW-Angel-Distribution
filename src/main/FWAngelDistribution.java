@@ -3,18 +3,21 @@ package main;
 import angels.Angel;
 import angels.Attribute;
 import angels.Status;
-import controllers.AddController;
-import controllers.AngelSelectionController;
-import controllers.ExportController;
-import controllers.HoldController;
 import controllers.MainMenuController;
-import controllers.RequestController;
-import controllers.SearchDisplayController;
-import controllers.StatusSelectController;
+import controllers.Angel.AddController;
+import controllers.Angel.AngelInfoController;
+import controllers.Angel.AngelMenuController;
+import controllers.Angel.AngelSelectionController;
+import controllers.Angel.ExportController;
+import controllers.Angel.HoldController;
+import controllers.Angel.RequestController;
+import controllers.Angel.SearchDisplayController;
+import controllers.Angel.StatusSelectController;
+import database.DBCollection;
 import database.Database;
 import database.DatabaseController;
-import display.DisplayManager;
-import display.Displays;
+import displays.AngelDisplays;
+import displays.DisplayManager;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -24,7 +27,6 @@ public class FWAngelDistribution extends Application {
 	private static final int TEMP_SIZE = 800;
 
 	private static final String DB_NAME = "FW_Distribution";
-	private static final String ANGEL_COLLECTION = "angels";
 	private static DatabaseController dbController;
 
 	public static void main(String[] args) {
@@ -33,7 +35,7 @@ public class FWAngelDistribution extends Application {
 
 		Database db = new Database(DB_NAME, user, password);
 		dbController = new DatabaseController(db);
-		dbController.createCollection(ANGEL_COLLECTION);
+		dbController.createCollection(DBCollection.ANGELS);
 
 		// Uncomment if you want to generate angels within the angels database.
 		//populateDatabase();
@@ -45,7 +47,7 @@ public class FWAngelDistribution extends Application {
 	public void start(Stage stage) throws Exception {
 		stage.setWidth(TEMP_SIZE);
 		stage.setHeight(TEMP_SIZE);
-		// stage.setMaximized(true);
+		//stage.setMaximized(true);
 
 		// Creating the display manager to deal with switching displays
 		new DisplayManager(stage);
@@ -54,8 +56,7 @@ public class FWAngelDistribution extends Application {
 		initControllers();
 
 		// Setting the first display to be the main menu
-		DisplayManager.setMainDisplay(Displays.MAIN_MENU);
-
+		DisplayManager.setMainDisplay(AngelDisplays.MAIN_MENU);
 		stage.setScene(new Scene(DisplayManager.getMainDisplay()));
 		stage.show();
 		stage.setOnCloseRequest(e -> {
@@ -64,17 +65,22 @@ public class FWAngelDistribution extends Application {
 	}
 
 	/**
+	 * TODO: Find a better way to create the controllers. This seems to be
+	 * gross.
+	 * 
 	 * Creating all the controllers need for the displays.
 	 */
 	private void initControllers() {
 		new MainMenuController();
-		new AddController(dbController, ANGEL_COLLECTION);
-		new AngelSelectionController(dbController, ANGEL_COLLECTION);
-		new StatusSelectController(dbController, ANGEL_COLLECTION);
-		new HoldController(dbController, ANGEL_COLLECTION);
+		new AngelMenuController();
+		new AngelInfoController();
+		new AddController(dbController, DBCollection.ANGELS);
+		new AngelSelectionController(dbController, DBCollection.ANGELS);
+		new StatusSelectController(dbController, DBCollection.ANGELS);
+		new HoldController(dbController, DBCollection.ANGELS);
 		new ExportController(dbController);
-		new RequestController(dbController, ANGEL_COLLECTION);
-		new SearchDisplayController(dbController, ANGEL_COLLECTION);
+		new RequestController(dbController, DBCollection.ANGELS);
+		new SearchDisplayController(dbController, DBCollection.ANGELS);
 	}
 
 	/**
@@ -163,12 +169,12 @@ public class FWAngelDistribution extends Application {
 				angel.addAttribute(Attribute.SPECIAL, special);
 
 				// Default values when the angels are first created
-				angel.addAttribute(Attribute.STATUS, Status.AWAITING.toString());
+				angel.addAttribute(Attribute.STATUS, Status.NOT_STARTED.toString());
 				angel.addAttribute(Attribute.MISSING, new String[0]);
 				angel.addAttribute(Attribute.LOCATION, "Family Resource");
 
 				// If the angel was added reset the inputs and indicate success
-				dbController.insertAngel(angel, "angels");
+				dbController.insertAngel(angel, DBCollection.ANGELS);
 			}
 		}
 	}
