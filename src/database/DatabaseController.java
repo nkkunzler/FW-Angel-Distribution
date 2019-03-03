@@ -22,9 +22,6 @@ public class DatabaseController {
 
 	private Database db;
 
-	// final ExecutorService exec = new ThreadPoolExecutor(0, 1, 0,
-	// TimeUnit.SECONDS, new SynchronousQueue<>());
-
 	/**
 	 * Creates a new database controller based off of a database. This allows
 	 * for data entry and access.
@@ -39,7 +36,7 @@ public class DatabaseController {
 	 * Creates a new collection within the database with the desired name.
 	 * 
 	 * @param collectionName The name of the collection to add to the database.
-	 * @return Task that returns true if the collection was added; otherwise
+	 * @return Boolean that returns true if the collection was added; otherwise
 	 *         false is returned.
 	 */
 	public boolean createCollection(DBCollection collection) {
@@ -51,7 +48,7 @@ public class DatabaseController {
 	 * 
 	 * @param angel      The angel that will be added to the desired collection
 	 * @param collection The collection in which to add the angel
-	 * @return Task that returns true if the angel was successfully added to the
+	 * @return Boolean that returns true if the angel was successfully added to the
 	 *         collection; otherwise false is returned.
 	 */
 	public boolean insertAngel(Angel angel, DBCollection collection) {
@@ -64,7 +61,7 @@ public class DatabaseController {
 	 * 
 	 * @param query      The aql query command for the collection
 	 * @param collection The collection used when querying the collection
-	 * @return Task that returns a list containing the results of the query.
+	 * @return A list containing the results of the query.
 	 *         Null is returned if the query is inconclusive.
 	 */
 	public List<Angel> query(String query) {
@@ -72,6 +69,8 @@ public class DatabaseController {
 		List<Angel> results = new ArrayList<>();
 
 		ArangoCursor<BaseDocument> documents = db.query(query);
+
+		// Query result was unsuccessful
 		if (documents == null)
 			return null;
 
@@ -87,11 +86,15 @@ public class DatabaseController {
 	 * 
 	 * @param query      The aql query command for the collection
 	 * @param collection The collection used when querying the collection
-	 * @return Task that returns a list containing the results of the query.
+	 * @return List containing the results of the query.
 	 *         Null is returned if the query is inconclusive.
 	 */
 	public List<Angel> querySorted(String query) {
 		List<Angel> results = this.query(query);
+		
+		if (results == null)
+			return null;
+		
 		Collections.sort(results);
 		return results;
 	}
@@ -102,7 +105,7 @@ public class DatabaseController {
 	 * 
 	 * @param key        The key to check for within the collection
 	 * @param collection The collection to check for the angel
-	 * @return Task that returns true if the angel exists within the collection;
+	 * @return Boolean that returns true if the angel exists within the collection;
 	 *         otherwise false is returned.
 	 */
 	public boolean contains(String key, DBCollection collection) {
@@ -118,13 +121,11 @@ public class DatabaseController {
 	 * @param attribute  The attribute to update within the document.
 	 * @param value      The value of the new attribute
 	 * @param collection The collection in which to search for the key
-	 * @return A Task that returns void. Nothing is returned.
 	 */
 	public void update(String key, Object attribute, Object values,
 			DBCollection collection) {
 		String updateQuery = "UPDATE {_key: '" + key + "'} "
-				+ "WITH {" + attribute.toString() + ": '" + values
-				+ "'} "
+				+ "WITH {" + attribute.toString() + ": '" + values + "'} "
 				+ "IN " + collection.toString();
 		db.query(updateQuery);
 	}
@@ -134,7 +135,7 @@ public class DatabaseController {
 	 * 
 	 * @param key        The key of the document to delete from the collection.
 	 * @param collection The collection to which to remove the key.
-	 * @return A Task that returns true if the document with the desired key was
+	 * @return A boolean that returns true if the document with the desired key was
 	 *         deleted; otherwise false is deleted.
 	 */
 	public boolean delete(String key, DBCollection collection) {

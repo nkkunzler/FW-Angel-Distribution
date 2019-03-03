@@ -46,14 +46,11 @@ public class SearchDisplayController extends Controller {
 	private Label resultsLabel;
 
 	private DatabaseController dbController;
-	private DBCollection collection;
 
-	public SearchDisplayController(DatabaseController dbController,
-			DBCollection collection) {
+	public SearchDisplayController(DatabaseController dbController) {
 		super(AngelDisplays.SEARCH_DISPLAY);
 
 		this.dbController = dbController;
-		this.collection = collection;
 	}
 
 	/**
@@ -184,7 +181,7 @@ public class SearchDisplayController extends Controller {
 	 */
 	@SuppressWarnings("unchecked")
 	private String createSearchQuery() {
-		String query = "FOR doc IN " + collection;
+		String query = "FOR doc IN " + DBCollection.ANGELS;
 
 		boolean containsFilter = false; // If no filters null is returned
 		HBox keywordHBox;

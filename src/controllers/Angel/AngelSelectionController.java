@@ -20,7 +20,6 @@ import angels.Angel;
 import angels.Attribute;
 import controllers.Controller;
 import customFX.StatusButton;
-import database.DBCollection;
 import database.DatabaseController;
 import displays.AngelDisplays;
 import javafx.event.ActionEvent;
@@ -47,7 +46,6 @@ public class AngelSelectionController extends Controller {
 	private BorderPane pane;
 
 	private DatabaseController dbController;
-	private DBCollection dbCollection;
 
 	/**
 	 * Constructor for the controller used to accept an angel id and display the
@@ -58,12 +56,10 @@ public class AngelSelectionController extends Controller {
 	 * @param collection The collection in which an angel will eventually be
 	 *                   added to.
 	 */
-	public AngelSelectionController(DatabaseController dbController,
-			DBCollection dbCollection) {
+	public AngelSelectionController(DatabaseController dbController) {
 		super(AngelDisplays.ANGEL_SELECTION);
 
 		this.dbController = dbController;
-		this.dbCollection = dbCollection;
 	}
 
 	@FXML

@@ -48,7 +48,6 @@ public class AddController extends Controller {
 	private Button addAngelButton;
 
 	private DatabaseController dbController;
-	private DBCollection dbCollection;
 
 	/**
 	 * Constructor for the controller used to validate and add a new angel from
@@ -59,12 +58,10 @@ public class AddController extends Controller {
 	 * @param collection The collection in which an angel will eventually be
 	 *                   added to.
 	 */
-	public AddController(DatabaseController controller,
-			DBCollection collection) {
+	public AddController(DatabaseController controller) {
 		super(AngelDisplays.ADD_DISPLAY); // Controller associated with scene
-		
+
 		dbController = controller;
-		dbCollection = collection;
 	}
 
 	/**
@@ -84,13 +81,15 @@ public class AddController extends Controller {
 			String angelID = idInput.getText().toUpperCase();
 
 			if (angelID.equals("")) { // Can't have an empty angel id
-				showPopup("Invalid ID", "An Angel ID must be provided");
+				new Popup(AlertType.ERROR, "Invalid ID",
+						"Angel ID must be provided");
 				idInput.requestFocus();
 				return;
 			}
 
 			if (!(angelID.charAt(0) + "").matches(".*[0-9]+.*")) {
-				showPopup("Invalid ID", "An Angel ID must start with a number");
+				new Popup(AlertType.ERROR, "Invalid ID",
+						"ID must start with a number");
 				idInput.requestFocus();
 				return;
 			}
@@ -101,10 +100,10 @@ public class AddController extends Controller {
 			}
 
 			// Checking to see if the angel id already exist in the database
-			boolean contains = dbController.contains(angelID, dbCollection);
+			boolean contains = dbController.contains(angelID, DBCollection.ANGELS);
 
 			if (contains) {
-				showPopup("Invalid ID",
+				new Popup(AlertType.ERROR, "Invalid ID",
 						"Angel ID '" + angelID + "' already exists");
 				idInput.clear();
 				e.consume(); // Prevents next enabled Node to be auto selected
@@ -137,7 +136,8 @@ public class AddController extends Controller {
 
 			if (!input.equalsIgnoreCase("boy")
 					&& !input.equalsIgnoreCase("girl")) {
-				showPopup("Invalid Gender", "Enter 'boy' or 'girl'");
+				new Popup(AlertType.ERROR, "Invalid Gender",
+						"Enter 'boy' or 'girl'");
 				genderInput.clear();
 				e.consume(); // Prevents next enabled Node from being selected
 			} else {
@@ -161,7 +161,8 @@ public class AddController extends Controller {
 			try {
 				age = Integer.valueOf(ageInput.getText());
 			} catch (NumberFormatException nfe) {
-				showPopup("Invalid Age", "Enter a number between 1 and 12");
+				new Popup(AlertType.ERROR, "Invalid Age",
+						"Enter an age between 1 and 12");
 				ageInput.clear();
 				e.consume(); // Prevents next enabled Node from being selected
 				return;
@@ -169,7 +170,8 @@ public class AddController extends Controller {
 
 			// Valid ages are between 1 and 12, inclusive
 			if (age < 0 || age > 12) {
-				showPopup("Invalid Age", "Enter a number between 1 and 12");
+				new Popup(AlertType.ERROR, "Invalid Age",
+						"Enter an age between 1 and 12");
 				ageInput.clear();
 				e.consume();
 			} else {
@@ -216,8 +218,8 @@ public class AddController extends Controller {
 					else
 						shoeSize = Integer.valueOf(text);
 				} catch (NumberFormatException nfe) {
-					showPopup("Invalid Shoe Size",
-							"Please enter a number indicating shoe size");
+					new Popup(AlertType.ERROR, "Invalid Shoe Size",
+							"Please enter a number");
 					shoeInput.clear();
 					e.consume(); // Prevents next Node from being selected
 					return;
@@ -478,14 +480,14 @@ public class AddController extends Controller {
 		agl.addAttribute(Attribute.LOCATION, "Family Resource");
 
 		// If the angel was added reset the inputs and indicate success
-		boolean success = dbController.insertAngel(agl, dbCollection);
+		boolean success = dbController.insertAngel(agl, DBCollection.ANGELS);
 
 		if (success) {
-			showPopup("Successfully Added", "Angel '" + idInput.getText()
-					+ "' was added successfully");
+			new Popup(AlertType.CONFIRMATION, "Successfully Added",
+					"Angel '" + idInput.getText() + "' was added successfully");
 			resetInputs();
 		} else {
-			showPopup("Error", "Angel could not be added");
+			new Popup(AlertType.WARNING, "Error", "Angel could not be added");
 		}
 	}
 
@@ -504,14 +506,5 @@ public class AddController extends Controller {
 		// Clearing the AngelID TextField
 		((TextInputControl) inputsContainer.getChildren().get(0)).clear();
 		addAngelButton.setDisable(true);
-	}
-
-	/**
-	 * TEMP solution for indicating that an input is invalid
-	 * 
-	 * @param message The message to display
-	 */
-	private void showPopup(String header, String message) {
-		new Popup(AlertType.WARNING, header, message);
 	}
 }

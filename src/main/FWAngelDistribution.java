@@ -74,13 +74,13 @@ public class FWAngelDistribution extends Application {
 		new MainMenuController();
 		new AngelMenuController();
 		new AngelInfoController();
-		new AddController(dbController, DBCollection.ANGELS);
-		new AngelSelectionController(dbController, DBCollection.ANGELS);
-		new StatusSelectController(dbController, DBCollection.ANGELS);
-		new HoldController(dbController, DBCollection.ANGELS);
+		new AddController(dbController);
+		new AngelSelectionController(dbController);
+		new StatusSelectController(dbController);
+		new HoldController(dbController);
 		new ExportController(dbController);
-		new RequestController(dbController, DBCollection.ANGELS);
-		new SearchDisplayController(dbController, DBCollection.ANGELS);
+		new RequestController(dbController);
+		new SearchDisplayController(dbController);
 	}
 
 	/**

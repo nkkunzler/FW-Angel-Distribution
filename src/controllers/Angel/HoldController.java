@@ -52,21 +52,19 @@ public class HoldController extends Controller {
 
 	private Angel angel;
 	private DatabaseController dbController;
-	private DBCollection collection;
 
 	/**
 	 * Constructor for the controller used to put an angel on hold.
 	 * 
 	 * @param controller The database controller used to connect to the
 	 *                   database.
-	 * @param collection The collection in which an angel will eventually be
-	 *                   added to.
+	 * @param            DBCollection.ANGELS The DBCollection.ANGELS in which an
+	 *                   angel will eventually be added to.
 	 */
-	public HoldController(DatabaseController dbController, DBCollection collection) {
+	public HoldController(DatabaseController dbController) {
 		super(AngelDisplays.HOLD_DISPLAY);
 
 		this.dbController = dbController;
-		this.collection = collection;
 	}
 
 	/**
@@ -240,25 +238,26 @@ public class HoldController extends Controller {
 
 			if (popup.getSelection() == ButtonType.YES) {
 				dbController.update((String) angel.get(Attribute.ID),
-						Attribute.STATUS, Status.FILLING, collection);
+						Attribute.STATUS, Status.FILLING, DBCollection.ANGELS);
 			}
 		} else { // Missing items indicate that item needs to go on hold
 			dbController.update(
 					(String) angel.get(Attribute.ID),
-					Attribute.STATUS, Status.HOLD, collection);
+					Attribute.STATUS, Status.HOLD, DBCollection.ANGELS);
 		}
 
 		// Changing the missing items in the database to newly selected items
 		dbController.query(
 				"UPDATE {_key: '" + angel.get(Attribute.ID) + "'} WITH {'"
 						+ Attribute.MISSING + "':" + missingItems + "} "
-						+ "IN " + collection);
-		
+						+ "IN " + DBCollection.ANGELS);
+
 		// Updating status to be 'on site', meaning main location
 		dbController.update(angel.get(Attribute.ID).toString(),
-				Attribute.LOCATION.toString(), "on_site", collection);
+				Attribute.LOCATION.toString(), "on_site", DBCollection.ANGELS);
 
-		List<Angel> updateAngel = dbController.query("FOR doc IN " + collection
+		List<Angel> updateAngel = dbController.query("FOR doc IN "
+				+ DBCollection.ANGELS
 				+ " FILTER doc.ID == '"
 				+ angel.get(Attribute.ID).toString() + "' LIMIT 1 RETURN doc");
 		angel = updateAngel.get(0);

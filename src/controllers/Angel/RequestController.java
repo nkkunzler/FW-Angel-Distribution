@@ -39,17 +39,14 @@ public class RequestController extends Controller {
 	private GridPane resultGrid;
 
 	private DatabaseController dbController;
-	private DBCollection dbCollection;
 
-	public RequestController(DatabaseController dbController,
-			DBCollection dbCollection) {
+	public RequestController(DatabaseController dbController) {
 		super(AngelDisplays.REQUEST_DISPLAY);
 		this.dbController = dbController;
-		this.dbCollection = dbCollection;
 	}
 
 	public void generateList() {
-		String query = "FOR doc IN " + dbCollection + " FILTER doc."
+		String query = "FOR doc IN " + DBCollection.ANGELS + " FILTER doc."
 				+ Attribute.STATUS + " == '" + Status.NOT_STARTED + "' LIMIT "
 				+ angelRequest.getText() + " RETURN doc";
 
@@ -99,9 +96,9 @@ public class RequestController extends Controller {
 		for (int i = 0; i < resultGrid.getChildren().size(); ++i) {
 			StatusButton btn = (StatusButton) resultGrid.getChildren().get(i);
 			dbController.update(btn.getText(), Attribute.LOCATION,
-					requesteeField.getText(), dbCollection);
+					requesteeField.getText(), DBCollection.ANGELS);
 			dbController.update(btn.getText(), Attribute.STATUS, Status.OUT,
-					dbCollection);
+					DBCollection.ANGELS);
 		}
 		backButton.fire();
 	}

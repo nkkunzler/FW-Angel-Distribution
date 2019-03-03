@@ -40,7 +40,6 @@ public class StatusSelectController extends Controller {
 	private Angel angel;
 
 	private DatabaseController dbController;
-	private DBCollection collection;
 
 	/**
 	 * Constructor for the controller used to change the status of an angel. The
@@ -48,15 +47,13 @@ public class StatusSelectController extends Controller {
 	 * 
 	 * @param controller The database controller used to connect to the
 	 *                   database.
-	 * @param collection The collection in which an angel will eventually be
-	 *                   added to.
+	 * @param            DBCollections.ANGELS The DBCollections.ANGELS in which
+	 *                   an angel will eventually be added to.
 	 */
-	public StatusSelectController(DatabaseController dbController,
-			DBCollection collection) {
+	public StatusSelectController(DatabaseController dbController) {
 		super(AngelDisplays.ANGEL_STATUS);
 
 		this.dbController = dbController;
-		this.collection = collection;
 	}
 
 	/**
@@ -133,11 +130,12 @@ public class StatusSelectController extends Controller {
 			dbController.update(angel.get(Attribute.ID).toString(),
 					Attribute.STATUS.toString(),
 					Status.COMPLETE.toString(),
-					collection);
-			
+					DBCollection.ANGELS);
+
 			// Updating status to be 'on site', meaning main location
 			dbController.update(angel.get(Attribute.ID).toString(),
-					Attribute.LOCATION.toString(), "on_site", collection);
+					Attribute.LOCATION.toString(), "on_site",
+					DBCollection.ANGELS);
 
 			String todos = "TODO:";
 			if (!shoeCB.isSelected())
@@ -181,7 +179,7 @@ public class StatusSelectController extends Controller {
 					(String) angel.get(Attribute.ID),
 					Attribute.STATUS.toString(),
 					Status.PULL.toString(),
-					collection);
+					DBCollection.ANGELS);
 
 			new Popup("The angel status has been altered to:\n'PULL'");
 			super.previousDisplay();
@@ -198,11 +196,11 @@ public class StatusSelectController extends Controller {
 		dbController.update((String) angel.get(Attribute.ID),
 				Attribute.STATUS.toString(),
 				Status.FILLING.toString(),
-				collection);
-	
+				DBCollection.ANGELS);
+
 		// Updating status to be 'on site', meaning main location
 		dbController.update(angel.get(Attribute.ID).toString(),
-				Attribute.LOCATION.toString(), "on_site", collection);
+				Attribute.LOCATION.toString(), "on_site", DBCollection.ANGELS);
 
 		new Popup("The angel status has been altered to 'Filling'",
 				ButtonType.OK);
@@ -247,10 +245,10 @@ public class StatusSelectController extends Controller {
 				System.out.println("updating");
 				// Update the status to out
 				dbController.update(angel.get(Attribute.ID).toString(),
-						Attribute.STATUS, Status.OUT, collection);
+						Attribute.STATUS, Status.OUT, DBCollection.ANGELS);
 				// Update the location to be the requester
 				dbController.update(angel.get(Attribute.ID).toString(),
-						Attribute.LOCATION, requestee, collection);
+						Attribute.LOCATION, requestee, DBCollection.ANGELS);
 				new Popup("Angel has been updated succesfully", ButtonType.OK);
 				super.previousDisplay();
 			}
