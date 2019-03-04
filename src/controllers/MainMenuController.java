@@ -6,7 +6,6 @@ import javafx.fxml.FXML;
 public class MainMenuController extends Controller {
 
 	public MainMenuController() {
-		super(AngelDisplays.MAIN_MENU);
 	}
 	
 	@FXML

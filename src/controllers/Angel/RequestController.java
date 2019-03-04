@@ -1,3 +1,6 @@
+/**
+ * @author
+ */
 package controllers.Angel;
 
 import java.util.List;
@@ -24,15 +27,9 @@ import javafx.scene.text.Font;
 public class RequestController extends Controller {
 
 	@FXML
-	private TextField requesteeField;
+	private TextField requesteeField, angelRequest;
 	@FXML
-	private TextField angelRequest;
-	@FXML
-	private Button listButton;
-	@FXML
-	private Button backButton;
-	@FXML
-	private Button lendButton;
+	private Button listButton, backButton, lendButton;
 	@FXML
 	private ScrollPane scrollPane;
 	@FXML
@@ -41,14 +38,16 @@ public class RequestController extends Controller {
 	private DatabaseController dbController;
 
 	public RequestController(DatabaseController dbController) {
-		super(AngelDisplays.REQUEST_DISPLAY);
 		this.dbController = dbController;
 	}
 
 	public void generateList() {
+		// Getting angels in database that have not been started
 		String query = "FOR doc IN " + DBCollection.ANGELS + " FILTER doc."
 				+ Attribute.STATUS + " == '" + Status.NOT_STARTED + "' LIMIT "
 				+ angelRequest.getText() + " RETURN doc";
+		
+		scrollPane.setVisible(true);
 
 		resultGrid.getChildren().removeAll(resultGrid.getChildren());
 		createGridPane(dbController.query(query));
@@ -59,9 +58,7 @@ public class RequestController extends Controller {
 
 	private void createGridPane(List<Angel> results) {
 		// Display a unique message when there are no results
-		if (results == null)
-			return;
-		if (results.size() == 0) {
+		if (results == null || results.size() == 0) {
 			Label label = new Label("No Results Found");
 			label.setFont(new Font(42));
 			label.setAlignment(Pos.CENTER);
@@ -72,7 +69,6 @@ public class RequestController extends Controller {
 		for (int i = 0; i < results.size(); i++) {
 			Angel angel = results.get(i);
 			StatusButton btn = new StatusButton(angel, 32, 8);
-			// Go to HoldDisplay.fxml display when pressed
 			btn.setOnMouseClicked(e -> {
 				if (e.getButton() == MouseButton.SECONDARY) {
 					results.remove(angel);
@@ -81,9 +77,9 @@ public class RequestController extends Controller {
 				e.consume();
 			});
 			btn.setOnAction(e -> {
-				super.switchScene(AngelDisplays.HOLD_DISPLAY);
-				HoldController controller = (HoldController) super.getController(
-						AngelDisplays.HOLD_DISPLAY);
+				super.switchScenePreserve(AngelDisplays.ANGEL_INFO_DISPLAY);
+				HoldController controller = (HoldController) AngelDisplays.ANGEL_INFO_DISPLAY
+						.getController();
 				controller.addAngel(angel);
 			});
 
@@ -92,6 +88,9 @@ public class RequestController extends Controller {
 
 	}
 
+	/**
+	 * 
+	 */
 	public void lendButtonController() {
 		for (int i = 0; i < resultGrid.getChildren().size(); ++i) {
 			StatusButton btn = (StatusButton) resultGrid.getChildren().get(i);
@@ -103,9 +102,8 @@ public class RequestController extends Controller {
 		backButton.fire();
 	}
 
-	public Display previousDisplay() {
+	public void previousDisplay() {
 		super.switchScene(AngelDisplays.ANGEL_MAIN_MENU);
-		return null;
 	}
 
 }

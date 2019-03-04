@@ -53,7 +53,6 @@ public class ExportController extends Controller {
 	private Map<Attribute, String> filters = new HashMap<>();
 
 	public ExportController(DatabaseController dbController) {
-		super(AngelDisplays.EXPORT_DISPLAY);
 
 		this.dbController = dbController;
 	}
@@ -403,7 +402,7 @@ public class ExportController extends Controller {
 	@FXML
 	public void browseButtonHandler() {
 		DirectoryChooser dc = new DirectoryChooser();
-		File file = dc.showDialog(super.getStage());
+		File file = dc.showDialog(super.getDisplayStage());
 
 		try {
 			filePath.setText(file.getAbsolutePath());
@@ -484,7 +483,7 @@ public class ExportController extends Controller {
 	 * Main Menu scene.
 	 */
 	public void exitButtonHandler() {
-		super.previousDisplay();
+		super.switchScene(AngelDisplays.ANGEL_MAIN_MENU);
 	}
 
 }

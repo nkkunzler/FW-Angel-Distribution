@@ -14,12 +14,6 @@ import displays.AngelDisplays;
 import javafx.fxml.FXML;
 
 public class AngelMenuController extends Controller {
-	/**
-	 * Constructor that connects the MainMenu.fxml file to this controller.
-	 */
-	public AngelMenuController() {
-		super(AngelDisplays.ANGEL_MAIN_MENU);
-	}
 
 	/**
 	 * Switches the scene from the AngelMainMenu to the AddAngel.fxml display.

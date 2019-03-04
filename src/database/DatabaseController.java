@@ -20,7 +20,8 @@ import angels.Attribute;
 
 public class DatabaseController {
 
-	private Database db;
+	public Database db;
+	private static DatabaseController controller = null;
 
 	/**
 	 * Creates a new database controller based off of a database. This allows
@@ -30,6 +31,13 @@ public class DatabaseController {
 	 */
 	public DatabaseController(Database db) {
 		this.db = db;
+		controller = this;
+	}
+	
+	public static DatabaseController getInstance() {
+		if (controller == null)
+			System.err.println("DatabaseController has not yet been initialized.");
+		return controller;
 	}
 
 	/**

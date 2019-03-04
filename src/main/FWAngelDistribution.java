@@ -51,10 +51,7 @@ public class FWAngelDistribution extends Application {
 
 		// Creating the display manager to deal with switching displays
 		new DisplayManager(stage);
-
-		// Initializing the controllers for all the scenes
-		initControllers();
-
+		
 		// Setting the first display to be the main menu
 		DisplayManager.setMainDisplay(AngelDisplays.MAIN_MENU);
 		stage.setScene(new Scene(DisplayManager.getMainDisplay()));
@@ -62,25 +59,6 @@ public class FWAngelDistribution extends Application {
 		stage.setOnCloseRequest(e -> {
 			dbController.close();
 		}); // Close connection
-	}
-
-	/**
-	 * TODO: Find a better way to create the controllers. This seems to be
-	 * gross.
-	 * 
-	 * Creating all the controllers need for the displays.
-	 */
-	private void initControllers() {
-		new MainMenuController();
-		new AngelMenuController();
-		new AngelInfoController();
-		new AddController(dbController);
-		new AngelSelectionController(dbController);
-		new StatusSelectController(dbController);
-		new HoldController(dbController);
-		new ExportController(dbController);
-		new RequestController(dbController);
-		new SearchDisplayController(dbController);
 	}
 
 	/**

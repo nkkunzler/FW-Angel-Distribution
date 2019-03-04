@@ -18,6 +18,7 @@ import customFX.Popup;
 import database.DBCollection;
 import database.DatabaseController;
 import displays.AngelDisplays;
+import displays.Display;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
@@ -59,8 +60,6 @@ public class AddController extends Controller {
 	 *                   added to.
 	 */
 	public AddController(DatabaseController controller) {
-		super(AngelDisplays.ADD_DISPLAY); // Controller associated with scene
-
 		dbController = controller;
 	}
 
@@ -76,9 +75,9 @@ public class AddController extends Controller {
 	@FXML
 	public void validateAngelID(KeyEvent e)
 			throws InterruptedException, ExecutionException {
-
+		
 		if (e.getCode() == KeyCode.TAB) { // Indicates movement to next field
-			String angelID = idInput.getText().toUpperCase();
+			String angelID = idInput.getText().toUpperCase(); 
 
 			if (angelID.equals("")) { // Can't have an empty angel id
 				new Popup(AlertType.ERROR, "Invalid ID",
@@ -87,12 +86,14 @@ public class AddController extends Controller {
 				return;
 			}
 
+			// If the input angel ID starts with a number
 			if (!(angelID.charAt(0) + "").matches(".*[0-9]+.*")) {
 				new Popup(AlertType.ERROR, "Invalid ID",
 						"ID must start with a number");
 				idInput.requestFocus();
 				return;
 			}
+
 			// Checking to see that a character was included, else an A is added
 			if (!angelID.matches(".*[a-zA-Z]+.*")) {
 				idInput.setText(angelID + "A");
@@ -100,9 +101,7 @@ public class AddController extends Controller {
 			}
 
 			// Checking to see if the angel id already exist in the database
-			boolean contains = dbController.contains(angelID, DBCollection.ANGELS);
-
-			if (contains) {
+			if (dbController.contains(angelID, DBCollection.ANGELS)) {
 				new Popup(AlertType.ERROR, "Invalid ID",
 						"Angel ID '" + angelID + "' already exists");
 				idInput.clear();
@@ -124,18 +123,17 @@ public class AddController extends Controller {
 	@FXML
 	public void validateGender(KeyEvent e) {
 		if (e.getCode() == KeyCode.TAB) {
-			String input = genderInput.getText();
+			String input = genderInput.getText().toLowerCase();
 
-			if (input.equalsIgnoreCase("b")) { // Auto fill is input is 'B'
+			if (input.equals("b")) { // If input equals 'B'
 				genderInput.setText("boy");
 				input = "boy";
-			} else if (input.equalsIgnoreCase("g")) { // Auto fill input 'G'
+			} else if (input.equals("g")) { // Auto fill input 'G'
 				genderInput.setText("girl");
 				input = "girl";
 			}
 
-			if (!input.equalsIgnoreCase("boy")
-					&& !input.equalsIgnoreCase("girl")) {
+			if (!(input.equals("boy") || input.equals("girl"))) {
 				new Popup(AlertType.ERROR, "Invalid Gender",
 						"Enter 'boy' or 'girl'");
 				genderInput.clear();
@@ -156,7 +154,7 @@ public class AddController extends Controller {
 	@FXML
 	public void validateAge(KeyEvent e) {
 		if (e.getCode() == KeyCode.TAB) {
-			int age = -1;
+			int age;
 
 			try {
 				age = Integer.valueOf(ageInput.getText());
@@ -260,6 +258,7 @@ public class AddController extends Controller {
 			if (clothesInput.getText().equals("")) {
 				clothesInput.setText("none");
 			} else {
+				// Converting a letter size to general size, m = 10/12
 				String size = convertClothesSizeToDimensions(
 						genderInput.getText(),
 						clothesInput.getText());
@@ -285,6 +284,7 @@ public class AddController extends Controller {
 			if (shirtInput.getText().equals("")) {
 				shirtInput.setText(clothesInput.getText());
 			} else {
+				// Converting a letter size to general size, m = 10/12
 				String size = convertClothesSizeToDimensions(
 						genderInput.getText(),
 						shirtInput.getText());
@@ -310,6 +310,7 @@ public class AddController extends Controller {
 			if (pantsInput.getText().equals("")) {
 				pantsInput.setText(clothesInput.getText());
 			} else {
+				// Converting a letter size to general size, m = 10/12
 				String size = convertClothesSizeToDimensions(
 						genderInput.getText(),
 						pantsInput.getText());
@@ -362,9 +363,8 @@ public class AddController extends Controller {
 	 */
 	@FXML
 	public void validateWish(KeyEvent e) {
-		if (wishInput.getText().length() >= MAX_WISH_CHARS) {
+		if (wishInput.getText().length() >= MAX_WISH_CHARS)
 			wishInput.deletePreviousChar();
-		}
 
 		if (e.getCode() == KeyCode.TAB) {
 			if (wishInput.getText().equals(""))
@@ -387,9 +387,8 @@ public class AddController extends Controller {
 	 */
 	@FXML
 	public void validateBook(KeyEvent e) {
-		if (bookInput.getText().length() > MAX_BOOK_CHARS) {
+		if (bookInput.getText().length() > MAX_BOOK_CHARS)
 			bookInput.deletePreviousChar();
-		}
 
 		if (e.getCode() == KeyCode.TAB) {
 			if (bookInput.getText().equals(""))
@@ -412,9 +411,8 @@ public class AddController extends Controller {
 	 */
 	@FXML
 	public void validateSpecial(KeyEvent e) {
-		if (specialInput.getText().length() > MAX_SPECIAL_CHARS) {
+		if (specialInput.getText().length() > MAX_SPECIAL_CHARS)
 			specialInput.deletePreviousChar();
-		}
 
 		if (e.getCode() == KeyCode.TAB) {
 			if (specialInput.getText().equals(""))
@@ -423,14 +421,6 @@ public class AddController extends Controller {
 			addAngelButton.setDisable(false);
 			addAngelButton.requestFocus();
 		}
-	}
-
-	/**
-	 * Goes back to the scene that resulted in this scene to be displayed
-	 */
-	@FXML
-	public void toMainMenu() {
-		super.previousDisplay();
 	}
 
 	/**
@@ -457,7 +447,7 @@ public class AddController extends Controller {
 		// The basic angel attributes
 		agl.addAttribute(Attribute.ID, idInput.getText().toUpperCase());
 		agl.addAttribute(Attribute.GENDER,
-				genderInput.getText().toLowerCase());
+				genderInput.getText().toUpperCase());
 		agl.addAttribute(Attribute.AGE, Integer.valueOf(ageInput.getText()));
 		agl.addAttribute(Attribute.SHOE_SIZE, shoeInput.getText());
 		agl.addAttribute(Attribute.CLOTHES_SIZE, clothesInput.getText());
@@ -477,18 +467,16 @@ public class AddController extends Controller {
 		// Default values when the angels are first created
 		agl.addAttribute(Attribute.STATUS, Status.NOT_STARTED.toString());
 		agl.addAttribute(Attribute.MISSING, new String[0]);
-		agl.addAttribute(Attribute.LOCATION, "Family Resource");
-
-		// If the angel was added reset the inputs and indicate success
-		boolean success = dbController.insertAngel(agl, DBCollection.ANGELS);
-
-		if (success) {
+		agl.addAttribute(Attribute.LOCATION, "on_site");
+		
+		// Check to see if the angel insertion is successful
+		if (dbController.insertAngel(agl, DBCollection.ANGELS)) {
 			new Popup(AlertType.CONFIRMATION, "Successfully Added",
 					"Angel '" + idInput.getText() + "' was added successfully");
-			resetInputs();
 		} else {
 			new Popup(AlertType.WARNING, "Error", "Angel could not be added");
 		}
+		resetInputs();
 	}
 
 	/**
@@ -507,4 +495,13 @@ public class AddController extends Controller {
 		((TextInputControl) inputsContainer.getChildren().get(0)).clear();
 		addAngelButton.setDisable(true);
 	}
+	
+	/**
+	 * Goes back to the scene that resulted in this scene to be displayed
+	 */
+	@FXML
+	public void toMainMenu() {
+		super.switchScenePreserve(AngelDisplays.ANGEL_MAIN_MENU);
+	}
+
 }

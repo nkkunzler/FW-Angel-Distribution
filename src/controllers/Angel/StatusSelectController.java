@@ -51,8 +51,6 @@ public class StatusSelectController extends Controller {
 	 *                   an angel will eventually be added to.
 	 */
 	public StatusSelectController(DatabaseController dbController) {
-		super(AngelDisplays.ANGEL_STATUS);
-
 		this.dbController = dbController;
 	}
 
@@ -84,7 +82,7 @@ public class StatusSelectController extends Controller {
 
 			// If the user does not want to alter the status, go back
 			if (popup.getSelection() == ButtonType.NO)
-				super.previousDisplay();
+				super.switchScene(AngelDisplays.ANGEL_SELECTION);
 		}
 
 		// All items must be off hold before being able to set as complete
@@ -143,7 +141,7 @@ public class StatusSelectController extends Controller {
 			if (!clothesCB.isSelected())
 				todos += " DECREASE CLOTHES INVENTORY BY 1\n";
 			new Popup("The angel status has been updated.\n" + todos);
-			super.previousDisplay();
+			super.switchScene(AngelDisplays.ANGEL_SELECTION);
 		});
 	}
 
@@ -157,8 +155,8 @@ public class StatusSelectController extends Controller {
 	 */
 	public void holdHandler() {
 		super.switchScene(AngelDisplays.HOLD_DISPLAY);
-		HoldController controller = (HoldController) super.getController(
-				AngelDisplays.HOLD_DISPLAY);
+		HoldController controller = (HoldController) AngelDisplays.HOLD_DISPLAY
+				.getController();
 		controller.addAngel(angel);
 	}
 
@@ -182,7 +180,7 @@ public class StatusSelectController extends Controller {
 					DBCollection.ANGELS);
 
 			new Popup("The angel status has been altered to:\n'PULL'");
-			super.previousDisplay();
+			super.switchScene(AngelDisplays.ANGEL_SELECTION);
 		}
 	}
 
@@ -204,7 +202,7 @@ public class StatusSelectController extends Controller {
 
 		new Popup("The angel status has been altered to 'Filling'",
 				ButtonType.OK);
-		super.previousDisplay();
+		super.switchScene(AngelDisplays.ANGEL_SELECTION);
 	}
 
 	@FXML
@@ -214,8 +212,8 @@ public class StatusSelectController extends Controller {
 	 */
 	public void infoHandler() {
 		super.switchScenePreserve(AngelDisplays.ANGEL_INFO_DISPLAY);
-		AngelInfoController controller = (AngelInfoController) super.getController(
-				AngelDisplays.ANGEL_INFO_DISPLAY);
+		AngelInfoController controller = (AngelInfoController) AngelDisplays.ANGEL_INFO_DISPLAY
+				.getController();
 		controller.addAngel(angel);
 	}
 
@@ -250,7 +248,7 @@ public class StatusSelectController extends Controller {
 				dbController.update(angel.get(Attribute.ID).toString(),
 						Attribute.LOCATION, requestee, DBCollection.ANGELS);
 				new Popup("Angel has been updated succesfully", ButtonType.OK);
-				super.previousDisplay();
+				super.switchScene(AngelDisplays.ANGEL_SELECTION);
 			}
 		});
 
@@ -261,6 +259,6 @@ public class StatusSelectController extends Controller {
 	 * Handler to switch the display to the display that called this one.
 	 */
 	public void toPreviousDisplay() {
-		super.previousDisplay();
+		super.switchScene(AngelDisplays.ANGEL_SELECTION);
 	}
 }

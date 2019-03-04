@@ -57,8 +57,6 @@ public class AngelSelectionController extends Controller {
 	 *                   added to.
 	 */
 	public AngelSelectionController(DatabaseController dbController) {
-		super(AngelDisplays.ANGEL_SELECTION);
-
 		this.dbController = dbController;
 	}
 
@@ -76,19 +74,8 @@ public class AngelSelectionController extends Controller {
 	 *           assigned in the EditStatus.fxml file.
 	 */
 	public void updateIDLabelActionEvent(ActionEvent ae) {
-		Button button = (Button) (ae.getSource());
-		String btnText = button.getText();
-
-		if (button == clearButton) { // The clear button
-			idLabel.clear();
-			pane.setCenter(generateAngelIDButtons(null));
-			return; // Do not need to query the database when clearing
-		} else if (button == backButton) {
-			if (!idLabel.getText().equals("")) // Don't delete if id is empty
-				idLabel.setText(idLabel.getText().substring(0,
-						idLabel.getText().length() - 1));
-		} else
-			idLabel.setText(idLabel.getText() + btnText);
+		Button selectedBtn = (Button) (ae.getSource());
+		idLabel.setText(idLabel.getText() + selectedBtn.getText());
 
 		// Puts buttons, representing angels, with the same id as input value
 		pane.setCenter(generateAngelIDButtons(idLabel.getText()));
@@ -116,6 +103,27 @@ public class AngelSelectionController extends Controller {
 	}
 
 	/**
+	 * Clears the idLabel TextField, which displays the angel being searched.
+	 */
+	public void clearButtonHandler() {
+		idLabel.clear();
+		pane.setCenter(null);
+	}
+
+	/**
+	 * Removes the last decimal character from the search ID value.
+	 */
+	public void backButtonHandler() {
+		if (!idLabel.getText().isEmpty()) {
+			idLabel.setText(
+					idLabel.getText().substring(0,
+							idLabel.getText().length() - 1));
+			// Create new buttons based off new value
+			pane.setCenter(generateAngelIDButtons(idLabel.getText()));
+		}
+	}
+
+	/**
 	 * When the user puts in an angle id number, this method is responsible for
 	 * querying the database and finding all angels with the given id.
 	 * 
@@ -127,29 +135,15 @@ public class AngelSelectionController extends Controller {
 	 */
 	private GridPane generateAngelIDButtons(String angelID) {
 		// Searching for the angel id in database
-		final String query = "FOR doc IN angels "
+		String query = "FOR doc IN angels "
 				+ "FILTER LIKE(doc." + Attribute.ID
 				+ ", " + "'" + angelID + "_')" // Find id similar to input
 				+ " SORT doc." + Attribute.ID // Sort the ID, a -> z
 				+ " RETURN doc";
+		List<Angel> result = dbController.query(query);
 
 		// Creating the buttons corresponding to input id value. Done on
 		// Separate thread to prevent UI locking
-		return createResultGrid(dbController.query(query));
-	}
-
-	/**
-	 * Creates the buttons for the angels that match the input for the angel id.
-	 * The buttons are colored corresponding to the gender of the angel, blue
-	 * for boy and pink for girl. The buttons when selected change the display
-	 * to allow for a selection of changing the status of the angel to complete,
-	 * on hold, or pull.
-	 * 
-	 * @param result A list, containing zero or more Angels, that are used to
-	 *               generate buttons with text corresponding to the Angel ID.
-	 */
-	private GridPane createResultGrid(List<Angel> result) {
-		// Creating GridPane used to display the found angels
 		GridPane grid = new GridPane();
 		grid.setAlignment(Pos.CENTER);
 		grid.setHgap(10);
@@ -169,8 +163,8 @@ public class AngelSelectionController extends Controller {
 			StatusButton btn = new StatusButton(angel);
 			btn.setOnAction(e -> {
 				super.switchScene(AngelDisplays.ANGEL_STATUS);
-				StatusSelectController ssc = (StatusSelectController) super.getController(
-						AngelDisplays.ANGEL_STATUS);
+				StatusSelectController ssc = (StatusSelectController) AngelDisplays.ANGEL_STATUS
+						.getController();
 				ssc.setAngel(angel);
 			});
 			grid.add(btn, i % 3, i / 3); // GridPane is 3x3.
