@@ -46,14 +46,10 @@ public class SearchDisplayController extends Controller {
 	private Label resultsLabel;
 
 	private DatabaseController dbController;
-	private DBCollection collection;
 
-	public SearchDisplayController(DatabaseController dbController,
-			DBCollection collection) {
-		super(AngelDisplays.SEARCH_DISPLAY);
+	public SearchDisplayController(DatabaseController dbController) {
 
 		this.dbController = dbController;
-		this.collection = collection;
 	}
 
 	/**
@@ -87,10 +83,9 @@ public class SearchDisplayController extends Controller {
 	}
 
 	/**
-	 * Creates a new HBox to allow for a new search criteria field to be
-	 * created. The field contains an +, for adding a new field, - for removing
-	 * a field, ComboBox for selecting an attribute, and TextField for entering
-	 * keyword.
+	 * Creates a new HBox to allow for a new search criteria field to be created.
+	 * The field contains an +, for adding a new field, - for removing a field,
+	 * ComboBox for selecting an attribute, and TextField for entering keyword.
 	 * 
 	 * @return HBox contain the Nodes for a new search field
 	 */
@@ -133,8 +128,8 @@ public class SearchDisplayController extends Controller {
 	}
 
 	/*
-	 * When the user presses the 'Search' button at the top of the display then
-	 * this method is called.
+	 * When the user presses the 'Search' button at the top of the display then this
+	 * method is called.
 	 */
 	@FXML
 	public void search() {
@@ -149,7 +144,7 @@ public class SearchDisplayController extends Controller {
 
 		// Results of the query
 		List<Angel> results = dbController.querySorted(query);
-		
+
 		resultsLabel.setText("RESULTS - " + results.size() + " FOUND");
 
 		// Display a unique message when there are no results
@@ -166,9 +161,9 @@ public class SearchDisplayController extends Controller {
 			StatusButton btn = new StatusButton(angel, 32, 8);
 			// Go to HoldDisplay.fxml display when pressed
 			btn.setOnAction(e -> {
-				super.switchScene(AngelDisplays.HOLD_DISPLAY);
-				HoldController controller = (HoldController) super.getController(
-						AngelDisplays.HOLD_DISPLAY);
+				super.switchScenePreserve(AngelDisplays.ANGEL_INFO_DISPLAY);
+				AngelInfoController controller = (AngelInfoController) AngelDisplays.ANGEL_INFO_DISPLAY
+						.getController();
 				controller.addAngel(angel);
 			});
 
@@ -184,7 +179,7 @@ public class SearchDisplayController extends Controller {
 	 */
 	@SuppressWarnings("unchecked")
 	private String createSearchQuery() {
-		String query = "FOR doc IN " + collection;
+		String query = "FOR doc IN " + DBCollection.ANGELS;
 
 		boolean containsFilter = false; // If no filters null is returned
 		HBox keywordHBox;
@@ -206,10 +201,9 @@ public class SearchDisplayController extends Controller {
 			containsFilter = true;
 
 			// Only exact match on the ID search
-			if (keywordCB.getValue().equals("ID")
-					&& exactMatchCheckBox.isSelected()) {
-				query += " FILTER LIKE(LOWER(doc." + keywordCB.getValue()
-						+ "), LOWER('" + keywordTF.getText() + "_'))\n";
+			if (keywordCB.getValue().equals("ID") && exactMatchCheckBox.isSelected()) {
+				query += " FILTER LIKE(LOWER(doc." + keywordCB.getValue() + "), LOWER('"
+						+ keywordTF.getText() + "_'))\n";
 			} else {
 				query += " FILTER CONTAINS(LOWER(doc." + keywordCB.getValue()
 						+ "), LOWER('" + keywordTF.getText() + "'))\n";
@@ -227,8 +221,8 @@ public class SearchDisplayController extends Controller {
 	 * When the user presses the 'Back' button on the bottom of the display this
 	 * method is called.
 	 */
-	public Display previousDisplay() {
-		return super.previousDisplay();
+	public void previousDisplay() {
+		super.switchScene(AngelDisplays.ANGEL_MAIN_MENU);
 	}
 
 }

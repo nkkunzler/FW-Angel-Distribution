@@ -44,29 +44,21 @@ public class HoldController extends Controller {
 	@FXML
 	private Label angelIDLabel;
 	@FXML
-	private VBox selectionArea;
-	@FXML
-	private VBox selectedItemsVBox;
+	private VBox selectionArea, selectedItemsVBox;
 	@FXML
 	private Button cancelButton;
 
 	private Angel angel;
 	private DatabaseController dbController;
-	private DBCollection collection;
 
 	/**
 	 * Constructor for the controller used to put an angel on hold.
 	 * 
 	 * @param controller The database controller used to connect to the
 	 *                   database.
-	 * @param collection The collection in which an angel will eventually be
-	 *                   added to.
 	 */
-	public HoldController(DatabaseController dbController, DBCollection collection) {
-		super(AngelDisplays.HOLD_DISPLAY);
-
+	public HoldController(DatabaseController dbController) {
 		this.dbController = dbController;
-		this.collection = collection;
 	}
 
 	/**
@@ -240,25 +232,26 @@ public class HoldController extends Controller {
 
 			if (popup.getSelection() == ButtonType.YES) {
 				dbController.update((String) angel.get(Attribute.ID),
-						Attribute.STATUS, Status.FILLING, collection);
+						Attribute.STATUS, Status.FILLING, DBCollection.ANGELS);
 			}
 		} else { // Missing items indicate that item needs to go on hold
 			dbController.update(
 					(String) angel.get(Attribute.ID),
-					Attribute.STATUS, Status.HOLD, collection);
+					Attribute.STATUS, Status.HOLD, DBCollection.ANGELS);
 		}
 
 		// Changing the missing items in the database to newly selected items
 		dbController.query(
 				"UPDATE {_key: '" + angel.get(Attribute.ID) + "'} WITH {'"
 						+ Attribute.MISSING + "':" + missingItems + "} "
-						+ "IN " + collection);
-		
+						+ "IN " + DBCollection.ANGELS);
+
 		// Updating status to be 'on site', meaning main location
 		dbController.update(angel.get(Attribute.ID).toString(),
-				Attribute.LOCATION.toString(), "on_site", collection);
+				Attribute.LOCATION.toString(), "on_site", DBCollection.ANGELS);
 
-		List<Angel> updateAngel = dbController.query("FOR doc IN " + collection
+		List<Angel> updateAngel = dbController.query("FOR doc IN "
+				+ DBCollection.ANGELS
 				+ " FILTER doc.ID == '"
 				+ angel.get(Attribute.ID).toString() + "' LIMIT 1 RETURN doc");
 		angel = updateAngel.get(0);
@@ -303,10 +296,9 @@ public class HoldController extends Controller {
 	 */
 	@FXML
 	public void cancelButtonHandler() {
-		if (super.previousDisplay() == AngelDisplays.ANGEL_STATUS) {
-			StatusSelectController controller = (StatusSelectController) super.getController(
-					AngelDisplays.ANGEL_STATUS);
-			controller.setAngel(angel);
-		}
+		super.switchScene(AngelDisplays.ANGEL_STATUS);
+		StatusSelectController controller = (StatusSelectController) AngelDisplays.ANGEL_STATUS
+				.getController();
+		controller.setAngel(angel);
 	}
 }

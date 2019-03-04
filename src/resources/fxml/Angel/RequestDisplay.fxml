@@ -56,9 +56,9 @@
                <font>
                   <Font size="22.0" />
                </font></Button>
-            <ScrollPane fx:id="scrollPane" hbarPolicy="NEVER" maxWidth="-Infinity" minWidth="-Infinity">
+            <ScrollPane fx:id="scrollPane" hbarPolicy="NEVER" maxWidth="-Infinity" minWidth="-Infinity" visible="false">
                <VBox.margin>
-                  <Insets />
+                  <Insets top="10.0" />
                </VBox.margin>
                <content>
                   <GridPane fx:id="resultGrid" alignment="CENTER" hgap="30.0" vgap="30.0">

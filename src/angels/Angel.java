@@ -20,7 +20,7 @@ public class Angel implements Comparable<Angel> {
 	 * BaseDocument
 	 * 
 	 * @param baseDocument Document containing direct information from the
-	 *                     database a specific angel
+	 *                     database related to a specific angel
 	 * 
 	 */
 	public Angel(BaseDocument baseDocument) {
@@ -28,9 +28,10 @@ public class Angel implements Comparable<Angel> {
 	}
 
 	/**
-	 * Adds a new attribute and its value to the map of attributes.
+	 * Adds a new attribute and its value to the attributes associated with
+	 * the angel.
 	 * 
-	 * @param attribute The attribute being assigned a value
+	 * @param attribute The attribute being added
 	 * @param value     The value assigned to the attribute.
 	 */
 	public void addAttribute(Attribute attribute, Object value) {
@@ -41,9 +42,7 @@ public class Angel implements Comparable<Angel> {
 	}
 
 	/**
-	 * Returns a mapping of all the angels attributes. If an certain attribute
-	 * does not exists for the angel, null will be returned when trying to
-	 * access the attribute.
+	 * Returns a mapping of all the angels attributes.
 	 * 
 	 * @return A BaseDocument containing the angels attributes and their values
 	 */
@@ -83,7 +82,7 @@ public class Angel implements Comparable<Angel> {
 		else if (thisID.length() < oID.length())
 			return -1;
 
-		// Lengths equal so check 
+		// Lengths equal so check
 		int i = -1;
 		while (i++ < thisID.length()) {
 			if (thisID.charAt(i) > oID.charAt(i))
